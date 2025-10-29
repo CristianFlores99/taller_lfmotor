@@ -74,6 +74,9 @@
         <label>Marca:</label>
         <input type="text" id="marca" />
 
+        <label>Categoría:</label>
+        <select id="categoria"></select>
+
         <label>Medida:</label>
         <input type="text" id="medida" />
 
@@ -81,22 +84,24 @@
         <input type="text" id="ubicacion" />
 
         <label>Stock actual:</label>
-        <input type="number" id="stock_actual" value="0" />
+        <input type="number" id="stock_actual" value="0" min="0" />
 
         <label>Stock mínimo:</label>
-        <input type="number" id="stock_minimo" value="1" />
+        <input type="number" id="stock_minimo" value="1" min="0" />
 
         <label>Precio venta:</label>
-        <input type="number" id="precio_venta" step="0.01" value="0" />
+        <input type="number" id="precio_venta" step="0.01" value="0" min="0" />
 
-        <button type="submit" id="guardarRepuesto">💾 Guardar</button>
+        <div class="form-actions">
+          <button type="submit" id="guardarRepuesto">💾 Guardar</button>
+          <button type="button" id="eliminarRepuesto" class="btn-eliminar">🗑️ Eliminar</button>
+        </div>
       </form>
     </div>
   </div>
 
   <script type="module" src="js/ver_repuesto.js"></script>
   <script>
-    // Botón "Volver" a index.html
     document.getElementById("btnVolver").addEventListener("click", () => {
       window.location.href = "index.html";
     });

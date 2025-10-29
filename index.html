@@ -1,39 +1,49 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Sistema de Gestión de Repuestos</title>
-  <link rel="stylesheet" href="css/index.css" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard Gestión de Repuestos</title>
+  <link rel="stylesheet" href="css/index.css">
 </head>
 <body>
-  <div class="app-container">
+  <div class="container">
     <header>
-      <h1>🧰 Sistema de Repuestos</h1>
+      <h1>⚙️ Panel de Gestión de Repuestos</h1>
+      <p>Selecciona una sección para administrar tu emprendimiento</p>
     </header>
 
-    <main>
-      <div class="menu">
-        <a href="ver_repuesto.html" class="card">
-          <h2>📦 Ver Repuestos</h2>
-          <p>Consulta el stock disponible, agrega o edita repuestos.</p>
-        </a>
+    <main class="grid">
+      <div class="card">
+        <h2>📦 Repuestos</h2>
+        <p>Ver y gestionar stock de repuestos</p>
+        <button onclick="location.href='ver_repuesto.html'">Ir a Repuestos</button>
+      </div>
 
-        <a href="#" class="card disabled">
-          <h2>💰 Registrar Venta</h2>
-          <p>Próximamente: registra ventas y salidas de stock.</p>
-        </a>
+      <div class="card">
+        <h2>💰 Ventas</h2>
+        <p>Registrar y consultar ventas realizadas</p>
+        <button onclick="location.href='ventas.html'">Ir a Ventas</button>
+      </div>
 
-        <a href="#" class="card disabled">
-          <h2>📊 Reportes</h2>
-          <p>Estadísticas y control de movimientos de inventario.</p>
-        </a>
+      <div class="card">
+        <h2>🗂 Categorías</h2>
+        <p>Gestionar tipos de repuestos</p>
+        <button onclick="location.href='categorias.html'">Ir a Categorías</button>
+      </div>
+
+      <div class="card">
+        <h2>🏢 Proveedores</h2>
+        <p>Ver y registrar proveedores</p>
+        <button onclick="location.href='proveedores.html'">Ir a Proveedores</button>
+      </div>
+
+      <div class="card">
+        <h2>📈 Movimientos</h2>
+        <p>Controlar entradas y salidas de stock</p>
+        <button onclick="location.href='movimientos.html'">Ir a Movimientos</button>
       </div>
     </main>
-
-    <footer>
-      <p>© 2025 Sistema de Gestión de Repuestos</p>
-    </footer>
   </div>
 </body>
 </html>

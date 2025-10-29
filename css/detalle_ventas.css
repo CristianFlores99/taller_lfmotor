@@ -1,0 +1,106 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+  background: #0f172a;
+  color: #fff;
+  padding: 20px;
+}
+
+.container {
+  max-width: 800px;
+  margin: auto;
+}
+
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+h1 {
+  font-size: 24px;
+}
+
+.info-venta {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.info-venta label {
+  grid-column: span 2;
+}
+
+.info-venta input,
+.info-venta textarea {
+  width: 100%;
+  padding: 8px;
+  border: none;
+  border-radius: 6px;
+  background: #1e293b;
+  color: #fff;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background: #1e293b;
+  border-radius: 10px;
+  overflow: hidden;
+  margin-bottom: 10px;
+}
+
+th,
+td {
+  padding: 10px 12px;
+  text-align: left;
+}
+
+th {
+  background: #334155;
+}
+
+tr:nth-child(even) {
+  background: #273449;
+}
+
+.acciones {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 10px;
+}
+
+button {
+  background: #2563eb;
+  border: none;
+  color: white;
+  padding: 8px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+button:hover {
+  background: #1d4ed8;
+}
+
+.btn-volver {
+  background: #3b82f6;
+}
+
+.btn-guardar {
+  background: #10b981;
+}
+
+#totalVenta {
+  text-align: right;
+  font-size: 18px;
+  font-weight: 600;
+  margin-top: 10px;
+}

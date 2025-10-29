@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gestión de Proveedores</title>
+  <link rel="stylesheet" href="css/proveedores.css">
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>🏭 Proveedores de Repuestos</h1>
+      <div class="acciones">
+        <button id="btnNuevoProveedor">➕ Nuevo Proveedor</button>
+        <button id="btnVolver" class="btn-volver">⬅ Volver</button>
+      </div>
+    </header>
+
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Nombre</th>
+          <th>Teléfono</th>
+          <th>Email</th>
+          <th>Dirección</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody id="cuerpoProveedores"></tbody>
+    </table>
+  </div>
+
+  <!-- Modal Proveedor -->
+  <div id="modalProveedor" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 id="tituloProveedor">Nuevo Proveedor</h2>
+        <button class="btn-cerrar" id="cerrarModalProveedor">X</button>
+      </div>
+      <form id="formProveedor">
+        <input type="hidden" id="idProveedor" />
+        <label>Nombre:</label>
+        <input type="text" id="nombreProveedor" required />
+        <label>Teléfono:</label>
+        <input type="text" id="telefonoProveedor" />
+        <label>Email:</label>
+        <input type="email" id="emailProveedor" />
+        <label>Dirección:</label>
+        <input type="text" id="direccionProveedor" />
+        <button type="submit" id="guardarProveedor">💾 Guardar Proveedor</button>
+      </form>
+    </div>
+  </div>
+
+  <script type="module" src="js/proveedores.js"></script>
+  <script>
+    document.getElementById("btnVolver").addEventListener("click", () => {
+      window.location.href = "index.html";
+    });
+  </script>
+</body>
+</html>

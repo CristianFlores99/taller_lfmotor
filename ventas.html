@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gestión de Ventas</title>
+  <link rel="stylesheet" href="css/ventas.css">
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>💰 Ventas Realizadas</h1>
+      <div class="acciones">
+        <input type="text" id="busqueda" placeholder="Buscar cliente o responsable...">
+        <button id="btnNuevaVenta">➕ Nueva Venta</button>
+        <button id="btnVolver" class="btn-volver">⬅ Volver</button>
+      </div>
+    </header>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Fecha</th>
+          <th>Cliente</th>
+          <th>Medio Pago</th>
+          <th>Total</th>
+          <th>Responsable</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody id="tablaVentas"></tbody>
+    </table>
+  </div>
+
+  <script type="module" src="js/ventas.js"></script>
+</body>
+</html>
