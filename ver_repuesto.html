@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Gestión de Repuestos</title>
+  <link rel="stylesheet" href="css/ver_repuesto.css" />
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>📦 Repuestos en Stock</h1>
+      <div class="acciones">
+        <input type="text" id="busqueda" placeholder="Buscar repuesto..." />
+        <button id="btnAgregar">➕ Nuevo Repuesto</button>
+      </div>
+    </header>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Código</th>
+          <th>Descripción</th>
+          <th>Marca</th>
+          <th>Categoría</th>
+          <th>Medida</th>
+          <th>Stock</th>
+          <th>Ubicación</th>
+          <th>Precio Venta</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody id="cuerpoTabla"></tbody>
+    </table>
+  </div>
+
+  <!-- Modal Movimientos -->
+  <div id="modalMovimientos" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 id="tituloRepuesto">Movimientos de stock</h2>
+        <button class="btn-cerrar" id="cerrarModal">X</button>
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th>Fecha</th>
+            <th>Tipo</th>
+            <th>Cantidad</th>
+            <th>Motivo</th>
+          </tr>
+        </thead>
+        <tbody id="cuerpoMovimientos"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Modal Formulario -->
+  <div id="modalForm" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 id="tituloForm">Agregar Repuesto</h2>
+        <button class="btn-cerrar" id="cerrarForm">X</button>
+      </div>
+      <form id="formRepuesto">
+        <input type="hidden" id="idRepuesto" />
+        <label>Código:</label>
+        <input type="text" id="codigo" required />
+
+        <label>Descripción:</label>
+        <input type="text" id="descripcion" required />
+
+        <label>Marca:</label>
+        <input type="text" id="marca" />
+
+        <label>Medida:</label>
+        <input type="text" id="medida" />
+
+        <label>Ubicación:</label>
+        <input type="text" id="ubicacion" />
+
+        <label>Stock actual:</label>
+        <input type="number" id="stock_actual" value="0" />
+
+        <label>Stock mínimo:</label>
+        <input type="number" id="stock_minimo" value="1" />
+
+        <label>Precio venta:</label>
+        <input type="number" id="precio_venta" step="0.01" value="0" />
+
+        <button type="submit" id="guardarRepuesto">💾 Guardar</button>
+      </form>
+    </div>
+  </div>
+
+  <script type="module" src="js/ver_repuesto.js"></script>
+</body>
+</html>
