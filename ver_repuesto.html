@@ -13,6 +13,7 @@
       <div class="acciones">
         <input type="text" id="busqueda" placeholder="Buscar repuesto..." />
         <button id="btnAgregar">➕ Nuevo Repuesto</button>
+        <button id="btnVolver" class="btn-volver">⬅ Volver</button>
       </div>
     </header>
 
@@ -94,5 +95,11 @@
   </div>
 
   <script type="module" src="js/ver_repuesto.js"></script>
+  <script>
+    // Botón "Volver" a index.html
+    document.getElementById("btnVolver").addEventListener("click", () => {
+      window.location.href = "index.html";
+    });
+  </script>
 </body>
 </html>
