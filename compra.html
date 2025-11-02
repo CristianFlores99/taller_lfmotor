@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gestión de Compras</title>
+  <link rel="stylesheet" href="css/compra.css">
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>🛒 Compras</h1>
+      <div class="acciones">
+        <button id="btnNuevaCompra">➕ Nueva Compra</button>
+        <button id="btnVolver" class="btn-volver">⬅ Volver</button>
+      </div>
+    </header>
+
+    <table>
+      <thead>
+        <tr>
+          <th>ID Compra</th>
+          <th>Proveedor</th>
+          <th>Fecha</th>
+          <th>Total</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody id="cuerpoCompras"></tbody>
+    </table>
+  </div>
+
+  <!-- Modal Compra -->
+  <div id="modalCompra" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Nueva Compra</h2>
+        <button id="cerrarModal" class="btn-cerrar">X</button>
+      </div>
+      <form id="formCompra">
+        <label>Proveedor:</label>
+        <select id="proveedor"></select>
+
+        <label>Productos:</label>
+        <div class="producto-agregar">
+          <select id="selectProducto"></select>
+          <input type="number" id="cantidadProducto" value="1" min="1">
+          <button type="button" id="btnAgregarProducto">Agregar</button>
+        </div>
+
+        <div id="productosCompra"></div>
+
+        <label>Total:</label>
+        <input type="text" id="totalCompra" value="0" disabled>
+
+        <div class="form-actions">
+          <button type="submit">💾 Guardar Compra</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script type="module" src="js/compra.js"></script>
+  <script>
+    document.getElementById("btnVolver").addEventListener("click", () => window.location.href="index.html");
+  </script>
+</body>
+</html>

@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Detalle Compra</title>
+<link rel="stylesheet" href="css/detalle_compra.css">
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>📦 Detalle Compra</h1>
+      <button id="btnVolver" class="btn-volver">⬅ Volver</button>
+    </header>
+
+    <table>
+      <thead>
+        <tr>
+          <th>ID Repuesto</th>
+          <th>Cantidad</th>
+          <th>Precio Unitario</th>
+          <th>Subtotal</th>
+        </tr>
+      </thead>
+      <tbody id="cuerpoDetalle"></tbody>
+    </table>
+  </div>
+
+  <script type="module" src="js/detalle_compra.js"></script>
+  <script>
+    document.getElementById("btnVolver").addEventListener("click", () => window.history.back());
+  </script>
+</body>
+</html>

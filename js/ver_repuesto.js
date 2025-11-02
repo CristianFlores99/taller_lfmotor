@@ -20,6 +20,9 @@ const cerrarModal = document.getElementById("cerrarModal");
 const cuerpoMovimientos = document.getElementById("cuerpoMovimientos");
 const tituloRepuesto = document.getElementById("tituloRepuesto");
 
+const filtroCategoria = document.getElementById("filtroCategoria");
+const indicadorStock = document.getElementById("indicadorStock");
+
 let editId = null;
 
 // ---------- Eventos ----------
@@ -29,6 +32,7 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 inputBusqueda.addEventListener("input", cargarRepuestos);
+filtroCategoria.addEventListener("change", cargarRepuestos);
 btnAgregar.addEventListener("click", abrirFormulario);
 cerrarForm.addEventListener("click", () => modalForm.style.display = "none");
 cerrarModal.addEventListener("click", () => modalMov.style.display = "none");
@@ -40,54 +44,74 @@ window.addEventListener("click", e => {
 
 // ---------- Funciones ----------
 
-// Cargar Categorías
+// --- Cargar Categorías con el filtro principal
 async function cargarCategorias() {
-    const { data, error } = await supabase.from("categorias").select("*");
-    if (error) return console.error(error);
-    categoriaSelect.innerHTML = data.map(c => `<option value="${c.id_categoria}">${c.nombre}</option>`).join("");
+  const { data, error } = await supabase.from("categorias").select("*").order("nombre", { ascending: true });
+  if (error) return console.error(error);
+
+  filtroCategoria.innerHTML = `<option value="">Todas las categorías</option>` +
+    data.map(c => `<option value="${c.id_categoria}">${c.nombre}</option>`).join("");
+
+  categoriaSelect.innerHTML = data.map(c => `<option value="${c.id_categoria}">${c.nombre}</option>`).join("");
 }
 
-// Cargar Repuestos
+// --- Cargar Repuestos con filtro de categoría + texto
 async function cargarRepuestos() {
-    const filtro = inputBusqueda.value.trim();
-    let query = supabase
-        .from("repuestos")
-        .select("*, categorias(nombre)")
-        .order("codigo", { ascending: true });
+  const filtro = inputBusqueda.value.trim();
+  const cat = filtroCategoria.value;
 
-    if (filtro) query = query.or(`codigo.ilike.%${filtro}%, descripcion.ilike.%${filtro}%, marca.ilike.%${filtro}%`);
+  let query = supabase
+    .from("repuestos")
+    .select("*, categorias(nombre)")
+    .order("codigo", { ascending: true });
 
-    const { data, error } = await query;
-    if (error) return console.error(error);
+  if (filtro) query = query.or(`codigo.ilike.%${filtro}%, descripcion.ilike.%${filtro}%, marca.ilike.%${filtro}%`);
+  if (cat) query = query.eq("id_categoria", cat);
 
-    cuerpoTabla.innerHTML = "";
-    data.forEach(rep => {
-        const claseStock = rep.stock_actual <= rep.stock_minimo ? "stock-bajo" : "stock-ok";
-        const tr = document.createElement("tr");
-        tr.innerHTML = `
-            <td>${rep.codigo}</td>
-            <td>${rep.descripcion}</td>
-            <td>${rep.marca || "-"}</td>
-            <td>${rep.categorias?.nombre || "-"}</td>
-            <td>${rep.medida || "-"}</td>
-            <td class="${claseStock}">${rep.stock_actual}</td>
-            <td>${rep.ubicacion || "-"}</td>
-            <td>$${rep.precio_venta?.toFixed(2) || "0.00"}</td>
-            <td>
-                <button class="btn-editar" data-id="${rep.id_repuesto}">✏️</button>
-                <button class="btn-mov" data-id="${rep.id_repuesto}" data-desc="${rep.descripcion}">📦</button>
-            </td>
-        `;
-        cuerpoTabla.appendChild(tr);
-    });
+  const { data, error } = await query;
+  if (error) return console.error(error);
 
-    document.querySelectorAll(".btn-editar").forEach(btn =>
-        btn.addEventListener("click", e => editarRepuesto(e.target.dataset.id))
-    );
+  cuerpoTabla.innerHTML = "";
+  if (!data.length) {
+    cuerpoTabla.innerHTML = "<tr><td colspan='9'>No se encontraron repuestos</td></tr>";
+    indicadorStock.textContent = "Sin datos";
+    return;
+  }
 
-    document.querySelectorAll(".btn-mov").forEach(btn =>
-        btn.addEventListener("click", e => verMovimientos(e.target.dataset.id, e.target.dataset.desc))
-    );
+  // 🔹 Calcular resumen de stock
+  const bajo = data.filter(r => r.stock_actual <= r.stock_minimo).length;
+  const normal = data.length - bajo;
+  indicadorStock.innerHTML = `
+    <span style="color:#f87171">⚠️ ${bajo} con stock bajo</span> |
+    <span style="color:#86efac">🔋 ${normal} en stock normal</span>
+  `;
+
+  data.forEach(rep => {
+    const claseStock = rep.stock_actual <= rep.stock_minimo ? "stock-bajo" : "stock-ok";
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td>${rep.codigo}</td>
+      <td>${rep.descripcion}</td>
+      <td>${rep.marca || "-"}</td>
+      <td>${rep.categorias?.nombre || "-"}</td>
+      <td>${rep.medida || "-"}</td>
+      <td class="${claseStock}">${rep.stock_actual}</td>
+      <td>${rep.ubicacion || "-"}</td>
+      <td>$${rep.precio_venta?.toFixed(2) || "0.00"}</td>
+      <td>
+        <button class="btn-editar" data-id="${rep.id_repuesto}">✏️</button>
+        <button class="btn-mov" data-id="${rep.id_repuesto}" data-desc="${rep.descripcion}">📦</button>
+      </td>
+    `;
+    cuerpoTabla.appendChild(tr);
+  });
+
+  document.querySelectorAll(".btn-editar").forEach(btn =>
+    btn.addEventListener("click", e => editarRepuesto(e.target.dataset.id))
+  );
+  document.querySelectorAll(".btn-mov").forEach(btn =>
+    btn.addEventListener("click", e => verMovimientos(e.target.dataset.id, e.target.dataset.desc))
+  );
 }
 
 // Abrir Formulario

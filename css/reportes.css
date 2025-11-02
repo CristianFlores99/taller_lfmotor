@@ -1,0 +1,18 @@
+* { margin:0; padding:0; box-sizing:border-box; font-family:'Segoe UI', sans-serif; }
+body { background:#0f172a; color:#fff; padding:20px; }
+.container { max-width:1200px; margin:auto; }
+header { text-align:center; margin-bottom:30px; }
+header h1 { font-size:28px; }
+
+.reportes { display:grid; gap:30px; grid-template-columns:repeat(auto-fit,minmax(300px,1fr)); }
+.reporte-card { background:#1e293b; padding:20px; border-radius:10px; box-shadow:0 4px 8px rgba(0,0,0,0.5); }
+.reporte-card h2 { margin-bottom:15px; }
+
+table { width:100%; border-collapse:collapse; margin-top:10px; }
+th, td { padding:8px; text-align:left; border-bottom:1px solid #334155; }
+th { background:#334155; }
+
+.export-buttons { margin-top:20px; display:flex; gap:10px; justify-content:center; }
+button { background:#2563eb; border:none; color:white; padding:10px 16px; border-radius:6px; cursor:pointer; font-weight:600; transition:0.3s; }
+button:hover { background:#1d4ed8; }
+canvas { background:#1e293b; border-radius:6px; }

@@ -1,0 +1,9 @@
+* { margin:0; padding:0; box-sizing:border-box; font-family:'Segoe UI',sans-serif; }
+body { background:#0f172a; color:#fff; padding:20px; }
+.container { max-width:900px; margin:auto; }
+header { display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; }
+button { background:#2563eb; border:none; color:#fff; padding:6px 12px; border-radius:6px; cursor:pointer; }
+table { width:100%; border-collapse:collapse; background:#1e293b; border-radius:10px; overflow:hidden; }
+th,td { padding:10px 12px; text-align:left; }
+th { background:#334155; font-weight:600; }
+tr:nth-child(even) { background:#273449; }

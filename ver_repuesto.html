@@ -11,11 +11,17 @@
     <header>
       <h1>📦 Repuestos en Stock</h1>
       <div class="acciones">
+        <select id="filtroCategoria">
+          <option value="">Todas las categorías</option>
+        </select>
         <input type="text" id="busqueda" placeholder="Buscar repuesto..." />
         <button id="btnAgregar">➕ Nuevo Repuesto</button>
         <button id="btnVolver" class="btn-volver">⬅ Volver</button>
       </div>
     </header>
+
+    <!-- 🔹 Contador de stock -->
+    <div id="indicadorStock" class="indicador-stock">Cargando datos...</div>
 
     <table>
       <thead>

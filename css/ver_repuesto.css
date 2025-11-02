@@ -91,14 +91,44 @@ tr:nth-child(even) {
   background: #273449;
 }
 
+/* 🔹 Fondo más notorio para stock bajo */
 .stock-bajo {
-  color: #f87171;
+  color: #fff;
+  background-color: #dc2626;
+  border-radius: 4px;
+  padding: 2px 6px;
+}
+
+/* 🔹 Indicador de stock */
+.indicador-stock {
+  margin-bottom: 12px;
+  padding: 8px 12px;
+  background: #1e293b;
+  border-radius: 8px;
   font-weight: 600;
+  text-align: center;
 }
 
 .stock-ok {
   color: #86efac;
+  background-color: rgba(134, 239, 172, 0.15);
 }
+
+/* --- Select de filtro --- */
+#filtroCategoria {
+  padding: 8px 12px;
+  border-radius: 6px;
+  border: none;
+  outline: none;
+  background-color: #1e293b;
+  color: white;
+  cursor: pointer;
+}
+
+#filtroCategoria:hover {
+  background-color: #334155;
+}
+
 
 /* ---------------- Modal ---------------- */
 .modal {

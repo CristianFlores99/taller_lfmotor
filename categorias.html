@@ -1,26 +1,35 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Gestión de Categorías</title>
-  <link rel="stylesheet" href="css/categorias.css">
+  <link rel="stylesheet" href="css/categorias.css" />
 </head>
 <body>
   <div class="container">
     <header>
-      <h1>🗂 Categorías de Repuestos</h1>
-      <div class="acciones">
-        <button id="btnNuevaCategoria">➕ Nueva Categoría</button>
-        <button id="btnVolver" class="btn-volver">⬅ Volver</button>
-      </div>
-    </header>
+  <h1>🗂 Categorías de Repuestos</h1>
+  <div class="acciones">
+    <input type="text" id="buscador" placeholder="🔎 Buscar categoría..." />
+
+    <select id="ordenarPor">
+      <option value="id_categoria">Ordenar por ID</option>
+      <option value="nombre">Ordenar por Nombre</option>
+    </select>
+
+    <button id="btnNuevaCategoria">➕ Nueva Categoría</button>
+    <button id="btnVolver" class="btn-volver">⬅ Volver</button>
+  </div>
+</header>
+    <p id="contadorCategorias" class="contador">Mostrando 0 de 0 categorías</p>
 
     <table>
       <thead>
         <tr>
           <th>ID</th>
-          <th>Nombre de Categoría</th>
+          <th>Nombre</th>
+          <th>Descripción</th>
           <th>Acciones</th>
         </tr>
       </thead>
@@ -33,12 +42,16 @@
     <div class="modal-content">
       <div class="modal-header">
         <h2 id="tituloCategoria">Nueva Categoría</h2>
-        <button class="btn-cerrar" id="cerrarModalCategoria">X</button>
+        <button class="btn-cerrar" id="cerrarModalCategoria">✖</button>
       </div>
       <form id="formCategoria">
         <input type="hidden" id="idCategoria" />
         <label>Nombre:</label>
         <input type="text" id="nombreCategoria" required />
+
+        <label>Descripción:</label>
+        <textarea id="descripcionCategoria" rows="3"></textarea>
+
         <button type="submit" id="guardarCategoria">💾 Guardar Categoría</button>
       </form>
     </div>
