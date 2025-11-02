@@ -2,11 +2,11 @@
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
 }
 
 body {
-  background: #0f172a;
+  background: #0f172a; /* Azul oscuro principal */
   color: #fff;
   padding: 20px;
 }
@@ -14,6 +14,10 @@ body {
 .container {
   max-width: 1000px;
   margin: auto;
+  background: #1e293b; /* Fondo de tarjeta */
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
 }
 
 header {
@@ -21,69 +25,114 @@ header {
   justify-content: space-between;
   align-items: center;
   margin-bottom: 20px;
-  flex-wrap: wrap;
 }
 
-header h1 {
-  font-size: 24px;
+h1 {
+  font-size: 26px;
+  color: #93c5fd; /* Azul suave */
+}
+
+.btn-volver {
+  background: #3b82f6; /* Azul brillante */
+  border: none;
+  color: white;
+  padding: 8px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.btn-volver:hover {
+  background: #2563eb;
 }
 
 .acciones {
   display: flex;
+  justify-content: flex-end;
+  margin-bottom: 15px;
   gap: 10px;
-  align-items: center;
 }
 
-input {
-  padding: 8px 12px;
-  border: none;
-  border-radius: 6px;
-  outline: none;
-  width: 250px;
-}
-
-button {
+.acciones button {
   background: #2563eb;
   border: none;
   color: white;
-  padding: 8px 12px;
+  padding: 8px 14px;
   border-radius: 6px;
   cursor: pointer;
+  transition: 0.2s ease;
 }
 
-button:hover {
+.acciones button:hover {
   background: #1d4ed8;
 }
 
-.btn-volver {
-  background: #3b82f6;
+.btn-agregar {
+  background: #10b981; /* Verde éxito */
+}
+
+.btn-agregar:hover {
+  background: #059669;
 }
 
 table {
   width: 100%;
   border-collapse: collapse;
-  background: #1e293b;
-  border-radius: 10px;
+  border-radius: 8px;
   overflow: hidden;
+  background: #1e293b;
+  color: #e2e8f0;
 }
 
-th, td {
-  padding: 10px 12px;
+th,
+td {
+  padding: 12px;
   text-align: left;
 }
 
 th {
   background: #334155;
+  font-weight: 600;
+  color: #cbd5e1;
 }
 
 tr:nth-child(even) {
   background: #273449;
 }
 
-td button {
-  background: #10b981;
+tr:hover {
+  background: #334155;
 }
 
-td button:hover {
-  background: #059669;
+.btn-ver {
+  background: #3b82f6;
+  color: white;
+  border: none;
+  padding: 6px 10px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.btn-ver:hover {
+  background: #2563eb;
+}
+
+.btn-eliminar {
+  background: #ef4444;
+  color: white;
+  border: none;
+  padding: 6px 10px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.btn-eliminar:hover {
+  background: #dc2626;
+}
+
+footer {
+  text-align: right;
+  color: #94a3b8;
+  margin-top: 15px;
+  font-size: 14px;
 }

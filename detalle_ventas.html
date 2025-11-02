@@ -1,55 +1,53 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Detalle de Venta</title>
-  <link rel="stylesheet" href="css/detalle_ventas.css">
+  <link rel="stylesheet" href="css/detalle_ventas.css" />
 </head>
 <body>
   <div class="container">
     <header>
-      <h1>🧾 Detalle de Venta</h1>
-      <button id="btnVolver" class="btn-volver">⬅ Volver</button>
+      <h1>Detalle de Venta</h1>
+      <div class="acciones">
+        <button id="btnVolver" class="btn-volver">⬅ Volver</button>
+        <button id="btnAgregarProducto">➕ Agregar Producto</button>
+        <button id="btnGuardarVenta" class="btn-guardar">💾 Guardar Venta</button>
+      </div>
     </header>
 
     <div class="info-venta">
-      <label>Cliente:</label>
-      <input type="text" id="cliente" placeholder="Nombre del cliente">
+      <label>Cliente</label>
+      <input type="text" id="cliente" />
 
-      <label>Medio de Pago:</label>
-      <input type="text" id="medio_pago" placeholder="Efectivo, tarjeta...">
+      <label>Medio de Pago</label>
+      <input type="text" id="medio_pago" />
 
-      <label>Responsable:</label>
-      <input type="text" id="responsable" placeholder="Empleado responsable">
+      <label>Responsable</label>
+      <input type="text" id="responsable" />
 
-      <label>Observaciones:</label>
-      <textarea id="observaciones" rows="2"></textarea>
+      <label>Observaciones</label>
+      <textarea id="observaciones"></textarea>
     </div>
 
-    <h2>🛒 Productos</h2>
+    <h2>Productos</h2>
     <table>
-  <thead>
-    <tr>
-      <th>Repuesto</th>
-      <th>Cantidad</th>
-      <th>Precio Unitario</th>
-      <th>Subtotal</th>
-      <th>Acciones</th> <!-- ✅ Agregar esta columna -->
-    </tr>
-  </thead>
-  <tbody id="tablaProductos"></tbody>
-</table>
+      <thead>
+        <tr>
+          <th>Descripción</th>
+          <th>Cantidad</th>
+          <th>Precio Unitario</th>
+          <th>Subtotal</th>
+        </tr>
+      </thead>
+      <tbody id="tablaProductos"></tbody>
+    </table>
 
-
-    <div class="acciones">
-      <button id="btnAgregarProducto">➕ Agregar Producto</button>
-      <button id="btnGuardarVenta" class="btn-guardar">💾 Guardar Venta</button>
-    </div>
-
-    <p id="totalVenta">Total: $0.00</p>
+    <p id="totalVenta">Total: $0</p>
   </div>
 
+  <!-- Importante: el script va al final -->
   <script type="module" src="js/detalle_ventas.js"></script>
 </body>
 </html>

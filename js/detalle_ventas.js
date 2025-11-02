@@ -36,11 +36,11 @@ if (idVentaActual) {
   btnGuardarVenta.style.display = "none";
 }
 
-// --- Función para agregar producto (solo si es nueva venta) ---
+// --- Agregar producto ---
 async function agregarProducto() {
   const { data: repuestos, error } = await supabase
     .from("repuestos")
-    .select("id_repuesto, descripcion, precio_venta");
+    .select("id_repuesto, descripcion, precio_venta, stock_actual");
 
   if (error) {
     alert("Error obteniendo repuestos: " + error.message);
@@ -49,7 +49,7 @@ async function agregarProducto() {
 
   const id_repuesto = prompt(
     "Ingrese el ID del repuesto o deje vacío para cancelar:\n" +
-      repuestos.map((r) => `${r.id_repuesto} - ${r.descripcion}`).join("\n")
+      repuestos.map((r) => `${r.id_repuesto} - ${r.descripcion} (Stock: ${r.stock_actual})`).join("\n")
   );
   if (!id_repuesto) return;
 
@@ -57,6 +57,12 @@ async function agregarProducto() {
   if (!rep) return alert("ID no encontrado.");
 
   const cantidad = parseInt(prompt("Cantidad vendida:", "1")) || 1;
+
+  if (cantidad > rep.stock_actual) {
+    alert(`⚠️ No hay suficiente stock. Disponible: ${rep.stock_actual}`);
+    return;
+  }
+
   const precio = parseFloat(rep.precio_venta) || 0;
   const subtotal = cantidad * precio;
 
@@ -91,52 +97,90 @@ function renderTabla() {
   totalVenta.textContent = `Total: $${total.toFixed(2)}`;
 }
 
-// --- Guardar venta + detalles ---
+// --- Guardar venta ---
 async function guardarVenta() {
-  if (productos.length === 0) return alert("Debe agregar al menos un producto.");
-  if (!cliente.value.trim()) return alert("Debe ingresar un cliente.");
+  const clienteVal = cliente.value.trim();
+  const medioVal = medio_pago.value.trim();
+  const respVal = responsable.value.trim();
+  const obsVal = observaciones.value.trim();
 
-  const total = productos.reduce((sum, p) => sum + p.subtotal, 0);
-
-  // 1️⃣ Insertar venta
-  const { data: venta, error: errVenta } = await supabase
-    .from("ventas")
-    .insert([
-      {
-        fecha: new Date().toISOString().split("T")[0],
-        cliente: cliente.value.trim(),
-        medio_pago: medio_pago.value.trim(),
-        responsable: responsable.value.trim(),
-        observaciones: observaciones.value.trim(),
-        total,
-      },
-    ])
-    .select();
-
-  if (errVenta) {
-    alert("Error guardando venta: " + errVenta.message);
+  if (!clienteVal || productos.length === 0) {
+    alert("⚠️ Debes ingresar un cliente y al menos un producto.");
     return;
   }
 
-  const idVenta = venta[0].id_venta;
+  const total = productos.reduce((acc, p) => acc + p.subtotal, 0);
 
-  // 2️⃣ Insertar detalles
+  // Insertar venta
+  const { data: venta, error: ventaError } = await supabase
+    .from("ventas")
+    .insert([
+      {
+        fecha: new Date(),
+        cliente: clienteVal,
+        medio_pago: medioVal,
+        responsable: respVal,
+        observaciones: obsVal,
+        total,
+      },
+    ])
+    .select()
+    .single();
+
+  if (ventaError) {
+    alert("❌ Error al guardar venta: " + ventaError.message);
+    return;
+  }
+
+  // Insertar detalles
   const detalles = productos.map((p) => ({
-    id_venta: idVenta,
+    id_venta: venta.id_venta,
     id_repuesto: p.id_repuesto,
     cantidad: p.cantidad,
     precio_unitario: p.precio_unitario,
     subtotal: p.subtotal,
   }));
 
-  const { error: errDetalle } = await supabase.from("detalle_venta").insert(detalles);
+  const { error: detalleError } = await supabase
+    .from("detalle_venta")
+    .insert(detalles);
 
-  if (errDetalle) {
-    alert("Error guardando detalle: " + errDetalle.message);
+  if (detalleError) {
+    alert("❌ Error al guardar detalles: " + detalleError.message);
     return;
   }
 
-  alert("✅ Venta guardada correctamente.");
+  // 🔹 Descontar stock y registrar movimientos
+  for (const p of detalles) {
+    // Actualizar stock en repuestos
+    const { data: repuesto, error: stockError } = await supabase
+      .from("repuestos")
+      .select("stock_actual")
+      .eq("id_repuesto", p.id_repuesto)
+      .single();
+
+    if (!stockError && repuesto) {
+      const nuevoStock = (repuesto.stock_actual || 0) - p.cantidad;
+      await supabase
+        .from("repuestos")
+        .update({ stock_actual: nuevoStock })
+        .eq("id_repuesto", p.id_repuesto);
+    }
+
+    // Registrar movimiento
+    await supabase.from("movimientos_stock").insert([
+      {
+        id_repuesto: p.id_repuesto,
+        tipo: "salida",
+        cantidad: p.cantidad,
+        motivo: `Venta #${venta.id_venta} - ${clienteVal}`,
+        responsable: respVal || "Sistema",
+        fecha: new Date().toISOString(),
+      },
+    ]);
+  }
+
+  alert("✅ Venta registrada y stock actualizado correctamente.");
   window.location.href = "ventas.html";
 }
 
@@ -159,7 +203,9 @@ async function cargarVenta(idVenta) {
   observaciones.value = venta.observaciones;
 
   // Bloquear edición
-  [cliente, medio_pago, responsable, observaciones].forEach((el) => (el.disabled = true));
+  [cliente, medio_pago, responsable, observaciones].forEach(
+    (el) => (el.disabled = true)
+  );
 
   const { data: detalles, error: errDetalle } = await supabase
     .from("detalle_venta")

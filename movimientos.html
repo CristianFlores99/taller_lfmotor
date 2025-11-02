@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>📊 Movimientos de Stock</title>
+  <link rel="stylesheet" href="css/movimientos.css">
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>📊 Movimientos de Stock</h1>
+      <div class="acciones-header">
+        <input type="text" id="buscarRepuesto" placeholder="Buscar por repuesto..." />
+        <input type="date" id="fechaDesde" />
+        <input type="date" id="fechaHasta" />
+        <button id="btnFiltrar">🔍 Filtrar</button>
+        <button id="btnNuevo">➕ Nuevo Movimiento</button>
+        <button id="btnVolver">⬅ Volver</button>
+      </div>
+    </header>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Fecha</th>
+          <th>Repuesto</th>
+          <th>Tipo</th>
+          <th>Cantidad</th>
+          <th>Motivo</th>
+          <th>Responsable</th>
+        </tr>
+      </thead>
+      <tbody id="cuerpoTabla"></tbody>
+    </table>
+  </div>
+
+  <!-- Modal Nuevo Movimiento -->
+  <div id="modalMovimiento" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Registrar Movimiento</h2>
+        <button class="btn-cerrar" id="cerrarModal">X</button>
+      </div>
+      <form id="formMovimiento">
+        <label>Repuesto:</label>
+        <input type="number" id="id_repuesto" placeholder="ID o código del repuesto" required />
+
+        <label>Tipo:</label>
+        <select id="tipo" required>
+          <option value="entrada">Entrada</option>
+          <option value="salida">Salida</option>
+        </select>
+
+        <label>Cantidad:</label>
+        <input type="number" id="cantidad" required />
+
+        <label>Motivo:</label>
+        <input type="text" id="motivo" placeholder="Compra, venta, ajuste..." />
+
+        <label>Responsable:</label>
+        <input type="text" id="responsable" placeholder="Nombre del responsable" />
+
+        <button type="submit">💾 Guardar Movimiento</button>
+      </form>
+    </div>
+  </div>
+
+  <script type="module" src="js/movimientos.js"></script>
+</body>
+</html>
