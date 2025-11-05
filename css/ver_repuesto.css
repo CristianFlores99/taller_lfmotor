@@ -187,3 +187,15 @@ form input, form select {
   margin-top: 10px;
   justify-content: flex-end;
 }
+#filtroMarca {
+  padding: 8px 12px;
+  border-radius: 6px;
+  border: none;
+  outline: none;
+  background-color: #1e293b;
+  color: white;
+  cursor: pointer;
+}
+#filtroMarca:hover {
+  background-color: #334155;
+}

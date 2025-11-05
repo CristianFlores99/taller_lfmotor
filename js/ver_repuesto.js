@@ -28,6 +28,7 @@ let editId = null;
 // ---------- Eventos ----------
 document.addEventListener("DOMContentLoaded", () => {
     cargarCategorias();
+    cargarMarcas(); // 🆕 nuevo
     cargarRepuestos();
 });
 
@@ -59,6 +60,7 @@ async function cargarCategorias() {
 async function cargarRepuestos() {
   const filtro = inputBusqueda.value.trim();
   const cat = filtroCategoria.value;
+  const marcaSel = document.getElementById("filtroMarca").value; // 🆕 nuevo
 
   let query = supabase
     .from("repuestos")
@@ -67,6 +69,7 @@ async function cargarRepuestos() {
 
   if (filtro) query = query.or(`codigo.ilike.%${filtro}%, descripcion.ilike.%${filtro}%, marca.ilike.%${filtro}%`);
   if (cat) query = query.eq("id_categoria", cat);
+  if (marcaSel) query = query.eq("marca", marcaSel); // 🆕 nuevo
 
   const { data, error } = await query;
   if (error) return console.error(error);
@@ -246,3 +249,23 @@ export async function actualizarStock(id_repuesto, cantidad) {
         .eq('id_repuesto', id_repuesto);
     cargarRepuestos(); // refresca tabla
 }
+
+// --- Cargar Marcas (únicas desde repuestos)
+async function cargarMarcas() {
+  const { data, error } = await supabase
+    .from("repuestos")
+    .select("marca")
+    .not("marca", "is", null);
+
+  if (error) return console.error(error);
+
+  // Obtener valores únicos
+  const marcasUnicas = [...new Set(data.map(r => r.marca.trim()).filter(m => m))].sort();
+
+  const filtroMarca = document.getElementById("filtroMarca");
+  filtroMarca.innerHTML = `<option value="">Todas las marcas</option>` +
+    marcasUnicas.map(m => `<option value="${m}">${m}</option>`).join("");
+
+  filtroMarca.addEventListener("change", cargarRepuestos);
+}
+
