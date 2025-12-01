@@ -25,7 +25,7 @@ ordenarPor.addEventListener("change", actualizarVista);
 
 async function cargarCategorias() {
   const { data, error } = await supabase
-    .from("categorias")
+    .from("subrubro")
     .select("*");
 
   if (error) {
@@ -58,7 +58,7 @@ function ordenarCategorias(lista) {
     if (criterio === "nombre") {
       return a.nombre.localeCompare(b.nombre);
     } else {
-      return a.id_categoria - b.id_categoria;
+      return a.id_subrubro - b.id_subrubro;
     }
   });
 }
@@ -68,12 +68,12 @@ function renderizarTabla(lista) {
   lista.forEach((cat) => {
     const tr = document.createElement("tr");
     tr.innerHTML = `
-      <td>${cat.id_categoria}</td>
+      <td>${cat.id_subrubro}</td>
       <td>${cat.nombre}</td>
       <td>${cat.descripcion || ""}</td>
       <td>
-        <button class="btn-editar" data-id="${cat.id_categoria}">✏️</button>
-        <button class="btn-eliminar" data-id="${cat.id_categoria}">🗑️</button>
+        <button class="btn-editar" data-id="${cat.id_subrubro}">✏️</button>
+        <button class="btn-eliminar" data-id="${cat.id_subrubro}">🗑️</button>
       </td>
     `;
     cuerpoCategorias.appendChild(tr);
@@ -101,9 +101,9 @@ function abrirFormulario() {
 
 async function editarCategoria(id) {
   const { data, error } = await supabase
-    .from("categorias")
+    .from("subrubro")
     .select("*")
-    .eq("id_categoria", id)
+    .eq("id_subrubro", id)
     .single();
   if (error) {
     console.error(error);
@@ -126,11 +126,11 @@ formCategoria.addEventListener("submit", async (e) => {
   let result;
   if (id) {
     result = await supabase
-      .from("categorias")
+      .from("subrubro")
       .update({ nombre, descripcion })
-      .eq("id_categoria", id);
+      .eq("id_subrubro", id);
   } else {
-    result = await supabase.from("categorias").insert([{ nombre, descripcion }]);
+    result = await supabase.from("subrubro").insert([{ nombre, descripcion }]);
   }
 
   if (result.error) {
@@ -145,7 +145,7 @@ formCategoria.addEventListener("submit", async (e) => {
 async function eliminarCategoria(id) {
   if (!confirm("⚠️ ¿Seguro que deseas eliminar esta categoría?")) return;
 
-  const { error } = await supabase.from("categorias").delete().eq("id_categoria", id);
+  const { error } = await supabase.from("subrubro").delete().eq("id_subrubro", id);
 
   if (error) {
     alert("❌ Error eliminando categoría: " + error.message);
