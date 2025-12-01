@@ -47,13 +47,13 @@ window.addEventListener("click", e => {
 
 // --- Cargar Categorías con el filtro principal
 async function cargarCategorias() {
-  const { data, error } = await supabase.from("categorias").select("*").order("nombre", { ascending: true });
+  const { data, error } = await supabase.from("subrubro").select("*").order("nombre", { ascending: true });
   if (error) return console.error(error);
 
   filtroCategoria.innerHTML = `<option value="">Todas las categorías</option>` +
     data.map(c => `<option value="${c.id_categoria}">${c.nombre}</option>`).join("");
 
-  categoriaSelect.innerHTML = data.map(c => `<option value="${c.id_categoria}">${c.nombre}</option>`).join("");
+  categoriaSelect.innerHTML = data.map(c => `<option value="${c.id_subrubro}">${c.nombre}</option>`).join("");
 }
 
 // --- Cargar Repuestos con filtro de categoría + texto
@@ -64,11 +64,11 @@ async function cargarRepuestos() {
 
   let query = supabase
     .from("repuestos")
-    .select("*, categorias(nombre)")
+    .select("*, subrubro(nombre)")
     .order("codigo", { ascending: true });
 
   if (filtro) query = query.or(`codigo.ilike.%${filtro}%, descripcion.ilike.%${filtro}%, marca.ilike.%${filtro}%`);
-  if (cat) query = query.eq("id_categoria", cat);
+  if (cat) query = query.eq("id_subrubro", cat);
   if (marcaSel) query = query.eq("marca", marcaSel); // 🆕 nuevo
 
   const { data, error } = await query;
@@ -168,7 +168,7 @@ formRepuesto.addEventListener("submit", async (e) => {
         stock_actual: parseInt(stock_actual.value) || 0,
         stock_minimo: parseInt(stock_minimo.value) || 1,
         precio_venta: parseFloat(precio_venta.value) || 0,
-        id_categoria: parseInt(categoria.value)
+        id_subrubro: parseInt(categoria.value)
     };
 
     let result;
