@@ -3,56 +3,55 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Gestión de Categorías</title>
+  <title>Gestión de Subrubros</title>
   <link rel="stylesheet" href="css/categorias.css" />
 </head>
 <body>
   <div class="container">
     <header>
-  <h1>🗂 Categorías de Repuestos</h1>
-  <div class="acciones">
-    <input type="text" id="buscador" placeholder="🔎 Buscar categoría..." />
+      <h1>🗂 Subrubros</h1>
+      <div class="acciones">
+        <input type="text" id="buscador" placeholder="🔎 Buscar subrubro..." />
 
-    <select id="ordenarPor">
-      <option value="id_categoria">Ordenar por ID</option>
-      <option value="nombre">Ordenar por Nombre</option>
-    </select>
+        <select id="ordenarPor">
+          <option value="id_subrubro">Ordenar por ID</option>
+          <option value="nombre">Ordenar por Nombre</option>
+        </select>
 
-    <button id="btnNuevaCategoria">➕ Nueva Categoría</button>
-    <button id="btnVolver" class="btn-volver">⬅ Volver</button>
-  </div>
-</header>
-    <p id="contadorCategorias" class="contador">Mostrando 0 de 0 categorías</p>
+        <button id="btnNuevo">➕ Nuevo Subrubro</button>
+        <button id="btnVolver" class="btn-volver">⬅ Volver</button>
+      </div>
+    </header>
+
+    <p id="contador" class="contador">Mostrando 0 de 0 subrubros</p>
 
     <table>
       <thead>
         <tr>
           <th>ID</th>
           <th>Nombre</th>
-          <th>Descripción</th>
           <th>Acciones</th>
         </tr>
       </thead>
-      <tbody id="cuerpoCategorias"></tbody>
+      <tbody id="tabla"></tbody>
     </table>
   </div>
 
-  <!-- Modal Categoría -->
-  <div id="modalCategoria" class="modal">
+  <!-- Modal -->
+  <div id="modal" class="modal">
     <div class="modal-content">
       <div class="modal-header">
-        <h2 id="tituloCategoria">Nueva Categoría</h2>
-        <button class="btn-cerrar" id="cerrarModalCategoria">✖</button>
+        <h2 id="tituloModal">Nuevo Subrubro</h2>
+        <button class="btn-cerrar" id="cerrarModal">✖</button>
       </div>
-      <form id="formCategoria">
-        <input type="hidden" id="idCategoria" />
+
+      <form id="form">
+        <input type="hidden" id="id" />
+
         <label>Nombre:</label>
-        <input type="text" id="nombreCategoria" required />
+        <input type="text" id="nombre" required />
 
-        <label>Descripción:</label>
-        <textarea id="descripcionCategoria" rows="3"></textarea>
-
-        <button type="submit" id="guardarCategoria">💾 Guardar Categoría</button>
+        <button type="submit" id="btnGuardar">💾 Guardar</button>
       </form>
     </div>
   </div>

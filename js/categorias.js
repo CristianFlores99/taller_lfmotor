@@ -3,155 +3,162 @@ import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js
 const supabaseUrl = "https://ovfsffckhzelgbgohakv.supabase.co";
 const supabaseKey =
   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im92ZnNmZmNraHplbGdiZ29oYWt2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjA2NTA0MjYsImV4cCI6MjA3NjIyNjQyNn0.hDiIhAHAr04Uo9todWdk0QUaqD3RYj5kMkITavzPiHc";
+
 const supabase = createClient(supabaseUrl, supabaseKey);
 
-const cuerpoCategorias = document.getElementById("cuerpoCategorias");
-const btnNuevaCategoria = document.getElementById("btnNuevaCategoria");
-const modalCategoria = document.getElementById("modalCategoria");
-const cerrarModalCategoria = document.getElementById("cerrarModalCategoria");
-const formCategoria = document.getElementById("formCategoria");
+// Elementos del DOM
+const tabla = document.getElementById("tabla");
+const btnNuevo = document.getElementById("btnNuevo");
+const modal = document.getElementById("modal");
+const cerrarModal = document.getElementById("cerrarModal");
+const form = document.getElementById("form");
 const buscador = document.getElementById("buscador");
 const ordenarPor = document.getElementById("ordenarPor");
 
-let categorias = [];
+let listaSubrubros = [];
 
-document.addEventListener("DOMContentLoaded", cargarCategorias);
-btnNuevaCategoria.addEventListener("click", abrirFormulario);
-cerrarModalCategoria.addEventListener("click", () => (modalCategoria.style.display = "none"));
-window.addEventListener("click", (e) => { if (e.target === modalCategoria) modalCategoria.style.display = "none"; });
+// Inicializar
+document.addEventListener("DOMContentLoaded", cargarSubrubros);
+btnNuevo.addEventListener("click", abrirNuevo);
+cerrarModal.addEventListener("click", () => (modal.style.display = "none"));
+window.addEventListener("click", (e) => { if (e.target === modal) modal.style.display = "none"; });
 
 buscador.addEventListener("input", actualizarVista);
 ordenarPor.addEventListener("change", actualizarVista);
 
-async function cargarCategorias() {
-  const { data, error } = await supabase
-    .from("subrubro")
-    .select("*");
+// -------------------------
+// Cargar subrubros
+// -------------------------
+async function cargarSubrubros() {
+  const { data, error } = await supabase.from("subrubro").select("*");
 
   if (error) {
-    console.error(error);
+    console.error("Error cargando:", error);
     return;
   }
 
-  categorias = data;
+  listaSubrubros = data;
   actualizarVista();
 }
 
+// -------------------------
+// FILTRO + ORDEN
+// -------------------------
 function actualizarVista() {
-  let lista = filtrarCategorias();
-  lista = ordenarCategorias(lista);
-  renderizarTabla(lista);
+  let lista = filtrar();
+  lista = ordenar(lista);
+  renderizar(lista);
 }
 
-function filtrarCategorias() {
+function filtrar() {
   const texto = buscador.value.toLowerCase();
-  return categorias.filter(
-    (c) =>
-      c.nombre.toLowerCase().includes(texto) ||
-      (c.descripcion && c.descripcion.toLowerCase().includes(texto))
+  return listaSubrubros.filter((s) => s.nombre.toLowerCase().includes(texto));
+}
+
+function ordenar(lista) {
+  const tipo = ordenarPor.value;
+  return lista.sort((a, b) =>
+    tipo === "nombre" ? a.nombre.localeCompare(b.nombre) : a.id_subrubro - b.id_subrubro
   );
 }
 
-function ordenarCategorias(lista) {
-  const criterio = ordenarPor.value;
-  return lista.sort((a, b) => {
-    if (criterio === "nombre") {
-      return a.nombre.localeCompare(b.nombre);
-    } else {
-      return a.id_subrubro - b.id_subrubro;
-    }
-  });
-}
+// -------------------------
+// RENDER
+// -------------------------
+function renderizar(lista) {
+  tabla.innerHTML = "";
 
-function renderizarTabla(lista) {
-  cuerpoCategorias.innerHTML = "";
-  lista.forEach((cat) => {
+  lista.forEach((s) => {
     const tr = document.createElement("tr");
+
     tr.innerHTML = `
-      <td>${cat.id_subrubro}</td>
-      <td>${cat.nombre}</td>
-      <td>${cat.descripcion || ""}</td>
+      <td>${s.id_subrubro}</td>
+      <td>${s.nombre}</td>
       <td>
-        <button class="btn-editar" data-id="${cat.id_subrubro}">✏️</button>
-        <button class="btn-eliminar" data-id="${cat.id_subrubro}">🗑️</button>
+        <button class="btn-editar" data-id="${s.id_subrubro}">✏️</button>
+        <button class="btn-eliminar" data-id="${s.id_subrubro}">🗑️</button>
       </td>
     `;
-    cuerpoCategorias.appendChild(tr);
+
+    tabla.appendChild(tr);
   });
 
-  // 🔢 Mostrar contador
-  const contador = document.getElementById("contadorCategorias");
-  contador.textContent = `Mostrando ${lista.length} de ${categorias.length} categorías`;
+  document.getElementById("contador").textContent =
+    `Mostrando ${lista.length} de ${listaSubrubros.length} subrubros`;
 
   document.querySelectorAll(".btn-editar").forEach((btn) =>
-    btn.addEventListener("click", (e) => editarCategoria(e.target.dataset.id))
+    btn.addEventListener("click", () => editar(btn.dataset.id))
   );
+
   document.querySelectorAll(".btn-eliminar").forEach((btn) =>
-    btn.addEventListener("click", (e) => eliminarCategoria(e.target.dataset.id))
+    btn.addEventListener("click", () => eliminar(btn.dataset.id))
   );
 }
 
-
-function abrirFormulario() {
-  formCategoria.reset();
-  document.getElementById("idCategoria").value = "";
-  document.getElementById("tituloCategoria").textContent = "Nueva Categoría";
-  modalCategoria.style.display = "flex";
+// -------------------------
+// NUEVO / EDITAR
+// -------------------------
+function abrirNuevo() {
+  form.reset();
+  document.getElementById("id").value = "";
+  document.getElementById("tituloModal").textContent = "Nuevo Subrubro";
+  modal.style.display = "flex";
 }
 
-async function editarCategoria(id) {
-  const { data, error } = await supabase
+async function editar(id) {
+  const { data } = await supabase
     .from("subrubro")
     .select("*")
     .eq("id_subrubro", id)
     .single();
-  if (error) {
-    console.error(error);
+
+  if (!data) return;
+
+  document.getElementById("id").value = data.id_subrubro;
+  document.getElementById("nombre").value = data.nombre;
+
+  document.getElementById("tituloModal").textContent = "Editar Subrubro";
+  modal.style.display = "flex";
+}
+
+// -------------------------
+// GUARDAR
+// -------------------------
+form.addEventListener("submit", async (e) => {
+  e.preventDefault();
+
+  const id = document.getElementById("id").value;
+  const nombre = document.getElementById("nombre").value.trim();
+
+  let res;
+
+  if (id) {
+    res = await supabase.from("subrubro").update({ nombre }).eq("id_subrubro", id);
+  } else {
+    res = await supabase.from("subrubro").insert([{ nombre }]);
+  }
+
+  if (res.error) {
+    alert("❌ Error: " + res.error.message);
     return;
   }
 
-  document.getElementById("idCategoria").value = data.id_categoria;
-  document.getElementById("nombreCategoria").value = data.nombre;
-  document.getElementById("descripcionCategoria").value = data.descripcion || "";
-  document.getElementById("tituloCategoria").textContent = "Editar Categoría";
-  modalCategoria.style.display = "flex";
-}
-
-formCategoria.addEventListener("submit", async (e) => {
-  e.preventDefault();
-  const nombre = document.getElementById("nombreCategoria").value.trim();
-  const descripcion = document.getElementById("descripcionCategoria").value.trim();
-  const id = document.getElementById("idCategoria").value;
-
-  let result;
-  if (id) {
-    result = await supabase
-      .from("subrubro")
-      .update({ nombre, descripcion })
-      .eq("id_subrubro", id);
-  } else {
-    result = await supabase.from("subrubro").insert([{ nombre, descripcion }]);
-  }
-
-  if (result.error) {
-    alert("❌ Error guardando categoría: " + result.error.message);
-  } else {
-    alert("✅ Categoría guardada correctamente");
-    modalCategoria.style.display = "none";
-    cargarCategorias();
-  }
+  modal.style.display = "none";
+  cargarSubrubros();
 });
 
-async function eliminarCategoria(id) {
-  if (!confirm("⚠️ ¿Seguro que deseas eliminar esta categoría?")) return;
+// -------------------------
+// ELIMINAR
+// -------------------------
+async function eliminar(id) {
+  if (!confirm("¿Eliminar este subrubro?")) return;
 
   const { error } = await supabase.from("subrubro").delete().eq("id_subrubro", id);
 
   if (error) {
-    alert("❌ Error eliminando categoría: " + error.message);
-  } else {
-    alert("🗑️ Categoría eliminada correctamente");
-    cargarCategorias();
+    alert("❌ Error: " + error.message);
+    return;
   }
-}
 
+  cargarSubrubros();
+}

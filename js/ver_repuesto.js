@@ -51,7 +51,7 @@ async function cargarCategorias() {
   if (error) return console.error(error);
 
   filtroCategoria.innerHTML = `<option value="">Todas las categorías</option>` +
-    data.map(c => `<option value="${c.id_categoria}">${c.nombre}</option>`).join("");
+    data.map(c => `<option value="${c.id_subrubro}">${c.nombre}</option>`).join("");
 
   categoriaSelect.innerHTML = data.map(c => `<option value="${c.id_subrubro}">${c.nombre}</option>`).join("");
 }
@@ -96,8 +96,7 @@ async function cargarRepuestos() {
       <td>${rep.codigo}</td>
       <td>${rep.descripcion}</td>
       <td>${rep.marca || "-"}</td>
-      <td>${rep.categorias?.nombre || "-"}</td>
-      <td>${rep.medida || "-"}</td>
+      <td>${rep.subrubro?.nombre || "-"}</td>
       <td class="${claseStock}">${rep.stock_actual}</td>
       <td>${rep.ubicacion || "-"}</td>
       <td>$${rep.precio_venta?.toFixed(2) || "0.00"}</td>
@@ -139,12 +138,11 @@ async function editarRepuesto(id) {
     document.getElementById("codigo").value = data.codigo;
     document.getElementById("descripcion").value = data.descripcion;
     document.getElementById("marca").value = data.marca || "";
-    document.getElementById("medida").value = data.medida || "";
     document.getElementById("ubicacion").value = data.ubicacion || "";
     document.getElementById("stock_actual").value = data.stock_actual;
     document.getElementById("stock_minimo").value = data.stock_minimo;
     document.getElementById("precio_venta").value = data.precio_venta;
-    categoriaSelect.value = data.id_categoria || "";
+    categoriaSelect.value = data.id_subrubro || "";
 
     modalForm.style.display = "flex";
 }
@@ -163,10 +161,9 @@ formRepuesto.addEventListener("submit", async (e) => {
         codigo: codigo.value.trim(),
         descripcion: descripcion.value.trim(),
         marca: marca.value.trim(),
-        medida: medida.value.trim(),
         ubicacion: ubicacion.value.trim(),
         stock_actual: parseInt(stock_actual.value) || 0,
-        stock_minimo: parseInt(stock_minimo.value) || 1,
+        stock_minimo: parseInt(stock_minimo.value) || 0,
         precio_venta: parseFloat(precio_venta.value) || 0,
         id_subrubro: parseInt(categoria.value)
     };

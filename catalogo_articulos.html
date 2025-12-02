@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Catálogo de Articulos</title>
+
+  <link rel="stylesheet" href="css/catalogo_articulos.css">
+</head>
+
+<body>
+
+  <header>
+    <h1>Catálogo de Articulos</h1>
+  </header>
+
+  <section id="filtros">
+    <select id="filtro-rubro">
+      <option value="">-- Rubro --</option>
+    </select>
+
+    <select id="filtro-subrubro">
+      <option value="">-- Subrubro --</option>
+    </select>
+
+    <select id="filtro-motor">
+      <option value="">-- Motor --</option>
+    </select>
+
+    <input type="text" id="buscar" placeholder="Buscar por código o marca…">
+  </section>
+
+  <section id="lista-productos">
+    Cargando productos…
+  </section>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/catalogo_articulos.js"></script>
+</body>
+
+</html>
