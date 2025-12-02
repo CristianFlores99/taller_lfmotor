@@ -266,3 +266,69 @@ async function cargarMarcas() {
   filtroMarca.addEventListener("change", cargarRepuestos);
 }
 
+/////exportar a pdf o excel
+// ==============================
+// 📌 Exportación PDF y Excel
+// ==============================
+
+// Formatear fecha/hora para el nombre del archivo
+function nombreArchivo() {
+    const ahora = new Date();
+    return ahora.toISOString().replace(/[:.]/g, "-");
+}
+
+// ------------------------------
+// 📄 EXPORTAR A PDF
+// ------------------------------
+document.getElementById("exportarPDF").addEventListener("click", async () => {
+    const { data, error } = await supabase
+        .from("repuestos")
+        .select("codigo, marca, descripcion, stock_actual, precio_venta");
+
+    if (error) return alert("Error obteniendo datos");
+
+    const pdf = new jsPDF();
+
+    pdf.setFontSize(14);
+    pdf.text("Listado de Repuestos", 10, 10);
+
+    let y = 20;
+
+    data.forEach((r, index) => {
+        pdf.setFontSize(10);
+        pdf.text(
+            `${index + 1}. Cod: ${r.codigo} | Marca: ${r.marca} | ${r.descripcion}
+Stock: ${r.stock_actual} | Precio: $${r.precio_venta}`,
+            10,
+            y
+        );
+        y += 15;
+
+        if (y > 280) {
+            pdf.addPage();
+            y = 20;
+        }
+    });
+
+    pdf.save(`repuestos_${nombreArchivo()}.pdf`);
+});
+
+
+// ------------------------------
+// 📊 EXPORTAR A EXCEL
+// ------------------------------
+document.getElementById("exportarExcel").addEventListener("click", async () => {
+    const { data, error } = await supabase
+        .from("repuestos")
+        .select("codigo, marca, descripcion, stock_actual, precio_venta");
+
+    if (error) return alert("Error obteniendo datos");
+
+    // Convertir datos a formato SheetJS
+    const worksheet = XLSX.utils.json_to_sheet(data);
+    const workbook = XLSX.utils.book_new();
+
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Repuestos");
+
+    XLSX.writeFile(workbook, `repuestos_${nombreArchivo()}.xlsx`);
+});
