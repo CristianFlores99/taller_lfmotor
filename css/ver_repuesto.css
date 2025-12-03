@@ -199,3 +199,75 @@ form input, form select {
 #filtroMarca:hover {
   background-color: #334155;
 }
+
+/* ==============================
+   ALERTA MODERNA — ESTILO PRO
+   ============================== */
+
+.alerta-custom {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    min-width: 260px;
+    max-width: 340px;
+    padding: 14px 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    border-radius: 12px;
+    font-size: 15px;
+    font-weight: 600;
+    color: white;
+
+    z-index: 99999;
+
+    box-shadow: 0 6px 14px rgba(0,0,0,0.25);
+
+    opacity: 0;
+    transform: translateX(20px);
+    transition:
+        opacity 0.4s ease,
+        transform 0.4s ease;
+}
+
+/* Icono dentro de la alerta */
+.alerta-custom::before {
+    font-size: 20px;
+}
+
+/* TIPOS */
+.alerta-ok {
+    background: linear-gradient(135deg, #2ecc71, #239b56);
+}
+.alerta-ok::before {
+    content: "✔️";
+}
+
+.alerta-error {
+    background: linear-gradient(135deg, #e74c3c, #c0392b);
+}
+.alerta-error::before {
+    content: "❌";
+}
+
+.alerta-info {
+    background: linear-gradient(135deg, #f1c40f, #d4ac0d);
+}
+.alerta-info::before {
+    content: "⚠️";
+}
+
+/* Animación de vibración para errores */
+@keyframes vibrar {
+    0% { transform: translateX(0); }
+    20% { transform: translateX(-4px); }
+    40% { transform: translateX(4px); }
+    60% { transform: translateX(-4px); }
+    80% { transform: translateX(4px); }
+    100% { transform: translateX(0); }
+}
+.alerta-error.anim-vibrar {
+    animation: vibrar 0.4s ease;
+}
+

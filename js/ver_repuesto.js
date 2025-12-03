@@ -101,8 +101,8 @@ async function cargarRepuestos() {
       <td>${rep.ubicacion || "-"}</td>
       <td>$${rep.precio_venta?.toFixed(2) || "0.00"}</td>
       <td>
-        <button class="btn-editar" data-id="${rep.id_repuesto}">✏️</button>
-        <button class="btn-mov" data-id="${rep.id_repuesto}" data-desc="${rep.descripcion}">📦</button>
+        <button class="btn-editar" data-id="${rep.id_repuesto}">Editar</button>
+        <button class="btn-mov" data-id="${rep.id_repuesto}" data-desc="${rep.descripcion}">Ver Historial</button>
       </td>
     `;
     cuerpoTabla.appendChild(tr);
@@ -183,7 +183,7 @@ formRepuesto.addEventListener("submit", async (e) => {
     if (result.error) alert("Error: " + result.error.message);
     else {
         // Feedback visual
-        alert("✅ Repuesto guardado correctamente");
+        mostrarAlerta("✅ Repuesto guardado correctamente");
         modalForm.style.display = "none";
         cargarRepuestos();
     }
@@ -332,3 +332,35 @@ document.getElementById("exportarExcel").addEventListener("click", async () => {
 
     XLSX.writeFile(workbook, `repuestos_${nombreArchivo()}.xlsx`);
 });
+
+
+///ALERTA!
+function mostrarAlerta(mensaje, tipo = "ok") {
+    const alerta = document.getElementById("alertaCustom");
+
+    alerta.textContent = mensaje;
+
+    alerta.className = "alerta-custom"; // reset
+    alerta.classList.add(`alerta-${tipo}`);
+
+    alerta.style.display = "flex";
+
+    // Fade + slide in
+    setTimeout(() => {
+        alerta.style.opacity = 1;
+        alerta.style.transform = "translateX(0)";
+    }, 10);
+
+    // Si es error → vibración
+    if (tipo === "error") {
+        alerta.classList.add("anim-vibrar");
+        setTimeout(() => alerta.classList.remove("anim-vibrar"), 500);
+    }
+
+    // Ocultar automático
+    setTimeout(() => {
+        alerta.style.opacity = 0;
+        alerta.style.transform = "translateX(20px)";
+        setTimeout(() => alerta.style.display = "none", 400);
+    }, 3000);
+}
