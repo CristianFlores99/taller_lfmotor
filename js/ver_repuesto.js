@@ -267,7 +267,38 @@ async function cargarMarcas() {
     filtroMarca.addEventListener("change", cargarRepuestos);
 }
 
-/////exportar a pdf o excel
+///ALERTA! 
+function mostrarAlerta(mensaje, tipo = "ok") {
+    const alerta = document.getElementById("alertaCustom");
+
+    alerta.textContent = mensaje;
+
+    alerta.className = "alerta-custom"; // reset
+    alerta.classList.add(`alerta-${tipo}`);
+
+    alerta.style.display = "flex";
+
+    // Fade + slide in
+    setTimeout(() => {
+        alerta.style.opacity = 1;
+        alerta.style.transform = "translateX(0)";
+    }, 10);
+
+    // Si es error → vibración
+    if (tipo === "error") {
+        alerta.classList.add("anim-vibrar");
+        setTimeout(() => alerta.classList.remove("anim-vibrar"), 500);
+    }
+
+    // Ocultar automático
+    setTimeout(() => {
+        alerta.style.opacity = 0;
+        alerta.style.transform = "translateX(20px)";
+        setTimeout(() => alerta.style.display = "none", 400);
+    }, 3000);
+}
+
+
 // ==============================
 // 📌 Exportación PDF y Excel
 // ==============================
