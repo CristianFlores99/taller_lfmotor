@@ -12,7 +12,7 @@ const modalForm = document.getElementById("modalForm");
 const cerrarForm = document.getElementById("cerrarForm");
 const formRepuesto = document.getElementById("formRepuesto");
 const tituloForm = document.getElementById("tituloForm");
-const categoriaSelect = document.getElementById("categoria");
+const subrubroSelect = document.getElementById("subrubro");
 const btnEliminar = document.getElementById("eliminarRepuesto");
 
 const modalMov = document.getElementById("modalMovimientos");
@@ -20,20 +20,20 @@ const cerrarModal = document.getElementById("cerrarModal");
 const cuerpoMovimientos = document.getElementById("cuerpoMovimientos");
 const tituloRepuesto = document.getElementById("tituloRepuesto");
 
-const filtroCategoria = document.getElementById("filtroCategoria");
+const filtroSubrubro = document.getElementById("filtroSubrubro");
 const indicadorStock = document.getElementById("indicadorStock");
 
 let editId = null;
 
 // ---------- Eventos ----------
 document.addEventListener("DOMContentLoaded", () => {
-    cargarCategorias();
+    cargarSubrubro();
     cargarMarcas(); // 🆕 nuevo
     cargarRepuestos();
 });
 
 inputBusqueda.addEventListener("input", cargarRepuestos);
-filtroCategoria.addEventListener("change", cargarRepuestos);
+filtroSubrubro.addEventListener("change", cargarRepuestos);
 btnAgregar.addEventListener("click", abrirFormulario);
 cerrarForm.addEventListener("click", () => modalForm.style.display = "none");
 cerrarModal.addEventListener("click", () => modalMov.style.display = "none");
@@ -45,21 +45,21 @@ window.addEventListener("click", e => {
 
 // ---------- Funciones ----------
 
-// --- Cargar Categorías con el filtro principal
-async function cargarCategorias() {
+// --- Cargar Subrubros con el filtro principal
+async function cargarSubrubro() {
     const { data, error } = await supabase.from("subrubro").select("*").order("nombre", { ascending: true });
     if (error) return console.error(error);
 
-    filtroCategoria.innerHTML = `<option value="">Todas las categorías</option>` +
+    filtroSubrubro.innerHTML = `<option value="">Todos los subrubros</option>` +
         data.map(c => `<option value="${c.id_subrubro}">${c.nombre}</option>`).join("");
 
-    categoriaSelect.innerHTML = data.map(c => `<option value="${c.id_subrubro}">${c.nombre}</option>`).join("");
+    subrubroSelect.innerHTML = data.map(c => `<option value="${c.id_subrubro}">${c.nombre}</option>`).join("");
 }
 
-// --- Cargar Repuestos con filtro de categoría + texto
+// --- Cargar Repuestos con filtro de subrubro + texto
 async function cargarRepuestos() {
     const filtro = inputBusqueda.value.trim();
-    const cat = filtroCategoria.value;
+    const _subrubro = filtroSubrubro.value;
     const marcaSel = document.getElementById("filtroMarca").value; // 🆕 nuevo
 
     let query = supabase
@@ -68,7 +68,7 @@ async function cargarRepuestos() {
         .order("codigo", { ascending: true });
 
     if (filtro) query = query.or(`codigo.ilike.%${filtro}%, descripcion.ilike.%${filtro}%, marca.ilike.%${filtro}%`);
-    if (cat) query = query.eq("id_subrubro", cat);
+    if (_subrubro) query = query.eq("id_subrubro", _subrubro);
     if (marcaSel) query = query.eq("marca", marcaSel); // 🆕 nuevo
 
     const { data, error } = await query;
@@ -142,7 +142,7 @@ async function editarRepuesto(id) {
     document.getElementById("stock_actual").value = data.stock_actual;
     document.getElementById("stock_minimo").value = data.stock_minimo;
     document.getElementById("precio_venta").value = data.precio_venta;
-    categoriaSelect.value = data.id_subrubro || "";
+    subrubroSelect.value = data.id_subrubro || "";
 
     modalForm.style.display = "flex";
 }
@@ -165,7 +165,7 @@ formRepuesto.addEventListener("submit", async (e) => {
         stock_actual: parseInt(stock_actual.value) || 0,
         stock_minimo: parseInt(stock_minimo.value) || 0,
         precio_venta: parseFloat(precio_venta.value) || 0,
-        id_subrubro: parseInt(categoria.value)
+        id_subrubro: parseInt(subrubro.value)
     };
 
     let result;

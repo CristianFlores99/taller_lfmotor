@@ -115,7 +115,7 @@ tr:nth-child(even) {
 }
 
 /* --- Select de filtro --- */
-#filtroCategoria {
+#filtroSubrubro {
   padding: 8px 12px;
   border-radius: 6px;
   border: none;
@@ -125,7 +125,7 @@ tr:nth-child(even) {
   cursor: pointer;
 }
 
-#filtroCategoria:hover {
+#filtroSubrubro:hover {
   background-color: #334155;
 }
 
