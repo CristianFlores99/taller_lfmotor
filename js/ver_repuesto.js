@@ -283,9 +283,10 @@ function nombreArchivo() {
 // ------------------------------
 document.getElementById("exportarPDF").addEventListener("click", async () => {
     try {
+        // Traigo repuestos con id_subrubro
         const { data, error } = await supabase
             .from("repuestos")
-            .select("codigo, marca, descripcion, stock_actual, precio_venta");
+            .select("codigo, marca, descripcion, stock_actual, precio_venta, id_subrubro");
 
         if (error) {
             mostrarAlerta("❌ Error obteniendo datos: " + error.message, "error");
@@ -296,6 +297,15 @@ document.getElementById("exportarPDF").addEventListener("click", async () => {
             mostrarAlerta("ℹ️ No hay repuestos para exportar", "info");
             return;
         }
+
+        // Traigo tabla de subrubros para convertir ID → nombre
+        const { data: subrubros } = await supabase
+            .from("subrubro")
+            .select("id_subrubro, nombre");
+
+        // Genero mapa rápido: {1: "Motor", 2: "Frenos", etc}
+        const mapSubrubro = {};
+        subrubros?.forEach(s => mapSubrubro[s.id_subrubro] = s.nombre);
 
         // Obtener jsPDF correctamente (UMD compatible)
         const jsPDFclass =
@@ -321,20 +331,23 @@ document.getElementById("exportarPDF").addEventListener("click", async () => {
         pdf.setFont("helvetica", "normal");
 
         data.forEach((r, index) => {
-            
-            const codigo = r.codigo ?? "-";
-            const marca = r.marca ?? "-";
-            const descripcion = r.descripcion ?? "-";
-            const stock = r.stock_actual ?? 0;
-            const precio = r.precio_venta ?? 0;
 
-            // CHECK: si falta espacio → nueva página
+            const codigo = r.codigo ?? "-";
+            const marca   = r.marca ?? "-";
+            const descripcion = r.descripcion ?? "-";
+            const stock   = r.stock_actual ?? 0;
+            const precio  = r.precio_venta ?? 0;
+
+            // Subrubro traducido
+            const subrubro = mapSubrubro[r.id_subrubro] ?? "Sin categoría";
+
+            // Si no hay espacio → nueva página
             if (y > pageHeight - 100) {
                 pdf.addPage();
                 y = 50;
             }
 
-            // NUMERO DEL ITEM
+            // Título del item
             pdf.setFontSize(12);
             pdf.setFont("helvetica", "bold");
             pdf.text(`${index + 1}. ${descripcion}`, 40, y);
@@ -343,19 +356,19 @@ document.getElementById("exportarPDF").addEventListener("click", async () => {
             pdf.setFontSize(10);
             pdf.setFont("helvetica", "normal");
 
-            // DETALLES FORMATO LISTA
+            // Detalles del item
             pdf.text(`Código: ${codigo}`, 60, y); y += 14;
             pdf.text(`Marca: ${marca}`, 60, y); y += 14;
+            pdf.text(`Subrubro: ${subrubro}`, 60, y); y += 14;
             pdf.text(`Stock: ${stock}`, 60, y); y += 14;
             pdf.text(`Precio Venta: $${precio}`, 60, y); y += 20;
 
-            // Separador fino
+            // Separador
             pdf.setDrawColor(180);
             pdf.line(40, y, 550, y);
             y += 20;
         });
 
-        // Guardar PDF
         pdf.save(`repuestos_${nombreArchivo()}.pdf`);
         mostrarAlerta("✅ PDF generado correctamente", "ok");
 
@@ -366,55 +379,69 @@ document.getElementById("exportarPDF").addEventListener("click", async () => {
 });
 
 
-
-
 // ------------------------------
 // 📊 EXPORTAR A EXCEL
 // ------------------------------
 document.getElementById("exportarExcel").addEventListener("click", async () => {
-    const { data, error } = await supabase
-        .from("repuestos")
-        .select("codigo, marca, descripcion, stock_actual, precio_venta");
+    try {
+        // Traigo repuestos con id_subrubro
+        const { data, error } = await supabase
+            .from("repuestos")
+            .select("codigo, marca, descripcion, stock_actual, precio_venta, id_subrubro");
 
-    if (error) return alert("Error obteniendo datos");
+        if (error) {
+            mostrarAlerta("❌ Error obteniendo datos: " + error.message, "error");
+            return;
+        }
 
-    // Convertir datos a formato SheetJS
-    const worksheet = XLSX.utils.json_to_sheet(data);
-    const workbook = XLSX.utils.book_new();
+        if (!data || data.length === 0) {
+            mostrarAlerta("ℹ️ No hay repuestos para exportar", "info");
+            return;
+        }
 
-    XLSX.utils.book_append_sheet(workbook, worksheet, "Repuestos");
+        // Traigo subrubros
+        const { data: subrubros } = await supabase
+            .from("subrubro")
+            .select("id_subrubro, nombre");
 
-    XLSX.writeFile(workbook, `repuestos_${nombreArchivo()}.xlsx`);
+        // Mapa ID → Nombre (siempre como string)
+        const mapSubrubro = {};
+        subrubros?.forEach(s => {
+            mapSubrubro[String(s.id_subrubro)] = s.nombre;
+        });
+
+        // Convierte los repuestos al formato final de Excel
+        const excelData = data.map(r => ({
+            "Descripción": r.descripcion ?? "-",
+            "Código": r.codigo ?? "-",
+            "Marca": r.marca ?? "-",
+            "Subrubro": mapSubrubro[String(r.id_subrubro)] ?? "Sin categoría",
+            "Stock Actual": r.stock_actual ?? 0,
+            "Precio Venta": r.precio_venta ?? 0
+        }));
+
+        // Crear hoja y libro Excel
+        const worksheet = XLSX.utils.json_to_sheet(excelData);
+        const workbook = XLSX.utils.book_new();
+
+        // Ajustar automáticamente el ancho de cada columna
+        const colWidths = [];
+        excelData.forEach(row => {
+            Object.values(row).forEach((val, i) => {
+                const width = (val ? val.toString().length : 10) + 5;
+                colWidths[i] = Math.max(colWidths[i] || 10, width);
+            });
+        });
+        worksheet['!cols'] = colWidths.map(w => ({ wch: w }));
+
+        XLSX.utils.book_append_sheet(workbook, worksheet, "Repuestos");
+        XLSX.writeFile(workbook, `repuestos_${nombreArchivo()}.xlsx`);
+
+        mostrarAlerta("✅ Excel generado correctamente", "ok");
+
+    } catch (err) {
+        console.error(err);
+        mostrarAlerta("❌ Error al generar Excel: " + err.message, "error");
+    }
 });
 
-
-///ALERTA!
-function mostrarAlerta(mensaje, tipo = "ok") {
-    const alerta = document.getElementById("alertaCustom");
-
-    alerta.textContent = mensaje;
-
-    alerta.className = "alerta-custom"; // reset
-    alerta.classList.add(`alerta-${tipo}`);
-
-    alerta.style.display = "flex";
-
-    // Fade + slide in
-    setTimeout(() => {
-        alerta.style.opacity = 1;
-        alerta.style.transform = "translateX(0)";
-    }, 10);
-
-    // Si es error → vibración
-    if (tipo === "error") {
-        alerta.classList.add("anim-vibrar");
-        setTimeout(() => alerta.classList.remove("anim-vibrar"), 500);
-    }
-
-    // Ocultar automático
-    setTimeout(() => {
-        alerta.style.opacity = 0;
-        alerta.style.transform = "translateX(20px)";
-        setTimeout(() => alerta.style.display = "none", 400);
-    }, 3000);
-}
