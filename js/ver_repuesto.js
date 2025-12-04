@@ -283,10 +283,19 @@ function nombreArchivo() {
 // ------------------------------
 document.getElementById("exportarPDF").addEventListener("click", async () => {
     try {
-        // Traigo repuestos con id_subrubro
-        const { data, error } = await supabase
+        const subrubroSeleccionado = document.getElementById("filtroSubrubro").value;
+
+        // Construyo query base
+        let query = supabase
             .from("repuestos")
             .select("codigo, marca, descripcion, stock_actual, precio_venta, id_subrubro");
+
+        // Si se selecciona un subrubro → filtro
+        if (subrubroSeleccionado !== "") {
+            query = query.eq("id_subrubro", subrubroSeleccionado);
+        }
+
+        const { data, error } = await query;
 
         if (error) {
             mostrarAlerta("❌ Error obteniendo datos: " + error.message, "error");
@@ -298,20 +307,19 @@ document.getElementById("exportarPDF").addEventListener("click", async () => {
             return;
         }
 
-        // Traigo tabla de subrubros para convertir ID → nombre
+        // Traigo tabla de subrubros para traducir ID -> nombre
         const { data: subrubros } = await supabase
             .from("subrubro")
             .select("id_subrubro, nombre");
 
-        // Genero mapa rápido: {1: "Motor", 2: "Frenos", etc}
         const mapSubrubro = {};
         subrubros?.forEach(s => mapSubrubro[s.id_subrubro] = s.nombre);
 
-        // Obtener jsPDF correctamente (UMD compatible)
+        // jsPDF init
         const jsPDFclass =
-            (window.jspdf && window.jspdf.jsPDF) ?
-                window.jspdf.jsPDF :
-                (typeof jsPDF !== "undefined" ? jsPDF : null);
+            (window.jspdf && window.jspdf.jsPDF)
+                ? window.jspdf.jsPDF
+                : (typeof jsPDF !== "undefined" ? jsPDF : null);
 
         if (!jsPDFclass) {
             mostrarAlerta("❌ jsPDF no está disponible", "error");
@@ -327,27 +335,21 @@ document.getElementById("exportarPDF").addEventListener("click", async () => {
         pdf.text("Listado de Repuestos", 40, 50);
 
         let y = 90;
-        pdf.setFontSize(11);
-        pdf.setFont("helvetica", "normal");
 
         data.forEach((r, index) => {
-
             const codigo = r.codigo ?? "-";
-            const marca   = r.marca ?? "-";
+            const marca = r.marca ?? "-";
             const descripcion = r.descripcion ?? "-";
-            const stock   = r.stock_actual ?? 0;
-            const precio  = r.precio_venta ?? 0;
-
-            // Subrubro traducido
+            const stock = r.stock_actual ?? 0;
+            const precio = r.precio_venta ?? 0;
             const subrubro = mapSubrubro[r.id_subrubro] ?? "Sin categoría";
 
-            // Si no hay espacio → nueva página
             if (y > pageHeight - 100) {
                 pdf.addPage();
                 y = 50;
             }
 
-            // Título del item
+            // Título del repuesto
             pdf.setFontSize(12);
             pdf.setFont("helvetica", "bold");
             pdf.text(`${index + 1}. ${descripcion}`, 40, y);
@@ -355,8 +357,6 @@ document.getElementById("exportarPDF").addEventListener("click", async () => {
 
             pdf.setFontSize(10);
             pdf.setFont("helvetica", "normal");
-
-            // Detalles del item
             pdf.text(`Código: ${codigo}`, 60, y); y += 14;
             pdf.text(`Marca: ${marca}`, 60, y); y += 14;
             pdf.text(`Subrubro: ${subrubro}`, 60, y); y += 14;
@@ -370,13 +370,14 @@ document.getElementById("exportarPDF").addEventListener("click", async () => {
         });
 
         pdf.save(`repuestos_${nombreArchivo()}.pdf`);
-        mostrarAlerta("✅ PDF generado correctamente", "ok");
+        mostrarAlerta("📄 PDF exportado correctamente", "ok");
 
     } catch (err) {
         console.error(err);
         mostrarAlerta("❌ Error al generar PDF: " + err.message, "error");
     }
 });
+
 
 
 // ------------------------------
