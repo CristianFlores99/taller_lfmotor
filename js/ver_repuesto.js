@@ -347,7 +347,7 @@ document.getElementById("exportarPDF").addEventListener("click", async () => {
             pdf.text(`Código: ${codigo}`, 60, y); y += 14;
             pdf.text(`Marca: ${marca}`, 60, y); y += 14;
             pdf.text(`Stock: ${stock}`, 60, y); y += 14;
-            pdf.text(`Precio: $${precio}`, 60, y); y += 20;
+            pdf.text(`Precio Venta: $${precio}`, 60, y); y += 20;
 
             // Separador fino
             pdf.setDrawColor(180);
