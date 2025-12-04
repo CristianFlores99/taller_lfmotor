@@ -47,52 +47,52 @@ window.addEventListener("click", e => {
 
 // --- Cargar Categorías con el filtro principal
 async function cargarCategorias() {
-  const { data, error } = await supabase.from("subrubro").select("*").order("nombre", { ascending: true });
-  if (error) return console.error(error);
+    const { data, error } = await supabase.from("subrubro").select("*").order("nombre", { ascending: true });
+    if (error) return console.error(error);
 
-  filtroCategoria.innerHTML = `<option value="">Todas las categorías</option>` +
-    data.map(c => `<option value="${c.id_subrubro}">${c.nombre}</option>`).join("");
+    filtroCategoria.innerHTML = `<option value="">Todas las categorías</option>` +
+        data.map(c => `<option value="${c.id_subrubro}">${c.nombre}</option>`).join("");
 
-  categoriaSelect.innerHTML = data.map(c => `<option value="${c.id_subrubro}">${c.nombre}</option>`).join("");
+    categoriaSelect.innerHTML = data.map(c => `<option value="${c.id_subrubro}">${c.nombre}</option>`).join("");
 }
 
 // --- Cargar Repuestos con filtro de categoría + texto
 async function cargarRepuestos() {
-  const filtro = inputBusqueda.value.trim();
-  const cat = filtroCategoria.value;
-  const marcaSel = document.getElementById("filtroMarca").value; // 🆕 nuevo
+    const filtro = inputBusqueda.value.trim();
+    const cat = filtroCategoria.value;
+    const marcaSel = document.getElementById("filtroMarca").value; // 🆕 nuevo
 
-  let query = supabase
-    .from("repuestos")
-    .select("*, subrubro(nombre)")
-    .order("codigo", { ascending: true });
+    let query = supabase
+        .from("repuestos")
+        .select("*, subrubro(nombre)")
+        .order("codigo", { ascending: true });
 
-  if (filtro) query = query.or(`codigo.ilike.%${filtro}%, descripcion.ilike.%${filtro}%, marca.ilike.%${filtro}%`);
-  if (cat) query = query.eq("id_subrubro", cat);
-  if (marcaSel) query = query.eq("marca", marcaSel); // 🆕 nuevo
+    if (filtro) query = query.or(`codigo.ilike.%${filtro}%, descripcion.ilike.%${filtro}%, marca.ilike.%${filtro}%`);
+    if (cat) query = query.eq("id_subrubro", cat);
+    if (marcaSel) query = query.eq("marca", marcaSel); // 🆕 nuevo
 
-  const { data, error } = await query;
-  if (error) return console.error(error);
+    const { data, error } = await query;
+    if (error) return console.error(error);
 
-  cuerpoTabla.innerHTML = "";
-  if (!data.length) {
-    cuerpoTabla.innerHTML = "<tr><td colspan='9'>No se encontraron repuestos</td></tr>";
-    indicadorStock.textContent = "Sin datos";
-    return;
-  }
+    cuerpoTabla.innerHTML = "";
+    if (!data.length) {
+        cuerpoTabla.innerHTML = "<tr><td colspan='9'>No se encontraron repuestos</td></tr>";
+        indicadorStock.textContent = "Sin datos";
+        return;
+    }
 
-  // 🔹 Calcular resumen de stock
-  const bajo = data.filter(r => r.stock_actual <= r.stock_minimo).length;
-  const normal = data.length - bajo;
-  indicadorStock.innerHTML = `
+    // 🔹 Calcular resumen de stock
+    const bajo = data.filter(r => r.stock_actual <= r.stock_minimo).length;
+    const normal = data.length - bajo;
+    indicadorStock.innerHTML = `
     <span style="color:#f87171">⚠️ ${bajo} con stock bajo</span> |
     <span style="color:#86efac">🔋 ${normal} en stock normal</span>
   `;
 
-  data.forEach(rep => {
-    const claseStock = rep.stock_actual <= rep.stock_minimo ? "stock-bajo" : "stock-ok";
-    const tr = document.createElement("tr");
-    tr.innerHTML = `
+    data.forEach(rep => {
+        const claseStock = rep.stock_actual <= rep.stock_minimo ? "stock-bajo" : "stock-ok";
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
       <td>${rep.codigo}</td>
       <td>${rep.descripcion}</td>
       <td>${rep.marca || "-"}</td>
@@ -105,15 +105,15 @@ async function cargarRepuestos() {
         <button class="btn-mov" data-id="${rep.id_repuesto}" data-desc="${rep.descripcion}">Ver Historial</button>
       </td>
     `;
-    cuerpoTabla.appendChild(tr);
-  });
+        cuerpoTabla.appendChild(tr);
+    });
 
-  document.querySelectorAll(".btn-editar").forEach(btn =>
-    btn.addEventListener("click", e => editarRepuesto(e.target.dataset.id))
-  );
-  document.querySelectorAll(".btn-mov").forEach(btn =>
-    btn.addEventListener("click", e => verMovimientos(e.target.dataset.id, e.target.dataset.desc))
-  );
+    document.querySelectorAll(".btn-editar").forEach(btn =>
+        btn.addEventListener("click", e => editarRepuesto(e.target.dataset.id))
+    );
+    document.querySelectorAll(".btn-mov").forEach(btn =>
+        btn.addEventListener("click", e => verMovimientos(e.target.dataset.id, e.target.dataset.desc))
+    );
 }
 
 // Abrir Formulario
@@ -153,7 +153,7 @@ formRepuesto.addEventListener("submit", async (e) => {
 
     // Validación básica
     if (!codigo.value || !descripcion.value) {
-        alert("⚠️ Código y Descripción son obligatorios");
+        mostrarAlerta("Código y Descripción son obligatorios");
         return;
     }
 
@@ -175,7 +175,8 @@ formRepuesto.addEventListener("submit", async (e) => {
         // Verificar duplicados por código
         const { data: duplicado } = await supabase.from("repuestos").select("*").eq("codigo", repuesto.codigo);
         if (duplicado.length > 0) {
-            return alert("⚠️ Ya existe un repuesto con ese código");
+            mostrarAlerta("Ya existe un repuesto con ese código");
+            return;
         }
         result = await supabase.from("repuestos").insert([repuesto]);
     }
@@ -183,7 +184,7 @@ formRepuesto.addEventListener("submit", async (e) => {
     if (result.error) alert("Error: " + result.error.message);
     else {
         // Feedback visual
-        mostrarAlerta("✅ Repuesto guardado correctamente");
+        mostrarAlerta("Repuesto guardado correctamente");
         modalForm.style.display = "none";
         cargarRepuestos();
     }
@@ -195,9 +196,9 @@ btnEliminar.addEventListener("click", async () => {
     if (!confirm("¿Desea eliminar este repuesto?")) return;
 
     const { error } = await supabase.from("repuestos").delete().eq("id_repuesto", editId);
-    if (error) alert("Error al eliminar: " + error.message);
+    if (error) mostrarAlerta("Error al eliminar: " + error.message);
     else {
-        alert("🗑️ Repuesto eliminado correctamente");
+        mostrarAlerta("Repuesto eliminado correctamente");
         modalForm.style.display = "none";
         cargarRepuestos();
     }
@@ -249,21 +250,21 @@ export async function actualizarStock(id_repuesto, cantidad) {
 
 // --- Cargar Marcas (únicas desde repuestos)
 async function cargarMarcas() {
-  const { data, error } = await supabase
-    .from("repuestos")
-    .select("marca")
-    .not("marca", "is", null);
+    const { data, error } = await supabase
+        .from("repuestos")
+        .select("marca")
+        .not("marca", "is", null);
 
-  if (error) return console.error(error);
+    if (error) return console.error(error);
 
-  // Obtener valores únicos
-  const marcasUnicas = [...new Set(data.map(r => r.marca.trim()).filter(m => m))].sort();
+    // Obtener valores únicos
+    const marcasUnicas = [...new Set(data.map(r => r.marca.trim()).filter(m => m))].sort();
 
-  const filtroMarca = document.getElementById("filtroMarca");
-  filtroMarca.innerHTML = `<option value="">Todas las marcas</option>` +
-    marcasUnicas.map(m => `<option value="${m}">${m}</option>`).join("");
+    const filtroMarca = document.getElementById("filtroMarca");
+    filtroMarca.innerHTML = `<option value="">Todas las marcas</option>` +
+        marcasUnicas.map(m => `<option value="${m}">${m}</option>`).join("");
 
-  filtroMarca.addEventListener("change", cargarRepuestos);
+    filtroMarca.addEventListener("change", cargarRepuestos);
 }
 
 /////exportar a pdf o excel
@@ -281,37 +282,90 @@ function nombreArchivo() {
 // 📄 EXPORTAR A PDF
 // ------------------------------
 document.getElementById("exportarPDF").addEventListener("click", async () => {
-    const { data, error } = await supabase
-        .from("repuestos")
-        .select("codigo, marca, descripcion, stock_actual, precio_venta");
+    try {
+        const { data, error } = await supabase
+            .from("repuestos")
+            .select("codigo, marca, descripcion, stock_actual, precio_venta");
 
-    if (error) return alert("Error obteniendo datos");
-
-    const pdf = new jsPDF();
-
-    pdf.setFontSize(14);
-    pdf.text("Listado de Repuestos", 10, 10);
-
-    let y = 20;
-
-    data.forEach((r, index) => {
-        pdf.setFontSize(10);
-        pdf.text(
-            `${index + 1}. Cod: ${r.codigo} | Marca: ${r.marca} | ${r.descripcion}
-Stock: ${r.stock_actual} | Precio: $${r.precio_venta}`,
-            10,
-            y
-        );
-        y += 15;
-
-        if (y > 280) {
-            pdf.addPage();
-            y = 20;
+        if (error) {
+            mostrarAlerta("❌ Error obteniendo datos: " + error.message, "error");
+            return;
         }
-    });
 
-    pdf.save(`repuestos_${nombreArchivo()}.pdf`);
+        if (!data || data.length === 0) {
+            mostrarAlerta("ℹ️ No hay repuestos para exportar", "info");
+            return;
+        }
+
+        // Obtener jsPDF correctamente (UMD compatible)
+        const jsPDFclass =
+            (window.jspdf && window.jspdf.jsPDF) ?
+                window.jspdf.jsPDF :
+                (typeof jsPDF !== "undefined" ? jsPDF : null);
+
+        if (!jsPDFclass) {
+            mostrarAlerta("❌ jsPDF no está disponible", "error");
+            return;
+        }
+
+        const pdf = new jsPDFclass({ unit: "pt", format: "a4" });
+        const pageHeight = pdf.internal.pageSize.height;
+
+        // Título
+        pdf.setFontSize(18);
+        pdf.setFont("helvetica", "bold");
+        pdf.text("Listado de Repuestos", 40, 50);
+
+        let y = 90;
+        pdf.setFontSize(11);
+        pdf.setFont("helvetica", "normal");
+
+        data.forEach((r, index) => {
+            
+            const codigo = r.codigo ?? "-";
+            const marca = r.marca ?? "-";
+            const descripcion = r.descripcion ?? "-";
+            const stock = r.stock_actual ?? 0;
+            const precio = r.precio_venta ?? 0;
+
+            // CHECK: si falta espacio → nueva página
+            if (y > pageHeight - 100) {
+                pdf.addPage();
+                y = 50;
+            }
+
+            // NUMERO DEL ITEM
+            pdf.setFontSize(12);
+            pdf.setFont("helvetica", "bold");
+            pdf.text(`${index + 1}. ${descripcion}`, 40, y);
+            y += 18;
+
+            pdf.setFontSize(10);
+            pdf.setFont("helvetica", "normal");
+
+            // DETALLES FORMATO LISTA
+            pdf.text(`Código: ${codigo}`, 60, y); y += 14;
+            pdf.text(`Marca: ${marca}`, 60, y); y += 14;
+            pdf.text(`Stock: ${stock}`, 60, y); y += 14;
+            pdf.text(`Precio: $${precio}`, 60, y); y += 20;
+
+            // Separador fino
+            pdf.setDrawColor(180);
+            pdf.line(40, y, 550, y);
+            y += 20;
+        });
+
+        // Guardar PDF
+        pdf.save(`repuestos_${nombreArchivo()}.pdf`);
+        mostrarAlerta("✅ PDF generado correctamente", "ok");
+
+    } catch (err) {
+        console.error(err);
+        mostrarAlerta("❌ Error al generar PDF: " + err.message, "error");
+    }
 });
+
+
 
 
 // ------------------------------
