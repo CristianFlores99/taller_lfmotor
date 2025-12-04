@@ -67,7 +67,41 @@ async function cargarRepuestos() {
         .select("*, subrubro(nombre)")
         .order("codigo", { ascending: true });
 
-    if (filtro) query = query.or(`codigo.ilike.%${filtro}%, descripcion.ilike.%${filtro}%, marca.ilike.%${filtro}%`);
+//    if (filtro) query = query.or(`codigo.ilike.%${filtro}%, descripcion.ilike.%${filtro}%, marca.ilike.%${filtro}%, ubicacion.ilike.%${filtro}%`);
+    // --------------------------------------------------------
+    // 🔎 1) Si hay texto en el buscador → buscar subrubros
+    // --------------------------------------------------------
+    let idsSub = [];
+    if (filtro) {
+        const { data: subs } = await supabase
+            .from("subrubro")
+            .select("id_subrubro")
+            .ilike("nombre", `%${filtro}%`);
+
+        idsSub = subs?.map(s => s.id_subrubro) ?? [];
+    }
+
+    // --------------------------------------------------------
+    // 🔎 2) OR principal (ya funciona bien tuyo)
+    // --------------------------------------------------------
+    if (filtro) {
+        let orFilters = [
+            `codigo.ilike.%${filtro}%`,
+            `descripcion.ilike.%${filtro}%`,
+            `marca.ilike.%${filtro}%`,
+            `ubicacion.ilike.%${filtro}%`
+        ];
+
+        // --------------------------------------------------------
+        // 🔎 3) Si se encontraron subrubros → agregarlos al OR
+        // --------------------------------------------------------
+        if (idsSub.length > 0) {
+            orFilters.push(`id_subrubro.in.(${idsSub.join(",")})`);
+        }
+
+        query = query.or(orFilters.join(","));
+    }
+
     if (_subrubro) query = query.eq("id_subrubro", _subrubro);
     if (marcaSel) query = query.eq("marca", marcaSel); // 🆕 nuevo
 
