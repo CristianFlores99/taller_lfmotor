@@ -416,7 +416,7 @@ document.getElementById("exportarPDF").addEventListener("click", async () => {
 // ------------------------------
 document.getElementById("exportarExcel").addEventListener("click", async () => {
     try {
-        // Traigo repuestos con id_subrubro
+        // Repuestos
         const { data, error } = await supabase
             .from("repuestos")
             .select("codigo, marca, descripcion, stock_actual, precio_venta, id_subrubro");
@@ -431,49 +431,55 @@ document.getElementById("exportarExcel").addEventListener("click", async () => {
             return;
         }
 
-        // Traigo subrubros
+        // Subrubros
         const { data: subrubros } = await supabase
             .from("subrubro")
-            .select("id_subrubro, nombre");
+            .select("id_subrubro, nombre")
+            .order("nombre", { ascending: true });
 
-        // Mapa ID → Nombre (siempre como string)
-        const mapSubrubro = {};
-        subrubros?.forEach(s => {
-            mapSubrubro[String(s.id_subrubro)] = s.nombre;
-        });
-
-        // Convierte los repuestos al formato final de Excel
-        const excelData = data.map(r => ({
-            "Descripción": r.descripcion ?? "-",
-            "Código": r.codigo ?? "-",
-            "Marca": r.marca ?? "-",
-            "Subrubro": mapSubrubro[String(r.id_subrubro)] ?? "Sin categoría",
-            "Stock Actual": r.stock_actual ?? 0,
-            "Precio Venta": r.precio_venta ?? 0
-        }));
-
-        // Crear hoja y libro Excel
-        const worksheet = XLSX.utils.json_to_sheet(excelData);
+        // Crear libro Excel
         const workbook = XLSX.utils.book_new();
 
-        // Ajustar automáticamente el ancho de cada columna
-        const colWidths = [];
-        excelData.forEach(row => {
-            Object.values(row).forEach((val, i) => {
-                const width = (val ? val.toString().length : 10) + 5;
-                colWidths[i] = Math.max(colWidths[i] || 10, width);
+        // Recorrer cada subrubro → una hoja por subrubro
+        subrubros.forEach(sub => {
+            const nombreSub = sub.nombre || "Sin nombre";
+
+            // Filtrar repuestos del subrubro actual
+            const datosFiltrados = data
+                .filter(r => r.id_subrubro === sub.id_subrubro)
+                .map(r => ({
+                    "Código": r.codigo ?? "-",
+                    "Marca": r.marca ?? "-",
+                    "Subrubro": nombreSub,
+                    "Descripción": r.descripcion ?? "-",
+                    "Stock Actual": r.stock_actual ?? 0,
+                    "Precio Venta": r.precio_venta ?? 0
+                }));
+
+            // Crear hoja
+            const worksheet = XLSX.utils.json_to_sheet(datosFiltrados);
+
+            // Ajustar ancho de columnas
+            const colWidths = [];
+            datosFiltrados.forEach(row => {
+                Object.values(row).forEach((val, i) => {
+                    const width = (val ? val.toString().length : 10) + 5;
+                    colWidths[i] = Math.max(colWidths[i] || 10, width);
+                });
             });
+            worksheet['!cols'] = colWidths.map(w => ({ wch: w }));
+
+            // Agregar hoja al libro
+            XLSX.utils.book_append_sheet(workbook, worksheet, nombreSub.substring(0, 30));
         });
-        worksheet['!cols'] = colWidths.map(w => ({ wch: w }));
 
-        XLSX.utils.book_append_sheet(workbook, worksheet, "Repuestos");
-        XLSX.writeFile(workbook, `repuestos_${nombreArchivo()}.xlsx`);
+        // Guardar archivo
+        XLSX.writeFile(workbook, `repuestos_por_subrubro_${nombreArchivo()}.xlsx`);
 
-        mostrarAlerta("✅ Excel generado correctamente", "ok");
+        mostrarAlerta("✅ Excel generado correctamente (una hoja por subrubro)", "ok");
 
     } catch (err) {
         console.error(err);
         mostrarAlerta("❌ Error al generar Excel: " + err.message, "error");
     }
 });
-
