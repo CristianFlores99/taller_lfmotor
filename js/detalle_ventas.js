@@ -38,8 +38,8 @@ if (idVentaActual) {
 // --- Agregar producto ---
 async function agregarProducto() {
   const { data: repuestos, error } = await supabase
-    .from("repuestos")
-    .select("id_repuesto, descripcion, precio_venta, stock_actual");
+    .from("articulos")
+    .select("id_articulo, descripcion, precio_venta, stock_actual");
 
   if (error) {
     alert("Error obteniendo repuestos: " + error.message);
@@ -48,11 +48,11 @@ async function agregarProducto() {
 
   const id_repuesto = prompt(
     "Ingrese el ID del repuesto o deje vacío para cancelar:\n" +
-      repuestos.map((r) => `${r.id_repuesto} - ${r.descripcion} (Stock: ${r.stock_actual})`).join("\n")
+      repuestos.map((r) => `${r.id_articulo} - ${r.descripcion} (Stock: ${r.stock_actual})`).join("\n")
   );
   if (!id_repuesto) return;
 
-  const rep = repuestos.find((r) => r.id_repuesto == id_repuesto);
+  const rep = repuestos.find((r) => r.id_articulo == id_repuesto);
   if (!rep) return alert("ID no encontrado.");
 
   const cantidad = parseInt(prompt("Cantidad vendida:", "1")) || 1;
@@ -66,7 +66,7 @@ async function agregarProducto() {
   const subtotal = cantidad * precio;
 
   productos.push({
-    id_repuesto: rep.id_repuesto,
+    id_articulo: rep.id_articulo,
     descripcion: rep.descripcion,
     cantidad,
     precio_unitario: precio,
@@ -134,7 +134,7 @@ async function guardarVenta() {
   // Insertar detalles
   const detalles = productos.map((p) => ({
     id_venta: venta.id_venta,
-    id_repuesto: p.id_repuesto,
+    id_articulo: p.id_articulo,
     cantidad: p.cantidad,
     precio_unitario: p.precio_unitario,
     subtotal: p.subtotal,
@@ -153,23 +153,23 @@ async function guardarVenta() {
   for (const p of detalles) {
     // Actualizar stock en repuestos
     const { data: repuesto, error: stockError } = await supabase
-      .from("repuestos")
+      .from("articulos")
       .select("stock_actual")
-      .eq("id_repuesto", p.id_repuesto)
+      .eq("id_articulo", p.id_articulo)
       .single();
 
     if (!stockError && repuesto) {
       const nuevoStock = (repuesto.stock_actual || 0) - p.cantidad;
       await supabase
-        .from("repuestos")
+        .from("articulos")
         .update({ stock_actual: nuevoStock })
-        .eq("id_repuesto", p.id_repuesto);
+        .eq("id_articulo", p.id_articulo);
     }
 
     // Registrar movimiento
     await supabase.from("movimientos_stock").insert([
       {
-        id_repuesto: p.id_repuesto,
+        id_articulo: p.id_articulo,
         tipo: "salida",
         cantidad: p.cantidad,
         motivo: `Venta #${venta.id_venta} - ${clienteVal}`,
@@ -208,7 +208,7 @@ async function cargarVenta(idVenta) {
 
   const { data: detalles, error: errDetalle } = await supabase
     .from("detalle_venta")
-    .select("*, repuestos(descripcion)")
+    .select("*, articulos(descripcion)")
     .eq("id_venta", idVenta);
 
   if (errDetalle) {
@@ -217,8 +217,8 @@ async function cargarVenta(idVenta) {
   }
 
   productos = detalles.map((d) => ({
-    id_repuesto: d.id_repuesto,
-    descripcion: d.repuestos.descripcion,
+    id_articulo: d.id_articulo,
+    descripcion: d.articulos.descripcion,
     cantidad: d.cantidad,
     precio_unitario: d.precio_unitario,
     subtotal: d.subtotal,

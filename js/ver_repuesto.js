@@ -63,7 +63,7 @@ async function cargarRepuestos() {
     const marcaSel = document.getElementById("filtroMarca").value; // 🆕 nuevo
 
     let query = supabase
-        .from("repuestos")
+        .from("articulos")
         .select("*, subrubro(nombre)")
         .order("codigo", { ascending: true });
 
@@ -135,8 +135,8 @@ async function cargarRepuestos() {
       <td>${rep.ubicacion || "-"}</td>
       <td>$${rep.precio_venta?.toFixed(2) || "0.00"}</td>
       <td>
-        <button class="btn-editar" data-id="${rep.id_repuesto}">Editar</button>
-        <button class="btn-mov" data-id="${rep.id_repuesto}" data-desc="${rep.descripcion}">Ver Historial</button>
+        <button class="btn-editar" data-id="${rep.id_articulo}">Editar</button>
+        <button class="btn-mov" data-id="${rep.id_articulo}" data-desc="${rep.descripcion}">Ver Historial</button>
       </td>
     `;
         cuerpoTabla.appendChild(tr);
@@ -161,7 +161,7 @@ function abrirFormulario() {
 
 // Editar Repuesto
 async function editarRepuesto(id) {
-    const { data, error } = await supabase.from("repuestos").select("*").eq("id_repuesto", id).single();
+    const { data, error } = await supabase.from("articulos").select("*").eq("id_articulo", id).single();
     if (error) return console.error(error);
 
     editId = id;
@@ -204,15 +204,15 @@ formRepuesto.addEventListener("submit", async (e) => {
 
     let result;
     if (editId) {
-        result = await supabase.from("repuestos").update(repuesto).eq("id_repuesto", editId);
+        result = await supabase.from("articulos").update(repuesto).eq("id_articulo", editId);
     } else {
         // Verificar duplicados por código
-        const { data: duplicado } = await supabase.from("repuestos").select("*").eq("codigo", repuesto.codigo);
+        const { data: duplicado } = await supabase.from("articulos").select("*").eq("codigo", repuesto.codigo);
         if (duplicado.length > 0) {
             mostrarAlerta("Ya existe un repuesto con ese código");
             return;
         }
-        result = await supabase.from("repuestos").insert([repuesto]);
+        result = await supabase.from("articulos").insert([repuesto]);
     }
 
     if (result.error) alert("Error: " + result.error.message);
@@ -229,7 +229,7 @@ btnEliminar.addEventListener("click", async () => {
     if (!editId) return;
     if (!confirm("¿Desea eliminar este repuesto?")) return;
 
-    const { error } = await supabase.from("repuestos").delete().eq("id_repuesto", editId);
+    const { error } = await supabase.from("articulos").delete().eq("id_articulo", editId);
     if (error) mostrarAlerta("Error al eliminar: " + error.message);
     else {
         mostrarAlerta("Repuesto eliminado correctamente");
@@ -247,7 +247,7 @@ async function verMovimientos(idRepuesto, descripcion) {
     const { data, error } = await supabase
         .from("movimientos_stock")
         .select("*")
-        .eq("id_repuesto", idRepuesto)
+        .eq("id_articulo", idRepuesto)
         .order("fecha", { ascending: false });
 
     if (error) {
@@ -276,16 +276,16 @@ async function verMovimientos(idRepuesto, descripcion) {
 // Actualizar stock automáticamente desde ventas
 export async function actualizarStock(id_repuesto, cantidad) {
     if (!id_repuesto || !cantidad) return;
-    await supabase.from('repuestos')
+    await supabase.from('articulos')
         .update({ stock_actual: supabase.raw('stock_actual - ?', [cantidad]) })
-        .eq('id_repuesto', id_repuesto);
+        .eq('id_articulo', id_repuesto);
     cargarRepuestos(); // refresca tabla
 }
 
 // --- Cargar Marcas (únicas desde repuestos)
 async function cargarMarcas() {
     const { data, error } = await supabase
-        .from("repuestos")
+        .from("articulos")
         .select("marca")
         .not("marca", "is", null);
 
@@ -352,7 +352,7 @@ document.getElementById("exportarPDF").addEventListener("click", async () => {
 
         // Construyo query base
         let query = supabase
-            .from("repuestos")
+            .from("articulos")
             .select("codigo, marca, descripcion, stock_actual, precio_venta, id_subrubro");
 
         // Si se selecciona un subrubro → filtro

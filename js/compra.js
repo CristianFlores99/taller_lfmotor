@@ -68,7 +68,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     const cantidad = parseInt(cantidadProducto.value);
     if(!id || cantidad<=0) return;
 
-    const producto = listaProductos.find(p=>p.id_repuesto===id);
+    const producto = listaProductos.find(p=>p.id_articulo===id);
     const subtotal = producto.precio_venta * cantidad;
     productosCompra.push({...producto, cantidad, subtotal});
     renderProductos();
@@ -109,7 +109,7 @@ async function guardarCompra(e){
 
     const detalles = productosCompra.map(p=>({
       id_compra: compra.id_compra,
-      id_repuesto: p.id_repuesto,
+      id_articulo: p.id_articulo,
       cantidad: p.cantidad,
       precio_unitario: p.precio_venta,
       subtotal: p.subtotal

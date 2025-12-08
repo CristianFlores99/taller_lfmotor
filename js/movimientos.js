@@ -30,12 +30,12 @@ window.addEventListener("click", e => {
 async function cargarMovimientos(filtros = {}) {
   let query = supabase
     .from("movimientos_stock")
-    .select("*, repuestos(codigo, descripcion)")
+    .select("*, articulos(codigo, descripcion)")
     .order("fecha", { ascending: false });
 
   // Aplicar filtros
   if (filtros.repuesto) {
-    query = query.ilike("repuestos.descripcion", `%${filtros.repuesto}%`);
+    query = query.ilike("articulos.descripcion", `%${filtros.repuesto}%`);
   }
 
   if (filtros.desde) {
@@ -66,7 +66,7 @@ async function cargarMovimientos(filtros = {}) {
     const tr = document.createElement("tr");
     tr.innerHTML = `
       <td>${new Date(m.fecha).toLocaleString()}</td>
-      <td>${m.repuestos?.descripcion || "—"}</td>
+      <td>${m.articulos?.descripcion || "—"}</td>
       <td style="color:${m.tipo === "entrada" ? "#10b981" : "#f87171"}">
         ${m.tipo === "entrada" ? "📥 Entrada" : "📤 Salida"}
       </td>
@@ -93,7 +93,7 @@ form.addEventListener("submit", async (e) => {
   e.preventDefault();
 
   const movimiento = {
-    id_repuesto: parseInt(id_repuesto.value),
+    id_articulo: parseInt(id_articulo.value),
     tipo: tipo.value,
     cantidad: parseInt(cantidad.value),
     motivo: motivo.value,

@@ -15,7 +15,7 @@ document.addEventListener("DOMContentLoaded", async ()=>{
   data.forEach(d=>{
     const tr = document.createElement("tr");
     tr.innerHTML = `
-      <td>${d.id_repuesto}</td>
+      <td>${d.id_articulo}</td>
       <td>${d.cantidad}</td>
       <td>$${d.precio_unitario}</td>
       <td>$${d.subtotal}</td>

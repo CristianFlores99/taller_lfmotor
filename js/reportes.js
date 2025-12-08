@@ -66,7 +66,7 @@ async function cargarCompras() {
 }
 
 async function cargarStock() {
-  const { data, error } = await supabase.from('repuestos').select('*').order('stock', { ascending:true });
+  const { data, error } = await supabase.from('articulos').select('*').order('stock', { ascending:true });
   if (error) return console.error(error);
 
   const tbody = document.querySelector('#tablaStock tbody');
