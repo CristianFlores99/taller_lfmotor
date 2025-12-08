@@ -74,8 +74,8 @@ function renderizar(lista) {
       <td>${s.id_subrubro}</td>
       <td>${s.nombre}</td>
       <td>
-        <button class="btn-editar" data-id="${s.id_subrubro}">✏️</button>
-        <button class="btn-eliminar" data-id="${s.id_subrubro}">🗑️</button>
+        <button class="btn-editar" data-id="${s.id_subrubro}">Editar</button>
+        <button class="btn-eliminar" data-id="${s.id_subrubro}">Eliminar</button>
       </td>
     `;
 

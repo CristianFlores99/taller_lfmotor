@@ -79,10 +79,10 @@ tr:nth-child(even) {
 
 /* Botones acciones */
 .btn-editar {
-  background: #10b981;
+  background: #3b82f6;
 }
 .btn-editar:hover {
-  background: #059669;
+  background: #2563eb;
 }
 
 .btn-eliminar {
