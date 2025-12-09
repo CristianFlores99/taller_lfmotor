@@ -39,7 +39,7 @@ if (idVentaActual) {
 async function agregarProducto() {
   const { data: repuestos, error } = await supabase
     .from("articulos")
-    .select("id_articulo, descripcion, precio_venta, stock_actual");
+    .select("id_articulo, codigo, descripcion, precio_venta, stock_actual");
 
   if (error) {
     alert("Error obteniendo repuestos: " + error.message);
@@ -48,7 +48,7 @@ async function agregarProducto() {
 
   const id_repuesto = prompt(
     "Ingrese el ID del repuesto o deje vacío para cancelar:\n" +
-      repuestos.map((r) => `${r.id_articulo} - ${r.descripcion} (Stock: ${r.stock_actual})`).join("\n")
+    repuestos.map((r) => `${r.id_articulo} - ${r.descripcion} (Stock: ${r.stock_actual})`).join("\n")
   );
   if (!id_repuesto) return;
 
@@ -67,6 +67,7 @@ async function agregarProducto() {
 
   productos.push({
     id_articulo: rep.id_articulo,
+    codigo: rep.codigo,
     descripcion: rep.descripcion,
     cantidad,
     precio_unitario: precio,
@@ -85,6 +86,7 @@ function renderTabla() {
     total += p.subtotal;
     const tr = document.createElement("tr");
     tr.innerHTML = `
+    <td>${p.codigo}</td>
       <td>${p.descripcion}</td>
       <td>${p.cantidad}</td>
       <td>$${p.precio_unitario.toFixed(2)}</td>
@@ -208,7 +210,7 @@ async function cargarVenta(idVenta) {
 
   const { data: detalles, error: errDetalle } = await supabase
     .from("detalle_venta")
-    .select("*, articulos(descripcion)")
+    .select("*, articulos(codigo, descripcion)")
     .eq("id_venta", idVenta);
 
   if (errDetalle) {
@@ -218,6 +220,7 @@ async function cargarVenta(idVenta) {
 
   productos = detalles.map((d) => ({
     id_articulo: d.id_articulo,
+    codigo: d.articulos.codigo,
     descripcion: d.articulos.descripcion,
     cantidad: d.cantidad,
     precio_unitario: d.precio_unitario,
