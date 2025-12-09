@@ -1,15 +1,20 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>📊 Panel de Reportes</title>
+
   <link rel="stylesheet" href="css/reportes.css">
+
+  <!-- Librerías -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 </head>
+
 <body>
   <div class="container">
     <header>
@@ -17,37 +22,27 @@
     </header>
 
     <section class="reportes">
+
       <div class="reporte-card">
         <h2>Ventas</h2>
         <canvas id="chartVentas"></canvas>
-        <table id="tablaVentas">
-          <thead>
-            <tr><th>ID Venta</th><th>Cliente</th><th>Fecha</th><th>Total</th></tr>
-          </thead>
-          <tbody></tbody>
-        </table>
+      </div>
+
+      <div class="reporte-card">
+        <h2>Ventas por Mes</h2>
+        <canvas id="chartVentasMes"></canvas>
       </div>
 
       <div class="reporte-card">
         <h2>Compras</h2>
         <canvas id="chartCompras"></canvas>
-        <table id="tablaCompras">
-          <thead>
-            <tr><th>ID Compra</th><th>Proveedor</th><th>Fecha</th><th>Total</th></tr>
-          </thead>
-          <tbody></tbody>
-        </table>
       </div>
 
       <div class="reporte-card">
         <h2>Stock Crítico</h2>
-        <table id="tablaStock">
-          <thead>
-            <tr><th>Repuesto</th><th>Categoría</th><th>Stock Actual</th></tr>
-          </thead>
-          <tbody></tbody>
-        </table>
+        <canvas id="chartStock"></canvas>
       </div>
+
     </section>
 
     <div class="export-buttons">
@@ -55,8 +50,10 @@
       <button id="exportExcel">📊 Exportar Excel</button>
       <button onclick="location.href='index.html'">⬅ Volver</button>
     </div>
+
   </div>
 
   <script type="module" src="js/reportes.js"></script>
 </body>
+
 </html>
