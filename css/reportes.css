@@ -99,3 +99,38 @@ button:hover {
     transform: translateY(-2px);
     box-shadow: 0 6px 15px rgba(29, 78, 216, 0.45);
 }
+
+/* === MÉTRICAS === */
+.metricas {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 22px;
+    margin-bottom: 40px;
+}
+
+.metrica-card {
+    background: linear-gradient(145deg, #1f2937 0%, #111827 100%);
+    padding: 22px;
+    border-radius: 14px;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.35);
+    text-align: center;
+    transition: 0.25s ease;
+    border: 1px solid #33415566;
+}
+
+.metrica-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 10px 26px rgba(0, 0, 0, 0.45);
+}
+
+.metrica-card h3 {
+    font-size: 17px;
+    color: #cbd5e1;
+    margin-bottom: 8px;
+}
+
+.metrica-card p {
+    font-size: 26px;
+    font-weight: 700;
+    color: #38bdf8;
+}

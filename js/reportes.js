@@ -15,6 +15,10 @@ document.addEventListener('DOMContentLoaded', async () => {
   await cargarCompras();
   await cargarStock();
   await cargarVentasMensual();
+  await metricasVentasDia();
+  await metricasVentasMes();
+  await metricasComprasMes();
+  await metricasStockCritico();
 });
 
 // ---------------- Funciones ----------------
@@ -252,3 +256,52 @@ document.getElementById('exportExcel').addEventListener('click', () => {
   });
   XLSX.writeFile(wb, 'reporte_completo.xlsx');
 });
+
+//
+async function metricasVentasDia() {
+  const hoy = new Date().toISOString().split("T")[0];
+
+  const { data, error } = await supabase
+    .from("ventas")
+    .select("total")
+    .eq("fecha", hoy);
+
+  if (error) return console.error(error);
+
+  const total = data.reduce((sum, v) => sum + v.total, 0);
+
+  document.getElementById("m_ventasDia").textContent = `$${total}`;
+}
+//
+async function metricasVentasMes() {
+  const hoy = new Date();
+  const año = hoy.getFullYear();
+  const mes = String(hoy.getMonth() + 1).padStart(2, "0");
+
+  const inicioMes = `${año}-${mes}-01`;
+
+  const { data, error } = await supabase
+    .from("ventas")
+    .select("total, fecha")
+    .gte("fecha", inicioMes);
+
+  if (error) return console.error(error);
+
+  const total = data.reduce((sum, v) => sum + v.total, 0);
+
+  document.getElementById("m_ventasMes").textContent = `$${total}`;
+}
+
+//
+async function metricasStockCritico() {
+  const { data, error } = await supabase
+    .from("articulos")
+    .select("stock_actual, stock_minimo");
+
+  if (error) return console.error(error);
+
+  const criticos = data.filter(a => a.stock_actual <= a.stock_minimo).length;
+
+  document.getElementById("m_stockCritico").textContent = `${criticos} Items`;
+}
+
