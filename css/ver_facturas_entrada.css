@@ -1,77 +1,147 @@
+/* ---------------- Reset y body ---------------- */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
 body {
-    font-family: Arial, sans-serif;
-    background: #f1f1f1;
-    padding: 20px;
+  background: #0f172a;
+  color: #fff;
+  padding: 20px;
 }
 
-.contenedor {
-    width: 95%;
-    max-width: 1000px;
-    background: white;
-    margin: auto;
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0px 0px 8px rgba(0,0,0,0.2);
+/* ---------------- Contenedor ---------------- */
+.container {
+  max-width: 1200px;
+  margin: auto;
 }
 
-h1 {
-    text-align: center;
-    margin-bottom: 20px;
+/* ---------------- Header ---------------- */
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
 }
 
-.barra-superior {
+header h1 {
+  font-size: 24px;
+}
+
+header input {
+  padding: 8px 12px;
+  width: 300px;
+  border: none;
+  border-radius: 6px;
+  outline: none;
+}
+
+header .acciones {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+/* ---------------- Botones ---------------- */
+button {
+  background: #2563eb;
+  border: none;
+  color: white;
+  padding: 8px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: background 0.3s;
+}
+button:hover {
+  background: #1d4ed8;
+}
+
+/* Botón volver */
+.btn-volver {
+  background: #3b82f6;
+  padding: 8px 14px;
+}
+.btn-volver:hover {
+  background: #2563eb;
+}
+
+/* ---------------- Tabla ---------------- */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background: #1e293b;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+th, td {
+  padding: 10px 12px;
+  text-align: left;
+}
+
+th {
+  background: #334155;
+  font-weight: 600;
+}
+
+tr:nth-child(even) {
+  background: #273449;
+}
+
+/* ============================== ALERTAS ============================== */
+.alerta-custom {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    min-width: 260px;
+    max-width: 340px;
+    padding: 14px 20px;
     display: flex;
-    justify-content: space-between;
-    margin-bottom: 15px;
-}
+    align-items: center;
+    gap: 10px;
 
-#buscar {
-    width: 70%;
-    padding: 10px;
-    border: 1px solid #bbb;
-    border-radius: 6px;
-    font-size: 16px;
-}
-
-#btnNueva {
-    padding: 10px 18px;
-    background: #28a745;
-    border: none;
+    border-radius: 12px;
+    font-size: 15px;
+    font-weight: 600;
     color: white;
-    font-size: 16px;
-    border-radius: 6px;
-    cursor: pointer;
+
+    z-index: 99999;
+
+    box-shadow: 0 6px 14px rgba(0,0,0,0.25);
+
+    opacity: 0;
+    transform: translateX(20px);
+    transition: opacity 0.4s ease, transform 0.4s ease;
 }
 
-#btnNueva:hover {
-    background: #1e7e34;
+.alerta-custom::before {
+    font-size: 20px;
 }
 
-.tabla {
-    width: 100%;
-    border-collapse: collapse;
+.alerta-ok {
+    background: linear-gradient(135deg, #2ecc71, #239b56);
 }
+.alerta-ok::before { content: "✔️"; }
 
-.tabla th, .tabla td {
-    padding: 10px;
-    text-align: center;
-    border: 1px solid #ccc;
+.alerta-error {
+    background: linear-gradient(135deg, #e74c3c, #c0392b);
 }
+.alerta-error::before { content: "❌"; }
 
-.tabla th {
-    background: #007bff;
-    color: white;
+.alerta-info {
+    background: linear-gradient(135deg, #f1c40f, #d4ac0d);
 }
+.alerta-info::before { content: "⚠️"; }
 
-.btn-detalle {
-    padding: 5px 10px;
-    background: #0069d9;
-    color: white;
-    border-radius: 4px;
-    cursor: pointer;
-    border: none;
+@keyframes vibrar {
+    0% { transform: translateX(0); }
+    20% { transform: translateX(-4px); }
+    40% { transform: translateX(4px); }
+    60% { transform: translateX(-4px); }
+    80% { transform: translateX(4px); }
+    100% { transform: translateX(0); }
 }
-
-.btn-detalle:hover {
-    background: #004fa3;
-}
+.alerta-error.anim-vibrar { animation: vibrar 0.4s ease; }

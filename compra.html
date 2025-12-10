@@ -9,65 +9,76 @@
 
 <body>
   <div class="container">
+
+    <!-- HEADER -->
     <header>
-      <h1>📥 Registrar Compra / Ingreso de Artículos</h1>
-      <p>Registrá compras con factura o ingresos del socio sin factura.</p>
+      <div>
+        <h1>📥 Registrar Compra / Ingreso de Artículos</h1>
+        <p>Registrá compras con factura o ingresos del socio sin factura.</p>
+      </div>
+      <button class="btn-volver" onclick="location.href='index.html'">⬅ Volver</button>
     </header>
 
-    <!-- Tipo de operación -->
+    <!-- TIPO DE OPERACIÓN -->
     <section class="box">
       <h2>Tipo de ingreso</h2>
+      <div class="opciones-tipo">
+        <label>
+          <input type="radio" name="tipoIngreso" value="factura" checked>
+          Compra con factura de proveedor
+        </label>
 
-      <label>
-        <input type="radio" name="tipoIngreso" value="factura" checked>
-        Compra con factura de proveedor
-      </label>
-
-      <label>
-        <input type="radio" name="tipoIngreso" value="socio">
-        Ingreso del socio (sin factura)
-      </label>
+        <label>
+          <input type="radio" name="tipoIngreso" value="socio">
+          Ingreso del socio (sin factura)
+        </label>
+      </div>
     </section>
 
-    <!-- Datos factura -->
+    <!-- DATOS FACTURA -->
     <section id="facturaSection" class="box">
       <h2>Datos de la Factura</h2>
 
-      <label>Proveedor:
-        <select id="proveedor"></select>
-      </label>
+      <div class="form-grid">
+        <label>Proveedor:
+          <select id="proveedor"></select>
+        </label>
 
-      <label>Número de factura:
-        <input type="text" id="numFactura" placeholder="Ej: A-1234-56">
-      </label>
+        <label>Número de factura:
+          <input type="text" id="numFactura" placeholder="Ej: A-1234-56">
+        </label>
 
-      <label>Fecha:
-        <input type="date" id="fechaFactura">
-      </label>
+        <label>Fecha:
+          <input type="date" id="fechaFactura">
+        </label>
+      </div>
     </section>
 
-    <!-- Agregar artículo -->
+    <!-- AGREGAR ARTÍCULO -->
     <section class="box">
       <h2>Agregar artículo a la compra</h2>
 
-      <label>Artículo:
-        <select id="articulo"></select>
-      </label>
+      <div class="form-grid">
+        <label>Artículo:
+          <select id="articulo"></select>
+        </label>
 
-      <label>Cantidad:
-        <input type="number" id="cantidad" min="1">
-      </label>
+        <label>Cantidad:
+          <input type="number" id="cantidad" min="1">
+        </label>
 
-      <label>Precio unitario:
-        <input type="number" id="precioUnitario" step="0.01">
-      </label>
+        <label>Precio unitario:
+          <input type="number" id="precioUnitario" step="0.01">
+        </label>
+      </div>
 
       <button id="btnAgregar">➕ Agregar</button>
     </section>
 
-    <!-- Tabla de artículos -->
+    <!-- DETALLE COMPRA -->
     <section class="box">
       <h2>Detalle de la compra</h2>
+
       <table id="tablaDetalle">
         <thead>
           <tr>
@@ -81,10 +92,11 @@
         <tbody></tbody>
       </table>
 
-      <h3>Total: $<span id="totalCompra">0.00</span></h3>
+      <h3 class="total">Total: $<span id="totalCompra">0.00</span></h3>
 
       <button id="btnGuardar" class="guardar">💾 Guardar Compra</button>
     </section>
+
   </div>
 
   <script type="module" src="js/compra.js"></script>

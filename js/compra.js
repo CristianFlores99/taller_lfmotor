@@ -115,7 +115,7 @@ function actualizarTabla() {
         <td>${item.cantidad}</td>
         <td>$${item.precio_unitario.toFixed(2)}</td>
         <td>$${item.subtotal.toFixed(2)}</td>
-        <td><button onclick="quitarItem(${index})">❌</button></td>
+        <td><button onclick="quitarItem(${index})">❌Eliminar</button></td>
       </tr>
     `;
   });
