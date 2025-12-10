@@ -3,66 +3,90 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Gestión de Compras</title>
+  <title>Registro de Compras</title>
   <link rel="stylesheet" href="css/compra.css">
 </head>
+
 <body>
   <div class="container">
     <header>
-      <h1>🛒 Compras</h1>
-      <div class="acciones">
-        <button id="btnNuevaCompra">➕ Nueva Compra</button>
-        <button id="btnVolver" class="btn-volver">⬅ Volver</button>
-      </div>
+      <h1>📥 Registrar Compra / Ingreso de Artículos</h1>
+      <p>Registrá compras con factura o ingresos del socio sin factura.</p>
     </header>
 
-    <table>
-      <thead>
-        <tr>
-          <th>ID Compra</th>
-          <th>Proveedor</th>
-          <th>Fecha</th>
-          <th>Total</th>
-          <th>Acciones</th>
-        </tr>
-      </thead>
-      <tbody id="cuerpoCompras"></tbody>
-    </table>
-  </div>
+    <!-- Tipo de operación -->
+    <section class="box">
+      <h2>Tipo de ingreso</h2>
 
-  <!-- Modal Compra -->
-  <div id="modalCompra" class="modal">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h2>Nueva Compra</h2>
-        <button id="cerrarModal" class="btn-cerrar">X</button>
-      </div>
-      <form id="formCompra">
-        <label>Proveedor:</label>
+      <label>
+        <input type="radio" name="tipoIngreso" value="factura" checked>
+        Compra con factura de proveedor
+      </label>
+
+      <label>
+        <input type="radio" name="tipoIngreso" value="socio">
+        Ingreso del socio (sin factura)
+      </label>
+    </section>
+
+    <!-- Datos factura -->
+    <section id="facturaSection" class="box">
+      <h2>Datos de la Factura</h2>
+
+      <label>Proveedor:
         <select id="proveedor"></select>
+      </label>
 
-        <label>Productos:</label>
-        <div class="producto-agregar">
-          <select id="selectProducto"></select>
-          <input type="number" id="cantidadProducto" value="1" min="1">
-          <button type="button" id="btnAgregarProducto">Agregar</button>
-        </div>
+      <label>Número de factura:
+        <input type="text" id="numFactura" placeholder="Ej: A-1234-56">
+      </label>
 
-        <div id="productosCompra"></div>
+      <label>Fecha:
+        <input type="date" id="fechaFactura">
+      </label>
+    </section>
 
-        <label>Total:</label>
-        <input type="text" id="totalCompra" value="0" disabled>
+    <!-- Agregar artículo -->
+    <section class="box">
+      <h2>Agregar artículo a la compra</h2>
 
-        <div class="form-actions">
-          <button type="submit">💾 Guardar Compra</button>
-        </div>
-      </form>
-    </div>
+      <label>Artículo:
+        <select id="articulo"></select>
+      </label>
+
+      <label>Cantidad:
+        <input type="number" id="cantidad" min="1">
+      </label>
+
+      <label>Precio unitario:
+        <input type="number" id="precioUnitario" step="0.01">
+      </label>
+
+      <button id="btnAgregar">➕ Agregar</button>
+    </section>
+
+    <!-- Tabla de artículos -->
+    <section class="box">
+      <h2>Detalle de la compra</h2>
+      <table id="tablaDetalle">
+        <thead>
+          <tr>
+            <th>Artículo</th>
+            <th>Cant.</th>
+            <th>Precio</th>
+            <th>Subtotal</th>
+            <th>Quitar</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+
+      <h3>Total: $<span id="totalCompra">0.00</span></h3>
+
+      <button id="btnGuardar" class="guardar">💾 Guardar Compra</button>
+    </section>
   </div>
 
   <script type="module" src="js/compra.js"></script>
-  <script>
-    document.getElementById("btnVolver").addEventListener("click", () => window.location.href="index.html");
-  </script>
 </body>
 </html>

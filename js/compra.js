@@ -1,145 +1,225 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-const supabaseUrl = 'https://ovfsffckhzelgbgohakv.supabase.co';
-const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im92ZnNmZmNraHplbGdiZ29oYWt2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjA2NTA0MjYsImV4cCI6MjA3NjIyNjQyNn0.hDiIhAHAr04Uo9todWdk0QUaqD3RYj5kMkITavzPiHc';
+
+const supabaseUrl = "https://ovfsffckhzelgbgohakv.supabase.co";
+const supabaseKey =
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im92ZnNmZmNraHplbGdiZ29oYWt2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjA2NTA0MjYsImV4cCI6MjA3NjIyNjQyNn0.hDiIhAHAr04Uo9todWdk0QUaqD3RYj5kMkITavzPiHc";
+
 const supabase = createClient(supabaseUrl, supabaseKey);
 
+// ELEMENTOS HTML
+const proveedor = document.getElementById("proveedor");
+const numFactura = document.getElementById("numFactura");
+const fechaFactura = document.getElementById("fechaFactura");
+
+const articuloSel = document.getElementById("articulo");
+const cantidadInput = document.getElementById("cantidad");
+const precioInput = document.getElementById("precioUnitario");
+
+const tablaDetalle = document.querySelector("#tablaDetalle tbody");
+const totalCompra = document.getElementById("totalCompra");
+
+const btnAgregar = document.getElementById("btnAgregar");
+const btnGuardar = document.getElementById("btnGuardar");
+
+let detalle = [];
+let total = 0;
+
+// Cargar combos
 document.addEventListener("DOMContentLoaded", async () => {
-  const cuerpoCompras = document.getElementById("cuerpoCompras");
-  const btnNuevaCompra = document.getElementById("btnNuevaCompra");
-  const modalCompra = document.getElementById("modalCompra");
-  const cerrarModal = document.getElementById("cerrarModal");
-  const formCompra = document.getElementById("formCompra");
-  const proveedorSelect = document.getElementById("proveedor");
-  const productosDiv = document.getElementById("productosCompra");
-  const totalCompraInput = document.getElementById("totalCompra");
-  const selectProducto = document.getElementById("selectProducto");
-  const cantidadProducto = document.getElementById("cantidadProducto");
-  const btnAgregarProducto = document.getElementById("btnAgregarProducto");
-
-  let listaProveedores = [];
-  let listaProductos = [];
-  let productosCompra = [];
-
-  // Listeners
-  btnNuevaCompra.addEventListener("click", ()=> modalCompra.style.display="flex");
-  cerrarModal.addEventListener("click", ()=> modalCompra.style.display="none");
-  window.addEventListener("click", e => { if(e.target===modalCompra) modalCompra.style.display="none"; });
-  btnAgregarProducto.addEventListener("click", agregarProducto);
-  formCompra.addEventListener("submit", guardarCompra);
-
   await cargarProveedores();
-  await cargarProductos();
-  await cargarCompras();
+  await cargarArticulos();
+});
 
-  async function cargarProveedores(){
-    const { data, error } = await supabase.from("proveedores").select("*").order("nombre");
-    if(error) return console.error(error);
-    listaProveedores = data;
-    proveedorSelect.innerHTML = data.map(p=>`<option value="${p.id_proveedor}">${p.nombre}</option>`).join("");
-  }
+// --------------------------------------
+// Cargar proveedores
+// --------------------------------------
+async function cargarProveedores() {
+  const { data, error } = await supabase
+    .from("proveedores")
+    .select("*")
+    .order("nombre");
 
-  async function cargarProductos(){
-    const { data, error } = await supabase.from("repuestos").select("*").order("descripcion");
-    if(error) return console.error(error);
-    listaProductos = data;
-    selectProducto.innerHTML = data.map(p=>`<option value="${p.id_repuesto}">${p.descripcion} ($${p.precio_venta})</option>`).join("");
-  }
+  if (error) return alert("Error cargando proveedores");
 
-  async function cargarCompras(){
-    const { data, error } = await supabase.from("compras").select("*").order("fecha",{ascending:false});
-    if(error) return console.error(error);
-    cuerpoCompras.innerHTML = "";
-    data.forEach(c=>{
-      const nombreProveedor = listaProveedores.find(p=>p.id_proveedor===c.id_proveedor)?.nombre || "-";
-      const tr = document.createElement("tr");
-      tr.innerHTML = `
-        <td>${c.id_compra}</td>
-        <td>${nombreProveedor}</td>
-        <td>${new Date(c.fecha).toLocaleDateString()}</td>
-        <td>$${c.total?.toFixed(2) || 0}</td>
-        <td><a href="detalle_compra.html?id=${c.id_compra}">Detalle</a></td>
-      `;
-      cuerpoCompras.appendChild(tr);
-    });
-  }
+  proveedor.innerHTML = `<option value="">-- Seleccione proveedor --</option>`;
 
-  function agregarProducto(){
-    const id = parseInt(selectProducto.value);
-    const cantidad = parseInt(cantidadProducto.value);
-    if(!id || cantidad<=0) return;
-
-    const producto = listaProductos.find(p=>p.id_articulo===id);
-    const subtotal = producto.precio_venta * cantidad;
-    productosCompra.push({...producto, cantidad, subtotal});
-    renderProductos();
-  }
-
-  function renderProductos(){
-    productosDiv.innerHTML = "";
-    let total = 0;
-    productosCompra.forEach((p,i)=>{
-      total += p.subtotal;
-      const div = document.createElement("div");
-      div.className = "producto-item";
-      div.innerHTML = `
-        ${p.descripcion} - Cant: ${p.cantidad} - $${p.subtotal.toFixed(2)}
-        <button type="button" data-index="${i}">❌</button>
-      `;
-      productosDiv.appendChild(div);
-      div.querySelector("button").addEventListener("click", ()=>{
-        productosCompra.splice(i,1);
-        renderProductos();
-      });
-    });
-    totalCompraInput.value = total.toFixed(2);
-  }
-
-async function guardarCompra(e){
-  e.preventDefault();
-  if(!proveedorSelect.value || productosCompra.length===0) return alert("Debe seleccionar proveedor y productos");
-  const total = parseFloat(totalCompraInput.value);
-
-  try {
-    const { data: compra, error } = await supabase.from("compras").insert([{
-      id_proveedor: proveedorSelect.value,
-      fecha: new Date(),
-      total
-    }]).select().single();
-    if(error) throw error;
-
-    const detalles = productosCompra.map(p=>({
-      id_compra: compra.id_compra,
-      id_articulo: p.id_articulo,
-      cantidad: p.cantidad,
-      precio_unitario: p.precio_venta,
-      subtotal: p.subtotal
-    }));
-
-    const { error: detalleError } = await supabase.from("detalle_compra").insert(detalles);
-    if(detalleError) throw detalleError;
-
-    // Actualizar stock y manejar posibles errores
-    for(let p of productosCompra){
-      try{
-        await actualizarStock(p.id_repuesto, p.cantidad);
-      }catch(err){
-        console.error("Error actualizando stock:", err);
-      }
-    }
-
-    alert("✅ Compra registrada y stock actualizado");
-
-  } catch(err){
-    console.error(err);
-    alert("❌ Ocurrió un error al guardar la compra: " + err.message);
-  } finally {
-    // Esto asegura que el modal siempre se cierra y se limpia la lista
-    productosCompra=[];
-    productosDiv.innerHTML="";
-    totalCompraInput.value="0";
-    modalCompra.style.display="none";
-    await cargarCompras();
-  }
+  data.forEach(p => {
+    const opt = document.createElement("option");
+    opt.value = p.id_proveedor;
+    opt.textContent = p.nombre;
+    proveedor.appendChild(opt);
+  });
 }
 
+// --------------------------------------
+// Cargar artículos
+// --------------------------------------
+async function cargarArticulos() {
+  const { data, error } = await supabase
+    .from("articulos")
+    .select("*")
+    .order("descripcion");
+
+  if (error) return alert("Error cargando artículos");
+
+  articuloSel.innerHTML = "<option value=''>-- Seleccione artículo --</option>";
+
+  data.forEach(a => {
+    const opt = document.createElement("option");
+    opt.value = a.id_articulo;
+    opt.textContent = `${a.descripcion} (${a.codigo})`;
+    opt.dataset.codigo = a.codigo;
+    articuloSel.appendChild(opt);
+  });
+}
+
+// --------------------------------------
+// Agregar artículo al detalle visual
+// --------------------------------------
+btnAgregar.addEventListener("click", () => {
+  const id_articulo = articuloSel.value;
+  const descripcion = articuloSel.options[articuloSel.selectedIndex].text;
+  const codigo = articuloSel.options[articuloSel.selectedIndex].dataset.codigo;
+  const cantidad = parseInt(cantidadInput.value);
+  const precio = parseFloat(precioInput.value);
+
+  if (!id_articulo) return alert("Seleccione un artículo");
+  if (!cantidad || cantidad <= 0) return alert("Ingrese cantidad");
+  if (!precio || precio <= 0) return alert("Ingrese precio válido");
+
+  const subtotal = cantidad * precio;
+
+  detalle.push({
+    id_articulo,
+    codigo,
+    descripcion,
+    cantidad,
+    precio_unitario: precio,
+    subtotal
+  });
+
+  total += subtotal;
+  actualizarTabla();
 });
+
+// --------------------------------------
+// Render tabla
+// --------------------------------------
+function actualizarTabla() {
+  tablaDetalle.innerHTML = "";
+
+  detalle.forEach((item, index) => {
+    tablaDetalle.innerHTML += `
+      <tr>
+        <td>${item.descripcion}</td>
+        <td>${item.cantidad}</td>
+        <td>$${item.precio_unitario.toFixed(2)}</td>
+        <td>$${item.subtotal.toFixed(2)}</td>
+        <td><button onclick="quitarItem(${index})">❌</button></td>
+      </tr>
+    `;
+  });
+
+  totalCompra.textContent = total.toFixed(2);
+}
+
+window.quitarItem = function (i) {
+  total -= detalle[i].subtotal;
+  detalle.splice(i, 1);
+  actualizarTabla();
+};
+
+// --------------------------------------
+// Guardar compra
+// --------------------------------------
+btnGuardar.addEventListener("click", async () => {
+  if (detalle.length === 0) return alert("Debe agregar artículos.");
+
+  const tipoIngreso = document.querySelector("input[name='tipoIngreso']:checked").value;
+
+  const compra = {
+    id_proveedor: tipoIngreso === "factura" ? proveedor.value : null,
+    codigo_alfanumerico: tipoIngreso === "factura" ? numFactura.value : "SIN_FACTURA",
+    fecha: tipoIngreso === "factura" ? fechaFactura.value : new Date().toISOString(),
+    monto_total: total,
+    saldo_pendiente: total,
+    notas: tipoIngreso === "socio" ? "Ingreso del socio" : ""
+  };
+
+  const { data: factura, error } = await supabase
+    .from("facturas_proveedor")
+    .insert([compra])
+    .select()
+    .single();
+
+  if (error) return alert("Error guardando compra");
+
+  // Procesar artículos (SOLO aumentar stock si existen)
+  for (const item of detalle) {
+    await procesarArticuloExistente(factura.id_compra, item);
+  }
+
+  alert("Compra registrada correctamente.");
+  window.location.reload();
+});
+
+// --------------------------------------
+// Buscar artículo por código
+// --------------------------------------
+async function buscarArticuloPorCodigo(codigo) {
+  const { data } = await supabase
+    .from("articulos")
+    .select("*")
+    .eq("codigo", codigo)
+    .maybeSingle();
+
+  return data;
+}
+
+// --------------------------------------
+// Actualizar stock
+// --------------------------------------
+async function actualizarStock(id_articulo, cantidad) {
+  const { data: actual } = await supabase
+    .from("articulos")
+    .select("stock_actual")
+    .eq("id_articulo", id_articulo)
+    .single();
+
+  const nuevoStock = actual.stock_actual + cantidad;
+
+  await supabase
+    .from("articulos")
+    .update({ stock_actual: nuevoStock })
+    .eq("id_articulo", id_articulo);
+}
+
+// --------------------------------------
+// Registrar detalle compra
+// --------------------------------------
+async function registrarDetalleCompra(id_compra, item) {
+  await supabase.from("compra_detalle").insert([
+    {
+      id_compra,
+      id_articulo: item.id_articulo,
+      cantidad: item.cantidad,
+      precio_unitario: item.precio_unitario,
+      subtotal: item.subtotal
+    }
+  ]);
+}
+
+// --------------------------------------
+// SOLO manejo de artículos existentes
+// --------------------------------------
+async function procesarArticuloExistente(id_compra, item) {
+  const articulo = await buscarArticuloPorCodigo(item.codigo);
+
+  if (!articulo) {
+    console.warn(`Artículo NO registrado: ${item.codigo} → NO se crea`);
+    return; // no se crea nada
+  }
+
+  await actualizarStock(articulo.id_articulo, item.cantidad);
+  await registrarDetalleCompra(id_compra, item);
+}
