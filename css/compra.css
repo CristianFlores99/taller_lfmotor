@@ -45,6 +45,7 @@ header p {
   cursor: pointer;
   transition: 0.2s;
 }
+
 .btn-volver:hover {
   background: #2563eb;
 }
@@ -55,8 +56,8 @@ header p {
   padding: 25px;
   border-radius: 16px;
   margin-bottom: 30px;
-  box-shadow: 0 4px 18px rgba(0,0,0,0.35);
-  border: 1px solid rgba(255,255,255,0.05);
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.35);
+  border: 1px solid rgba(255, 255, 255, 0.05);
 }
 
 .box h2 {
@@ -131,6 +132,7 @@ input[list]:focus {
   color: white;
   transition: 0.2s;
 }
+
 #btnAgregar:hover {
   background: #1d4ed8;
 }
@@ -178,6 +180,7 @@ td button {
   cursor: pointer;
   transition: 0.2s;
 }
+
 td button:hover {
   background: #dc2626;
 }
@@ -203,6 +206,7 @@ td button:hover {
   color: white;
   transition: 0.2s;
 }
+
 .guardar:hover {
   background: #15803d;
 }
@@ -224,5 +228,5 @@ td button:hover {
 #notas:focus {
   border-color: #60a5fa;
   background: #334155;
-  box-shadow: 0 0 4px rgba(96,165,250,0.4);
+  box-shadow: 0 0 4px rgba(96, 165, 250, 0.4);
 }

@@ -24,9 +24,8 @@ const btnGuardar = document.getElementById("btnGuardar");
 
 let detalle = [];
 let total = 0;
-const articuloInput = document.getElementById("articuloInput");
+
 const listaArticulos = document.getElementById("listaArticulos");
-let articulosGlobal = [];
 
 // Cargar combos
 document.addEventListener("DOMContentLoaded", async () => {
@@ -66,8 +65,6 @@ async function cargarArticulos() {
 
   if (error) return alert("Error cargando artículos");
 
-  articulosGlobal = data;
-
   listaArticulos.innerHTML = "";
 
   data.forEach(a => {
@@ -83,9 +80,19 @@ async function cargarArticulos() {
 // Agregar artículo al detalle visual
 // --------------------------------------
 btnAgregar.addEventListener("click", () => {
-  const id_articulo = articuloSel.value;
-  const descripcion = articuloSel.options[articuloSel.selectedIndex].text;
-  const codigo = articuloSel.options[articuloSel.selectedIndex].dataset.codigo;
+  // Obtener el texto escrito en el input
+  const texto = articuloInput.value.trim();
+
+  // Buscar cuál option coincide
+  const option = [...listaArticulos.options].find(opt => opt.value === texto);
+
+  if (!option) return alert("Seleccione un artículo válido.");
+
+  // Recuperar ID del artículo
+  const id_articulo = option.dataset.id;
+
+  // Separar código y descripción
+  const [codigo, descripcion] = texto.split(" - ");
   const cantidad = parseInt(cantidadInput.value);
   const precio = parseFloat(precioInput.value);
 
@@ -230,7 +237,7 @@ async function procesarArticuloExistente(id_compra, item) {
   await registrarDetalleCompra(id_compra, item);
 }
 */
-  // Sin aumento de stock (sin automatizacion)
+// Sin aumento de stock (sin automatizacion)
 async function procesarArticuloExistente(id_compra, item) {
   await registrarDetalleCompra(id_compra, item);
 }
