@@ -1,0 +1,96 @@
+body {
+    font-family: Arial, sans-serif;
+    background: #f4f4f4;
+    margin: 0;
+    padding: 20px;
+}
+
+.factura-container {
+    background: #fff;
+    max-width: 900px;
+    margin: auto;
+    padding: 25px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px #0003;
+}
+
+.factura-header {
+    display: flex;
+    border-bottom: 2px solid #e0e0e0;
+    padding-bottom: 10px;
+    align-items: center;
+}
+
+.logo-box img {
+    width: 130px;
+}
+
+.empresa-info {
+    margin-left: 20px;
+}
+
+.empresa-info h2 {
+    margin: 0;
+    color: #c41717;
+}
+
+.titulo-factura {
+    text-align: center;
+    margin-top: 15px;
+    font-size: 24px;
+}
+
+.venta-info p {
+    margin: 3px 0;
+}
+
+.detalle-tabla {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+.detalle-tabla th,
+.detalle-tabla td {
+    border: 1px solid #ddd;
+    padding: 8px;
+}
+
+.detalle-tabla th {
+    background: #eaeaea;
+}
+
+.total-box {
+    text-align: right;
+    margin-top: 15px;
+    font-size: 20px;
+    font-weight: bold;
+}
+
+.btn-imprimir {
+    background: #1a73e8;
+    color: white;
+    border: none;
+    padding: 12px 18px;
+    font-size: 16px;
+    border-radius: 8px;
+    cursor: pointer;
+    margin-top: 20px;
+}
+
+.btn-imprimir:hover {
+    background: #125bb5;
+}
+
+/* Estilos especiales para impresión */
+@media print {
+    .btn-imprimir {
+        display: none;
+    }
+    body {
+        background: white;
+    }
+    .factura-container {
+        box-shadow: none;
+    }
+}

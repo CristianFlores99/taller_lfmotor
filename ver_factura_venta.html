@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Factura de Venta</title>
+    <link rel="stylesheet" href="css/ver_factura_venta.css">
+</head>
+<body>
+
+<div class="factura-container">
+
+    <!-- Encabezado -->
+    <header class="factura-header">
+
+        <div class="logo-box">
+            <img src="ruta/a/tu/logo.jpeg" alt="LF Hnos Logo">
+        </div>
+
+        <div class="empresa-info">
+            <h2>LF Hnos – MOTOR</h2>
+            <p>Servicios de Mecánica Integral</p>
+            <p><strong>CUIT:</strong> 20-42279018-8</p>
+            <p><strong>Dirección:</strong> Ex Ruta 7 (Intendente Colobraro) 917, Partido de General Rodríguez</p>
+            <p><strong>WhatsApp:</strong> 11 4046-7070</p>
+        </div>
+    </header>
+
+    <h1 class="titulo-factura">FACTURA DE VENTA</h1>
+
+    <!-- Info de la venta -->
+    <section class="venta-info">
+        <p><strong>Fecha:</strong> <span id="fecha"></span></p>
+        <p><strong>Cliente:</strong> <span id="cliente"></span></p>
+        <p><strong>Medio de pago:</strong> <span id="medio_pago"></span></p>
+        <p><strong>Responsable:</strong> <span id="responsable"></span></p>
+        <p><strong>Observaciones:</strong> <span id="observaciones"></span></p>
+    </section>
+
+    <!-- Detalle -->
+    <table class="detalle-tabla">
+        <thead>
+            <tr>
+                <th>Código</th>
+                <th>Descripción</th>
+                <th>Cantidad</th>
+                <th>Precio Unit.</th>
+                <th>Subtotal</th>
+            </tr>
+        </thead>
+        <tbody id="detalle-body"></tbody>
+    </table>
+
+    <!-- Total -->
+    <div class="total-box">
+        Total: <span id="total"></span>
+    </div>
+
+    <button class="btn-imprimir" onclick="window.print()">Imprimir Factura</button>
+
+</div>
+
+<script src="js/ver_factura_venta.js"></script>
+</body>
+</html>
