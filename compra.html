@@ -2,10 +2,10 @@
 <html lang="es">
 
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Registro de Compras</title>
-  <link rel="stylesheet" href="css/compra.css">
+  <link rel="stylesheet" href="css/compra.css" />
 </head>
 
 <body>
@@ -30,63 +30,71 @@
         </label>
 
         <label>Número de factura:
-          <input type="text" id="numFactura" placeholder="Ej: A-1234-56">
+          <input type="text" id="numFactura" placeholder="Ej: A-1234-56" />
         </label>
 
         <label>Fecha:
-          <input type="date" id="fechaFactura">
+          <input type="date" id="fechaFactura" />
         </label>
       </div>
-      <label>Notas:
+
+      <label style="display:block; margin-top:12px;">Notas:
         <textarea id="notas" rows="3" placeholder="Escriba aquí una nota..."></textarea>
       </label>
-
     </section>
 
-    <!-- AGREGAR ARTÍCULO -->
-    <section class="box">
-      <h2>Agregar artículo a la compra</h2>
-
-      <div class="form-grid">
-        <label>Artículo:
-          <input list="listaArticulos" id="articuloInput" placeholder="Escribí código o descripción...">
-          <datalist id="listaArticulos"></datalist>
-        </label>
-
-        <label>Cantidad:
-          <input type="number" id="cantidad" min="1">
-        </label>
-
-        <label>Precio unitario:
-          <input type="number" id="precioUnitario" step="0.01">
-        </label>
-      </div>
-
-      <button id="btnAgregar">➕ Agregar</button>
-    </section>
-
-    <!-- DETALLE COMPRA -->
+    <!-- DETALLE COMPRA (form integrado encima de la tabla) -->
     <section class="box">
       <h2>Detalle de la compra</h2>
 
+      <!-- Botón para mostrar el formulario de artículo -->
+      <div style="margin-bottom:12px;">
+        <button id="btnMostrarForm" class="btn-volver" style="background:#2563eb;">➕ Agregar Artículo</button>
+      </div>
+
+      <!-- Formulario para agregar/editar artículo (oculto por defecto) -->
+      <div id="formArticulo" class="form-grid" style="display:none; gap:12px; align-items:end; margin-bottom:14px;">
+        <label style="grid-column: 1 / span 2;">
+          Artículo:
+          <input list="listaArticulos" id="articuloInput" placeholder="Escribí código o descripción..." />
+          <datalist id="listaArticulos"></datalist>
+        </label>
+
+        <label>
+          Cantidad:
+          <input type="number" id="cantidad" min="1" />
+        </label>
+
+        <label>
+          Precio unitario:
+          <input type="text" id="precioUnitario" placeholder="Ej: 9360.90" />
+        </label>
+
+        <div style="grid-column: 1 / span 3; display:flex; gap:8px; margin-top:6px;">
+          <button id="btnGuardarArticulo" class="guardar" style="background:#16a34a; padding:8px 14px;">💾 Guardar Artículo</button>
+          <button id="btnCancelarArticulo" class="btn-volver" style="background:#ef4444;">Cancelar</button>
+        </div>
+      </div>
+
+      <!-- Tabla Detalle -->
       <table id="tablaDetalle">
         <thead>
           <tr>
-            <th>Artículo</th>
+            <th>Codigo</th>
+            <th>Descripcion</th>
             <th>Cantidad</th>
             <th>Precio Unitario</th>
             <th>Subtotal</th>
-            <th>Quitar</th>
+            <th>Acciones</th>
           </tr>
         </thead>
         <tbody></tbody>
       </table>
 
-      <h3 class="total">Total: $<span id="totalCompra">0.00</span></h3>
+      <h3 class="total" style="margin-top:16px;">Total: $<span id="totalCompra">0.00</span></h3>
 
-      <button id="btnGuardar" class="guardar">💾 Guardar Compra</button>
+      <button id="btnGuardar" class="guardar" style="margin-top:12px;">💾 Guardar Compra</button>
     </section>
-
   </div>
 
   <script type="module" src="js/compra.js"></script>
