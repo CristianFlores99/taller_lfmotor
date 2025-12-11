@@ -1,4 +1,4 @@
-/* ---------------- Reset y body ---------------- */
+/* ---------------- Reset general ---------------- */
 * {
   margin: 0;
   padding: 0;
@@ -8,40 +8,52 @@
 
 body {
   background: #0f172a;
-  color: #fff;
+  color: #e2e8f0;
   padding: 20px;
 }
 
-/* ---------------- Contenedor ---------------- */
+/* ---------------- Layout general ---------------- */
 .container {
-  max-width: 1200px;
+  max-width: 1300px;
   margin: auto;
 }
 
 /* ---------------- Header ---------------- */
 header {
+  background: #1e293b;
+  padding: 15px 20px;
+  border-radius: 12px;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 20px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.35);
+  margin-bottom: 22px;
 }
 
 header h1 {
-  font-size: 24px;
+  font-size: 22px;
+  color: #fff;
 }
 
 header input {
-  padding: 8px 12px;
-  width: 300px;
-  border: none;
-  border-radius: 6px;
+  padding: 10px 14px;
+  width: 280px;
+  border: 1px solid #334155;
+  background: #0f172a;
+  border-radius: 8px;
+  color: #fff;
   outline: none;
+  transition: 0.2s;
+}
+
+header input:focus {
+  border-color: #3b82f6;
+  box-shadow: 0 0 6px rgba(59,130,246,0.5);
 }
 
 header .acciones {
   display: flex;
   gap: 10px;
-  align-items: center;
 }
 
 /* ---------------- Botones ---------------- */
@@ -49,225 +61,221 @@ button {
   background: #2563eb;
   border: none;
   color: white;
-  padding: 8px 12px;
-  border-radius: 6px;
+  padding: 9px 14px;
+  border-radius: 8px;
+  font-size: 14px;
   cursor: pointer;
   font-weight: 600;
-  transition: background 0.3s;
+  transition: 0.25s;
 }
+
 button:hover {
+  background: #1d4ed8;
+  transform: translateY(-1px);
+}
+
+.btn-volver {
+  background: #2563eb;
+}
+.btn-volver:hover {
   background: #1d4ed8;
 }
 
-/* Botón volver */
-.btn-volver {
-  background: #3b82f6;
-  padding: 8px 14px;
+/* ---------------- Filtros ---------------- */
+#filtroSubrubro,
+#filtroMarca {
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: 1px solid #334155;
+  background: #1e293b;
+  color: white;
+  cursor: pointer;
+  transition: 0.2s;
 }
-.btn-volver:hover {
-  background: #2563eb;
+
+#filtroSubrubro:hover,
+#filtroMarca:hover {
+  background: #334155;
 }
 
 /* ---------------- Tabla ---------------- */
 table {
   width: 100%;
   border-collapse: collapse;
+  margin-top: 10px;
   background: #1e293b;
-  border-radius: 10px;
+  border-radius: 12px;
   overflow: hidden;
+  box-shadow: 0px 4px 12px rgba(0,0,0,0.35);
 }
 
 th, td {
-  padding: 10px 12px;
+  padding: 12px 14px;
   text-align: left;
 }
 
 th {
   background: #334155;
   font-weight: 600;
+  color: #e2e8f0;
+  text-transform: uppercase;
+  font-size: 13px;
+}
+
+tr {
+  border-bottom: 1px solid #253041;
 }
 
 tr:nth-child(even) {
   background: #273449;
 }
 
-/* 🔹 Fondo más notorio para stock bajo */
+tr:hover {
+  background: #2c3a50;
+}
+
+/* Stock bajo resaltado */
 .stock-bajo {
   color: #fff;
   background-color: #dc2626;
-  border-radius: 4px;
-  padding: 2px 6px;
+  border-radius: 6px;
+  padding: 3px 7px;
+  font-weight: 600;
 }
 
-/* 🔹 Indicador de stock */
+/* Indicadores superiores */
 .indicador-stock {
-  margin-bottom: 12px;
-  padding: 8px 12px;
+  padding: 10px;
   background: #1e293b;
-  border-radius: 8px;
-  font-weight: 600;
+  border-radius: 10px;
+  margin-bottom: 15px;
   text-align: center;
+  font-weight: 600;
 }
 
 .stock-ok {
   color: #86efac;
-  background-color: rgba(134, 239, 172, 0.15);
+  background: rgba(134,239,172,0.15);
 }
-
-/* --- Select de filtro --- */
-#filtroSubrubro {
-  padding: 8px 12px;
-  border-radius: 6px;
-  border: none;
-  outline: none;
-  background-color: #1e293b;
-  color: white;
-  cursor: pointer;
-}
-
-#filtroSubrubro:hover {
-  background-color: #334155;
-}
-
 
 /* ---------------- Modal ---------------- */
 .modal {
   display: none;
   position: fixed;
-  z-index: 10;
-  left: 0;
-  top: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.7);
+  inset: 0;
+  background: rgba(0, 0, 0, 0.75);
   justify-content: center;
   align-items: center;
+  z-index: 1000;
 }
 
 .modal-content {
-  background: #1e1e1e;
-  padding: 15px 20px;  /* más compacto */
-  border-radius: 10px;
-  width: 450px;         /* ancho reducido */
-  max-width: 90%;
-  box-shadow: 0 0 10px #000;
+  background: #1e293b;
+  padding: 20px;
+  border-radius: 12px;
+  width: 480px;
+  max-width: 92%;
+  box-shadow: 0 0 20px rgba(0,0,0,0.6);
+  animation: fadeIn 0.25s ease-out;
 }
 
 .modal-header {
   display: flex;
   justify-content: space-between;
-  align-items: center;
-  margin-bottom: 10px;
+  margin-bottom: 15px;
+  color: #fff;
 }
 
 .btn-cerrar {
-  background: #f44336;
+  background: #ef4444;
   border: none;
-  color: white;
-  padding: 5px 10px;
-  cursor: pointer;
+  padding: 6px 10px;
+  border-radius: 6px;
+}
+.btn-cerrar:hover {
+  background: #dc2626;
 }
 
-/* ---------------- Formulario ---------------- */
+/* Formulario del modal */
 form {
   display: flex;
   flex-direction: column;
-  gap: 8px;  /* separación más compacta */
+  gap: 10px;
 }
 
-form input, form select {
-  padding: 6px;
-  border: none;
-  border-radius: 4px;
+form input,
+form select {
+  padding: 8px;
+  background: #0f172a;
+  color: #e2e8f0;
+  border: 1px solid #334155;
+  border-radius: 6px;
+}
+
+form input:focus,
+form select:focus {
+  border-color: #3b82f6;
 }
 
 .form-actions {
+  margin-top: 15px;
   display: flex;
-  gap: 10px;
-  margin-top: 10px;
   justify-content: flex-end;
-}
-#filtroMarca {
-  padding: 8px 12px;
-  border-radius: 6px;
-  border: none;
-  outline: none;
-  background-color: #1e293b;
-  color: white;
-  cursor: pointer;
-}
-#filtroMarca:hover {
-  background-color: #334155;
+  gap: 10px;
 }
 
-/* ==============================
-   ALERTA MODERNA — ESTILO PRO
-   ============================== */
-
+/* ---------------- Alertas ---------------- */
 .alerta-custom {
-    position: fixed;
-    top: 20px;
-    right: 20px;
-    min-width: 260px;
-    max-width: 340px;
-    padding: 14px 20px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  min-width: 260px;
+  max-width: 340px;
+  padding: 14px 20px;
 
-    border-radius: 12px;
-    font-size: 15px;
-    font-weight: 600;
-    color: white;
+  display: flex;
+  align-items: center;
+  gap: 10px;
 
-    z-index: 99999;
+  border-radius: 12px;
+  font-size: 15px;
+  font-weight: 600;
+  color: white;
 
-    box-shadow: 0 6px 14px rgba(0,0,0,0.25);
+  z-index: 99999;
 
-    opacity: 0;
-    transform: translateX(20px);
-    transition:
-        opacity 0.4s ease,
-        transform 0.4s ease;
+  box-shadow: 0 6px 14px rgba(0,0,0,0.25);
+
+  opacity: 0;
+  transform: translateX(20px);
+  transition: 0.4s ease;
 }
 
-/* Icono dentro de la alerta */
-.alerta-custom::before {
-    font-size: 20px;
-}
-
-/* TIPOS */
 .alerta-ok {
-    background: linear-gradient(135deg, #2ecc71, #239b56);
+  background: linear-gradient(135deg, #22c55e, #16a34a);
 }
-.alerta-ok::before {
-    content: "✔️";
-}
-
 .alerta-error {
-    background: linear-gradient(135deg, #e74c3c, #c0392b);
+  background: linear-gradient(135deg, #ef4444, #dc2626);
 }
-.alerta-error::before {
-    content: "❌";
-}
-
 .alerta-info {
-    background: linear-gradient(135deg, #f1c40f, #d4ac0d);
-}
-.alerta-info::before {
-    content: "⚠️";
+  background: linear-gradient(135deg, #facc15, #eab308);
 }
 
-/* Animación de vibración para errores */
 @keyframes vibrar {
-    0% { transform: translateX(0); }
-    20% { transform: translateX(-4px); }
-    40% { transform: translateX(4px); }
-    60% { transform: translateX(-4px); }
-    80% { transform: translateX(4px); }
-    100% { transform: translateX(0); }
-}
-.alerta-error.anim-vibrar {
-    animation: vibrar 0.4s ease;
+  0% { transform: translateX(0); }
+  20% { transform: translateX(-4px); }
+  40% { transform: translateX(4px); }
+  60% { transform: translateX(-4px); }
+  80% { transform: translateX(4px); }
+  100% { transform: translateX(0); }
 }
 
+.alerta-error.anim-vibrar {
+  animation: vibrar 0.4s ease;
+}
+
+/* Animación modal */
+@keyframes fadeIn {
+  from { opacity: 0; transform: scale(0.96); }
+  to { opacity: 1; transform: scale(1); }
+}

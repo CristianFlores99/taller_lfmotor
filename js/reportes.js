@@ -154,7 +154,7 @@ async function cargarVentasMensual() {
 
 // ---------------- Compras ----------------
 async function cargarCompras() {
-  const { data, error } = await supabase.from('compras').select('*').order('fecha', { ascending: true });
+  const { data, error } = await supabase.from('compra_detalle').select('*').order('fecha', { ascending: true });
   if (error) return console.error(error);
 
   const etiquetas = data.map(c => new Date(c.fecha).toLocaleDateString());

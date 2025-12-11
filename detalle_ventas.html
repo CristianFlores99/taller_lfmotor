@@ -1,11 +1,13 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Detalle de Venta</title>
   <link rel="stylesheet" href="css/detalle_ventas.css" />
 </head>
+
 <body>
   <div class="container">
     <header>
@@ -48,7 +50,31 @@
     <p id="totalVenta">Total: $0</p>
   </div>
 
+  <!-- ===============================
+   MODAL AGREGAR PRODUCTO
+================================= -->
+  <div id="modalAgregar" class="modal">
+    <div class="modal-content">
+      <h2>Seleccionar Producto</h2>
+
+      <input type="text" id="buscarProducto" placeholder="Buscar por código o descripción...">
+
+      <div class="lista-articulos" id="listaArticulos"></div>
+
+      <div class="cantidad-box">
+        <label>Cantidad</label>
+        <input type="number" id="cantidadProducto" min="1" value="1">
+      </div>
+
+      <div class="acciones-modal">
+        <button id="btnCancelarModal" class="btn-cancelar">Cancelar</button>
+        <button id="btnConfirmarProducto" class="btn-confirmar">Agregar</button>
+      </div>
+    </div>
+  </div>
+
   <!-- Importante: el script va al final -->
   <script type="module" src="js/detalle_ventas.js"></script>
 </body>
+
 </html>

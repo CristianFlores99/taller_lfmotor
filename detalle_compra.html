@@ -1,50 +1,53 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <title>Detalle de Compra</title>
     <link rel="stylesheet" href="css/detalle_compra.css">
 </head>
+
 <body>
 
-<div class="container">
+    <div class="container">
 
-    <h1>📄 Detalle de Compra</h1>
+        <h1>📄 Detalle de la Factura</h1>
 
-    <button class="btn-volver" onclick="window.location.href='ver_facturas_entrada.html'">
-        ⬅ Volver
-    </button>
+        <button class="btn-volver" onclick="window.location.href='ver_facturas_entrada.html'">
+            ⬅ Volver
+        </button>
 
-    <div class="card">
-        <h2>Información de la Factura</h2>
+        <div class="card">
+            <h2>Información de la Factura</h2>
 
-        <div class="info-grid">
-            <div><strong>Número:</strong> <span id="numFactura"></span></div>
-            <div><strong>Fecha:</strong> <span id="fecha"></span></div>
-            <div><strong>Proveedor:</strong> <span id="proveedor"></span></div>
-            <div><strong>Total:</strong> <span id="total"></span></div>
+            <div class="info-grid">
+                <div><strong>Número:</strong> <span id="numFactura"></span></div>
+                <div><strong>Fecha:</strong> <span id="fecha"></span></div>
+                <div><strong>Proveedor:</strong> <span id="proveedor"></span></div>
+                <div><strong>Total:</strong> <span id="total"></span></div>
+            </div>
         </div>
+
+        <div class="card">
+            <h2>Artículos de la Compra</h2>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Código</th>
+                        <th>Artículo</th>
+                        <th>Cantidad</th>
+                        <th>Precio Unitario</th>
+                        <th>Subtotal</th>
+                    </tr>
+                </thead>
+                <tbody id="tablaDetalle"></tbody>
+            </table>
+        </div>
+
     </div>
 
-    <div class="card">
-        <h2>Artículos de la Compra</h2>
-
-        <table>
-            <thead>
-                <tr>
-                    <th>Artículo</th>
-                    <th>Código</th>
-                    <th>Cantidad</th>
-                    <th>Precio Unit.</th>
-                    <th>Subtotal</th>
-                </tr>
-            </thead>
-            <tbody id="tablaDetalle"></tbody>
-        </table>
-    </div>
-
-</div>
-
-<script src="js/detalle_compra.js" type="module"></script>
+    <script src="js/detalle_compra.js" type="module"></script>
 </body>
+
 </html>

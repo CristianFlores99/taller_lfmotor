@@ -1,7 +1,7 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 const supabaseUrl = "https://ovfsffckhzelgbgohakv.supabase.co";
 const supabaseKey =
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im92ZnNmZmNraHplbGdiZ29oYWt2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjA2NTA0MjYsImV4cCI6MjA3NjIyNjQyNn0.hDiIhAHAr04Uo9todWdk0QUaqD3RYj5kMkITavzPiHc";
+    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im92ZnNmZmNraHplbGdiZ29oYWt2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjA2NTA0MjYsImV4cCI6MjA3NjIyNjQyNn0.hDiIhAHAr04Uo9todWdk0QUaqD3RYj5kMkITavzPiHc";
 
 const supabase = createClient(supabaseUrl, supabaseKey);
 
@@ -46,12 +46,11 @@ function renderTabla(lista) {
         const row = document.createElement("tr");
 
         row.innerHTML = `
-            <td>${f.id_compra}</td>
             <td>${f.proveedor?.nombre || "Sin proveedor"}</td>
             <td>${f.codigo_alfanumerico || "-"}</td>
             <td>${f.fecha}</td>
+            <td>0</td>
             <td>$${f.monto_total}</td>
-            <td>$${f.saldo_pendiente}</td>
             <td>
                 <button class="btn-detalle" onclick="verDetalle(${f.id_compra})">Ver</button>
             </td>
@@ -78,7 +77,7 @@ buscarInput.addEventListener("input", () => {
 // --------------------------------------------------
 // Ver detalle
 // --------------------------------------------------
-window.verDetalle = function(id) {
+window.verDetalle = function (id) {
     window.location.href = `detalle_compra.html?id=${id}`;
 };
 

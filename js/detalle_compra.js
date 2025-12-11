@@ -2,7 +2,7 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const supabaseUrl = "https://ovfsffckhzelgbgohakv.supabase.co";
 const supabaseKey =
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im92ZnNmZmNraHplbGdiZ29oYWt2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjA2NTA0MjYsImV4cCI6MjA3NjIyNjQyNn0.hDiIhAHAr04Uo9todWdk0QUaqD3RYj5kMkITavzPiHc";
+    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im92ZnNmZmNraHplbGdiZ29oYWt2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjA2NTA0MjYsImV4cCI6MjA3NjIyNjQyNn0.hDiIhAHAr04Uo9todWdk0QUaqD3RYj5kMkITavzPiHc";
 
 const supabase = createClient(supabaseUrl, supabaseKey);
 
@@ -72,8 +72,8 @@ async function cargarDetalle() {
     data.forEach(item => {
         const tr = document.createElement("tr");
         tr.innerHTML = `
-            <td>${item.articulos.descripcion}</td>
             <td>${item.articulos.codigo}</td>
+            <td>${item.articulos.descripcion}</td>
             <td>${item.cantidad}</td>
             <td>$${item.precio_unitario.toFixed(2)}</td>
             <td>$${item.subtotal.toFixed(2)}</td>

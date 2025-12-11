@@ -1,99 +1,123 @@
+/* ---------------- Reset general ---------------- */
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
+/* ---------------- Fondo general ---------------- */
 body {
-  background: #0f172a; /* Azul oscuro principal */
-  color: #fff;
-  padding: 20px;
+  background: #0f172a;
+  color: #e2e8f0;
+  padding: 22px;
 }
 
+/* ---------------- Contenedor principal ---------------- */
 .container {
-  max-width: 1000px;
+  max-width: 1200px;
   margin: auto;
-  background: #1e293b; /* Fondo de tarjeta */
-  border-radius: 12px;
-  padding: 20px;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+  background: #1e293b;
+  padding: 25px;
+  border-radius: 14px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.35);
+  animation: fadeIn 0.35s ease-out;
 }
 
+/* ---------------- Header ---------------- */
 header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 20px;
+  background: #1e293b;
+  padding: 12px 15px;
+  border-radius: 12px;
+  margin-bottom: 22px;
 }
 
 h1 {
   font-size: 26px;
-  color: #93c5fd; /* Azul suave */
+  color: #93c5fd;
+  font-weight: 700;
 }
 
+/* ---------------- Botón Volver ---------------- */
 .btn-volver {
-  background: #3b82f6; /* Azul brillante */
+  background: #475569;
   border: none;
   color: white;
-  padding: 8px 14px;
-  border-radius: 6px;
+  padding: 9px 16px;
+  border-radius: 8px;
+  font-weight: 600;
   cursor: pointer;
-  transition: 0.2s ease;
+  transition: 0.25s;
 }
 
 .btn-volver:hover {
-  background: #2563eb;
+  background: #64748b;
+  transform: translateY(-1px);
 }
 
+/* ---------------- Acciones ---------------- */
 .acciones {
   display: flex;
   justify-content: flex-end;
-  margin-bottom: 15px;
-  gap: 10px;
+  margin-bottom: 18px;
+  gap: 12px;
 }
 
 .acciones button {
   background: #2563eb;
   border: none;
   color: white;
-  padding: 8px 14px;
-  border-radius: 6px;
+  padding: 9px 16px;
+  border-radius: 8px;
   cursor: pointer;
-  transition: 0.2s ease;
+  font-weight: 600;
+  transition: 0.25s;
 }
 
 .acciones button:hover {
   background: #1d4ed8;
+  transform: translateY(-1px);
 }
 
+/* Botón agregar */
 .btn-agregar {
-  background: #10b981; /* Verde éxito */
+  background: #10b981;
 }
 
 .btn-agregar:hover {
   background: #059669;
 }
 
+/* ---------------- Tabla ---------------- */
 table {
   width: 100%;
   border-collapse: collapse;
-  border-radius: 8px;
-  overflow: hidden;
+  margin-top: 15px;
   background: #1e293b;
-  color: #e2e8f0;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.35);
 }
 
-th,
-td {
-  padding: 12px;
+th, td {
+  padding: 14px 16px;
   text-align: left;
+  font-size: 15px;
 }
 
 th {
   background: #334155;
-  font-weight: 600;
   color: #cbd5e1;
+  text-transform: uppercase;
+  font-size: 13px;
+  letter-spacing: 0.5px;
+}
+
+tr {
+  border-bottom: 1px solid #253041;
 }
 
 tr:nth-child(even) {
@@ -101,38 +125,50 @@ tr:nth-child(even) {
 }
 
 tr:hover {
-  background: #334155;
+  background: #2d3a4d;
 }
 
+/* ---------------- Botones de tabla ---------------- */
 .btn-ver {
   background: #3b82f6;
-  color: white;
   border: none;
-  padding: 6px 10px;
-  border-radius: 5px;
+  padding: 7px 12px;
+  border-radius: 6px;
   cursor: pointer;
+  color: #fff;
+  transition: 0.25s;
 }
 
 .btn-ver:hover {
   background: #2563eb;
+  transform: scale(1.05);
 }
 
 .btn-eliminar {
   background: #ef4444;
-  color: white;
   border: none;
-  padding: 6px 10px;
-  border-radius: 5px;
+  padding: 7px 12px;
+  border-radius: 6px;
   cursor: pointer;
+  color: #fff;
+  transition: 0.25s;
 }
 
 .btn-eliminar:hover {
   background: #dc2626;
+  transform: scale(1.05);
 }
 
+/* ---------------- Footer ---------------- */
 footer {
   text-align: right;
   color: #94a3b8;
-  margin-top: 15px;
+  margin-top: 25px;
   font-size: 14px;
+}
+
+/* ---------------- Animación de entrada ---------------- */
+@keyframes fadeIn {
+  from { opacity: 0; transform: scale(0.97); }
+  to { opacity: 1; transform: scale(1); }
 }

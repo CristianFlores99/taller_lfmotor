@@ -36,46 +36,110 @@ if (idVentaActual) {
 }
 
 // --- Agregar producto ---
+let articulosCache = [];
+let articuloSeleccionado = null;
+
 async function agregarProducto() {
   const { data: repuestos, error } = await supabase
     .from("articulos")
     .select("id_articulo, codigo, descripcion, precio_venta, stock_actual");
 
   if (error) {
-    alert("Error obteniendo repuestos: " + error.message);
+    alert("Error obteniendo artículos: " + error.message);
     return;
   }
 
-  const id_repuesto = prompt(
-    "Ingrese el ID del repuesto o deje vacío para cancelar:\n" +
-    repuestos.map((r) => `${r.id_articulo} - ${r.descripcion} (Stock: ${r.stock_actual})`).join("\n")
-  );
-  if (!id_repuesto) return;
+  articulosCache = repuestos;
 
-  const rep = repuestos.find((r) => r.id_articulo == id_repuesto);
-  if (!rep) return alert("ID no encontrado.");
+  // Mostrar modal
+  document.getElementById("modalAgregar").style.display = "flex";
 
-  const cantidad = parseInt(prompt("Cantidad vendida:", "1")) || 1;
+  const lista = document.getElementById("listaArticulos");
+  lista.innerHTML = "";
 
-  if (cantidad > rep.stock_actual) {
-    alert(`⚠️ No hay suficiente stock. Disponible: ${rep.stock_actual}`);
-    return;
-  }
-
-  const precio = parseFloat(rep.precio_venta) || 0;
-  const subtotal = cantidad * precio;
-
-  productos.push({
-    id_articulo: rep.id_articulo,
-    codigo: rep.codigo,
-    descripcion: rep.descripcion,
-    cantidad,
-    precio_unitario: precio,
-    subtotal,
+  repuestos.forEach((r) => {
+    const div = document.createElement("div");
+    div.className = "item-articulo";
+    div.dataset.id = r.id_articulo;
+    div.innerHTML = `
+      <strong>${r.codigo}</strong> - ${r.descripcion}<br>
+      <small>Stock: ${r.stock_actual} | $${r.precio_venta}</small>
+    `;
+    div.onclick = () => seleccionarArticulo(div, r);
+    lista.appendChild(div);
   });
 
+  document.getElementById("buscarProducto").onkeyup = filtrarArticulos;
+
+  document.getElementById("btnCancelarModal").onclick = cerrarModal;
+  document.getElementById("btnConfirmarProducto").onclick = confirmarAgregar;
+}
+
+function seleccionarArticulo(div, articulo) {
+  document.querySelectorAll(".item-articulo").forEach(i => i.classList.remove("selected"));
+  div.classList.add("selected");
+  articuloSeleccionado = articulo;
+}
+
+function filtrarArticulos() {
+  const texto = this.value.toLowerCase();
+  const lista = document.getElementById("listaArticulos");
+
+  lista.innerHTML = "";
+
+  articulosCache
+    .filter(a =>
+      a.codigo.toLowerCase().includes(texto) ||
+      a.descripcion.toLowerCase().includes(texto)
+    )
+    .forEach(a => {
+      const div = document.createElement("div");
+      div.className = "item-articulo";
+      div.dataset.id = a.id_articulo;
+      div.innerHTML = `
+        <strong>${a.codigo}</strong> - ${a.descripcion}<br>
+        <small>Stock: ${a.stock_actual} | $${a.precio_venta}</small>
+      `;
+      div.onclick = () => seleccionarArticulo(div, a);
+      lista.appendChild(div);
+    });
+}
+
+function cerrarModal() {
+  document.getElementById("modalAgregar").style.display = "none";
+  articuloSeleccionado = null;
+}
+
+function confirmarAgregar() {
+  if (!articuloSeleccionado) {
+    alert("Debe seleccionar un artículo.");
+    return;
+  }
+
+  const cant = parseInt(document.getElementById("cantidadProducto").value);
+  if (cant <= 0) {
+    alert("Cantidad inválida.");
+    return;
+  }
+
+  if (cant > articuloSeleccionado.stock_actual) {
+    alert("No hay suficiente stock.");
+    return;
+  }
+
+  productos.push({
+    id_articulo: articuloSeleccionado.id_articulo,
+    codigo: articuloSeleccionado.codigo,
+    descripcion: articuloSeleccionado.descripcion,
+    cantidad: cant,
+    precio_unitario: articuloSeleccionado.precio_venta,
+    subtotal: cant * articuloSeleccionado.precio_venta
+  });
+
+  cerrarModal();
   renderTabla();
 }
+
 
 // --- Renderizar tabla ---
 function renderTabla() {

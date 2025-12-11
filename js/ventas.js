@@ -31,7 +31,6 @@ async function cargarVentas() {
   data.forEach((v) => {
     const tr = document.createElement("tr");
     tr.innerHTML = `
-      <td>${v.id_venta}</td>
       <td>${v.fecha}</td>
       <td>${v.cliente}</td>
       <td>${v.medio_pago || "-"}</td>

@@ -1,3 +1,6 @@
+/* ===============================
+   RESET GENERAL
+================================= */
 * {
   margin: 0;
   padding: 0;
@@ -7,66 +10,106 @@
 
 body {
   background: #0f172a;
-  color: #fff;
-  padding: 20px;
+  color: #e2e8f0;
+  padding: 24px;
 }
 
+/* ===============================
+   CONTENEDOR PRINCIPAL
+================================= */
 .container {
-  max-width: 1200px;
+  max-width: 1250px;
   margin: auto;
+  animation: fadeIn 0.35s ease-out;
 }
 
 header {
   text-align: center;
-  margin-bottom: 30px;
+  margin-bottom: 40px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid rgba(148,163,184,0.25);
 }
 
 header h1 {
-  font-size: 28px;
-  margin-bottom: 10px;
+  font-size: 32px;
+  font-weight: 700;
+  color: #93c5fd;
+  margin-bottom: 8px;
 }
 
 header p {
   color: #cbd5e1;
+  font-size: 16px;
 }
 
+/* ===============================
+   GRID DE OPCIONES (CARDS)
+================================= */
 .grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 20px;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 25px;
 }
 
+/* CARD */
 .card {
   background: #1e293b;
-  padding: 20px;
-  border-radius: 10px;
-  box-shadow: 0 4px 8px rgba(0,0,0,0.5);
+  padding: 26px 22px;
+  border-radius: 14px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.45);
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+  transition: 0.25s;
+  border: 1px solid rgba(148,163,184,0.15);
+}
+
+.card:hover {
+  transform: translateY(-4px);
+  background: #25324a;
+  box-shadow: 0 8px 22px rgba(0,0,0,0.55);
 }
 
 .card h2 {
-  font-size: 20px;
-  margin-bottom: 10px;
+  font-size: 22px;
+  margin-bottom: 12px;
+  color: #bfdbfe;
+  font-weight: 700;
 }
 
 .card p {
   flex-grow: 1;
+  font-size: 15px;
   color: #cbd5e1;
+  margin-bottom: 18px;
 }
 
+/* ===============================
+   BOTONES
+================================= */
 .card button {
   background: #2563eb;
   border: none;
   color: white;
-  padding: 10px;
-  border-radius: 6px;
+  padding: 12px 0;
+  border-radius: 10px;
   cursor: pointer;
-  font-weight: 600;
-  transition: background 0.3s;
+  font-weight: 700;
+  transition: 0.25s;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.35);
+  font-size: 15px;
 }
 
 .card button:hover {
   background: #1d4ed8;
+  box-shadow: 0 4px 14px rgba(59,130,246,0.45);
+  transform: translateY(-2px);
+}
+
+/* ===============================
+   ANIMACIÓN
+================================= */
+@keyframes fadeIn {
+  from { opacity: 0; transform: scale(0.97); }
+  to { opacity: 1; transform: scale(1); }
 }

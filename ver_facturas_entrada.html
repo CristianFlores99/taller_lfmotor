@@ -1,39 +1,42 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <title>Facturas de Entrada</title>
     <link rel="stylesheet" href="css/ver_facturas_entrada.css">
 </head>
+
 <body>
 
-<div class="contenedor">
+    <div class="contenedor">
 
-    <h1>Facturas de Entrada</h1>
+        <h1>Facturas de Entrada/Proveedores</h1>
 
-    <div class="barra-superior">
-        <input type="text" id="buscar" placeholder="Buscar proveedor, fecha o código...">
-        <button id="btnNueva">Nueva Entrada</button>
+        <div class="barra-superior">
+            <input type="text" id="buscar" placeholder="Buscar proveedor, fecha o código...">
+            <button id="btnNueva">Nueva Entrada</button>
+            <button onclick="location.href='index.html'">⬅ Volver</button>
+        </div>
+
+        <table class="tabla">
+            <thead>
+                <tr>
+                    <th>Proveedor</th>
+                    <th>Código</th>
+                    <th>Fecha</th>
+                    <th>Saldo Pendiente</th>
+                    <th>Monto Total</th>
+                    <th>Acción</th>
+                </tr>
+            </thead>
+            <tbody id="tabla_facturas_body"></tbody>
+        </table>
+
     </div>
 
-    <table class="tabla">
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>Proveedor</th>
-                <th>Código</th>
-                <th>Fecha</th>
-                <th>Monto Total</th>
-                <th>Saldo Pendiente</th>
-                <th>Acción</th>
-            </tr>
-        </thead>
-        <tbody id="tabla_facturas_body"></tbody>
-    </table>
-
-</div>
-
-<script type="module" src="js/ver_facturas_entrada.js"></script>
+    <script type="module" src="js/ver_facturas_entrada.js"></script>
 
 </body>
+
 </html>

@@ -67,7 +67,7 @@ async function cargarArticulos() {
   data.forEach(a => {
     const opt = document.createElement("option");
     opt.value = a.id_articulo;
-    opt.textContent = `${a.descripcion} (${a.codigo})`;
+    opt.textContent = `(Codigo: ${a.codigo}) - ${a.descripcion}`;
     opt.dataset.codigo = a.codigo;
     articuloSel.appendChild(opt);
   });
