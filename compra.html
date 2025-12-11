@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -19,22 +20,6 @@
       <button class="btn-volver" onclick="location.href='ver_facturas_entrada.html'">⬅ Volver</button>
     </header>
 
-    <!-- TIPO DE OPERACIÓN -->
-    <section class="box">
-      <h2>Tipo de ingreso</h2>
-      <div class="opciones-tipo">
-        <label>
-          <input type="radio" name="tipoIngreso" value="factura" checked>
-          Compra con factura de proveedor
-        </label>
-
-        <label>
-          <input type="radio" name="tipoIngreso" value="socio">
-          Ingreso del socio (sin factura)
-        </label>
-      </div>
-    </section>
-
     <!-- DATOS FACTURA -->
     <section id="facturaSection" class="box">
       <h2>Datos de la Factura</h2>
@@ -52,6 +37,10 @@
           <input type="date" id="fechaFactura">
         </label>
       </div>
+      <label>Notas:
+        <textarea id="notas" rows="3" placeholder="Escriba aquí una nota..."></textarea>
+      </label>
+
     </section>
 
     <!-- AGREGAR ARTÍCULO -->
@@ -101,4 +90,5 @@
 
   <script type="module" src="js/compra.js"></script>
 </body>
+
 </html>

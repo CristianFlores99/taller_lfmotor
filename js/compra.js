@@ -10,6 +10,7 @@ const supabase = createClient(supabaseUrl, supabaseKey);
 const proveedor = document.getElementById("proveedor");
 const numFactura = document.getElementById("numFactura");
 const fechaFactura = document.getElementById("fechaFactura");
+const notasInput = document.getElementById("notas");
 
 const articuloSel = document.getElementById("articulo");
 const cantidadInput = document.getElementById("cantidad");
@@ -135,16 +136,15 @@ window.quitarItem = function (i) {
 btnGuardar.addEventListener("click", async () => {
   if (detalle.length === 0) return alert("Debe agregar artículos.");
 
-  const tipoIngreso = document.querySelector("input[name='tipoIngreso']:checked").value;
-
   const compra = {
-    id_proveedor: tipoIngreso === "factura" ? proveedor.value : null,
-    codigo_alfanumerico: tipoIngreso === "factura" ? numFactura.value : "SIN_FACTURA",
-    fecha: tipoIngreso === "factura" ? fechaFactura.value : new Date().toISOString(),
+    id_proveedor: proveedor.value || null,
+    codigo_alfanumerico: numFactura.value || "SIN_FACTURA",
+    fecha: fechaFactura.value || new Date().toISOString(),
     monto_total: total,
     saldo_pendiente: total,
-    notas: tipoIngreso === "socio" ? "Ingreso del socio" : ""
+    notas: notasInput.value || ""
   };
+
 
   const { data: factura, error } = await supabase
     .from("facturas_proveedor")
@@ -210,8 +210,9 @@ async function registrarDetalleCompra(id_compra, item) {
 }
 
 // --------------------------------------
-// SOLO manejo de artículos existentes
+// SOLO manejo de artículos existentes Con aumento de stock(automatizado)
 // --------------------------------------
+/*
 async function procesarArticuloExistente(id_compra, item) {
   const articulo = await buscarArticuloPorCodigo(item.codigo);
 
@@ -221,5 +222,10 @@ async function procesarArticuloExistente(id_compra, item) {
   }
 
   await actualizarStock(articulo.id_articulo, item.cantidad);
+  await registrarDetalleCompra(id_compra, item);
+}
+*/
+  // Sin aumento de stock (sin automatizacion)
+async function procesarArticuloExistente(id_compra, item) {
   await registrarDetalleCompra(id_compra, item);
 }
