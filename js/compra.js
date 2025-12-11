@@ -24,6 +24,9 @@ const btnGuardar = document.getElementById("btnGuardar");
 
 let detalle = [];
 let total = 0;
+const articuloInput = document.getElementById("articuloInput");
+const listaArticulos = document.getElementById("listaArticulos");
+let articulosGlobal = [];
 
 // Cargar combos
 document.addEventListener("DOMContentLoaded", async () => {
@@ -63,16 +66,18 @@ async function cargarArticulos() {
 
   if (error) return alert("Error cargando artículos");
 
-  articuloSel.innerHTML = "<option value=''>-- Seleccione artículo --</option>";
+  articulosGlobal = data;
+
+  listaArticulos.innerHTML = "";
 
   data.forEach(a => {
-    const opt = document.createElement("option");
-    opt.value = a.id_articulo;
-    opt.textContent = `(Codigo: ${a.codigo}) - ${a.descripcion}`;
-    opt.dataset.codigo = a.codigo;
-    articuloSel.appendChild(opt);
+    const option = document.createElement("option");
+    option.value = `${a.codigo} - ${a.descripcion}`;
+    option.dataset.id = a.id_articulo;
+    listaArticulos.appendChild(option);
   });
 }
+
 
 // --------------------------------------
 // Agregar artículo al detalle visual

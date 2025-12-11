@@ -48,9 +48,10 @@
       <h2>Agregar artículo a la compra</h2>
 
       <div class="form-grid">
-        <label>Artículo:
-          <select id="articulo"></select>
-        </label>
+<label>Artículo:
+  <input list="listaArticulos" id="articuloInput" placeholder="Escribí código o descripción...">
+  <datalist id="listaArticulos"></datalist>
+</label>
 
         <label>Cantidad:
           <input type="number" id="cantidad" min="1">
