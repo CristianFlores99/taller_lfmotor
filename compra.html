@@ -3,7 +3,7 @@
 
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Registro de Compras</title>
   <link rel="stylesheet" href="css/compra.css" />
 </head>
@@ -41,6 +41,13 @@
       <label style="display:block; margin-top:12px;">Notas:
         <textarea id="notas" rows="3" placeholder="Escriba aquí una nota..."></textarea>
       </label>
+
+      <label>IVA:
+        <select id="tipoIVA">
+          <option value="sin">Sin IVA</option>
+          <option value="21">Con IVA (21%)</option>
+        </select>
+      </label>
     </section>
 
     <!-- DETALLE COMPRA (form integrado encima de la tabla) -->
@@ -71,7 +78,8 @@
         </label>
 
         <div style="grid-column: 1 / span 3; display:flex; gap:8px; margin-top:6px;">
-          <button id="btnGuardarArticulo" class="guardar" style="background:#16a34a; padding:8px 14px;">💾 Guardar Artículo</button>
+          <button id="btnGuardarArticulo" class="guardar" style="background:#16a34a; padding:8px 14px;">💾 Guardar
+            Artículo</button>
           <button id="btnCancelarArticulo" class="btn-volver" style="background:#ef4444;">Cancelar</button>
         </div>
       </div>

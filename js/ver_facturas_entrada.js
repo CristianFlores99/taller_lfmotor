@@ -49,7 +49,6 @@ function renderTabla(lista) {
             <td>${f.proveedor?.nombre || "Sin proveedor"}</td>
             <td>${f.codigo_alfanumerico || "-"}</td>
             <td>${f.fecha}</td>
-            <td>0</td>
             <td>$${f.monto_total}</td>
             <td>
                 <button class="btn-detalle" onclick="verDetalle(${f.id_compra})">Ver</button>

@@ -138,3 +138,25 @@ button:hover {
 .btn-volver:hover {
   background: #2563eb;
 }
+.info-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px 25px;
+    padding: 15px;
+    background: #0f1a2e;
+    border-radius: 10px;
+    border: 1px solid rgba(255,255,255,0.05);
+}
+
+.info-grid div {
+    background: #1e293b;
+    padding: 12px 14px;
+    border-radius: 8px;
+    box-shadow: 0 3px 8px rgba(0,0,0,0.2);
+}
+
+.info-grid strong {
+    color: #93c5fd;
+    display: block;
+    margin-bottom: 4px;
+}

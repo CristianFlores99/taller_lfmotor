@@ -16,15 +16,24 @@
         <button class="btn-volver" onclick="window.location.href='ver_facturas_entrada.html'">
             ⬅ Volver
         </button>
+        <button class="btn-exportar" onclick="exportarPDF()">
+            📄 Exportar PDF
+        </button>
 
         <div class="card">
             <h2>Información de la Factura</h2>
 
             <div class="info-grid">
-                <div><strong>Número:</strong> <span id="numFactura"></span></div>
+                <div><strong>Numero de comprobante:</strong> <span id="numFactura"></span></div>
                 <div><strong>Fecha:</strong> <span id="fecha"></span></div>
                 <div><strong>Proveedor:</strong> <span id="proveedor"></span></div>
                 <div><strong>Total:</strong> <span id="total"></span></div>
+
+                <!-- NUEVOS CAMPOS -->
+                <div><strong>Subtotal:</strong> <span id="subtotal"></span></div>
+                <div><strong>IVA:</strong> <span id="iva"></span></div>
+                <div><strong>Saldo Pendiente:</strong> <span id="saldoPendiente"></span></div>
+                <div><strong>Notas:</strong> <span id="notas"></span></div>
             </div>
         </div>
 
@@ -38,7 +47,7 @@
                         <th>Artículo</th>
                         <th>Cantidad</th>
                         <th>Precio Unitario</th>
-                        <th>Subtotal</th>
+                        <th>Importe</th>
                     </tr>
                 </thead>
                 <tbody id="tablaDetalle"></tbody>
@@ -47,6 +56,8 @@
 
     </div>
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
     <script src="js/detalle_compra.js" type="module"></script>
 </body>
 

@@ -13,6 +13,8 @@ const fechaFactura = document.getElementById("fechaFactura");
 const notasInput = document.getElementById("notas");
 
 const listaArticulos = document.getElementById("listaArticulos");
+const tipoIVA = document.getElementById("tipoIVA");
+
 
 // tabla y total
 const tablaDetalleBody = document.querySelector("#tablaDetalle tbody");
@@ -434,12 +436,20 @@ function recalcularTotalDesdeDetalle() {
 btnGuardar.addEventListener("click", async () => {
   if (detalle.length === 0) return alert("Debe agregar artículos.");
 
+  let iva = 0;
+  if (tipoIVA.value === "21") {
+    iva = total * 0.21;
+  }
+
+  const monto_total = total + iva;
   const compra = {
     id_proveedor: proveedor.value || null,
     codigo_alfanumerico: numFactura.value || "SIN_FACTURA",
     fecha: fechaFactura.value || new Date().toISOString(),
-    monto_total: total,
-    saldo_pendiente: total,
+    subtotal: total,
+    //    saldo_pendiente: total,}
+    IVA: iva,
+    monto_total: monto_total,
     notas: notasInput.value || ""
   };
 
