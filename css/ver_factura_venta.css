@@ -1,83 +1,100 @@
-body {
+/* ===== ESTILO EXCLUSIVO PARA FACTURA ===== */
+
+body.factura-page {
     font-family: 'Courier New', monospace;
-    background: #fff;
+    background: #ffffff;
     padding: 20px;
 }
 
-.hoja {
+.factura-hoja {
     width: 800px;
     margin: auto;
     padding: 10px;
     background: white;
 }
 
-.encabezado {
+/* Encabezado */
+.factura-encabezado {
     display: flex;
     justify-content: space-between;
     margin-bottom: 20px;
 }
 
-.title {
+.factura-title {
     font-size: 20px;
     font-weight: bold;
 }
 
-.subtitle {
+.factura-subtitle {
     font-size: 14px;
 }
 
-.right p {
+.factura-right p {
     text-align: right;
 }
 
-.datos-local {
+/* Datos del local */
+.factura-datos-local {
     margin-bottom: 20px;
     line-height: 1.3;
 }
 
-.cta {
+/* CTA */
+.factura-cta {
     margin-bottom: 20px;
 }
 
-.tabla {
+/* Tabla */
+.factura-tabla {
     width: 100%;
 }
 
-.fila {
+.factura-fila {
     display: grid;
     grid-template-columns: 50px 80px 1fr 100px 120px;
     margin-bottom: 5px;
 }
 
-.header {
+.factura-header {
     font-weight: bold;
     border-bottom: 1px solid #000;
     padding-bottom: 5px;
 }
 
-.c4, .c5 {
+.c4,
+.c5 {
     text-align: right;
 }
 
-.pie {
+/* Pie */
+.factura-pie {
     margin-top: 40px;
 }
 
-.totales {
+.factura-totales {
     margin-top: 20px;
     width: 300px;
     margin-left: auto;
 }
 
-.linea {
+.factura-totales-linea {
     display: flex;
     justify-content: space-between;
     margin-bottom: 5px;
 }
 
-.acciones {
+/* Acciones PDF */
+.factura-acciones {
     width: 800px;
     margin: auto;
     margin-top: 30px;
     text-align: right;
+}
+
+.factura-acciones button {
+    padding: 10px 20px;
+    font-family: 'Courier New', monospace;
+    cursor: pointer;
+    border: 1px solid #000;
+    background: #e7e7e7;
 }

@@ -6,96 +6,103 @@ const supabaseKey =
 
 const supabase = createClient(supabaseUrl, supabaseKey);
 
+// ==========================================
+// CARGAR FACTURA / BOLETA
+// ==========================================
+
 async function cargarBoleta() {
-  const params = new URLSearchParams(window.location.search);
-  const idVenta = params.get("id_venta");
+    const params = new URLSearchParams(window.location.search);
+    const idVenta = params.get("id_venta");
 
-  if (!idVenta) {
-    alert("No se recibió id_venta");
-    return;
-  }
+    if (!idVenta) {
+        alert("No se recibió id_venta");
+        return;
+    }
 
-  // --- CABECERA ---
-  const { data: venta, error: errVenta } = await supabase
-    .from("ventas")
-    .select("*")
-    .eq("id_venta", idVenta)
-    .single();
+    // ----------- CABECERA -----------------
+    const { data: venta, error: errVenta } = await supabase
+        .from("ventas")
+        .select("*")
+        .eq("id_venta", idVenta)
+        .single();
 
-  if (errVenta || !venta) {
-    alert("Error cargando la venta");
-    return;
-  }
+    if (errVenta || !venta) {
+        alert("Error cargando la venta");
+        return;
+    }
 
-  document.getElementById("fecha").textContent =
-    new Date(venta.fecha).toLocaleDateString("es-AR");
+    document.getElementById("fecha").textContent =
+        new Date(venta.fecha).toLocaleDateString("es-AR");
 
-  document.getElementById("numero").textContent = "N° " + venta.id_venta;
+    document.getElementById("numero").textContent = "N° " + venta.id_venta;
 
-  // --- DETALLE ---
-  const { data: items, error: errItems } = await supabase
-    .from("detalle_venta")
-    .select(`
-        cantidad,
-        precio_unitario,
-        articulos:id_articulo (
-            codigo,
-            descripcion,
-            marca,
-            precio_venta
-        )
-    `)
-    .eq("id_venta", idVenta);
 
-  if (errItems) {
-    console.error(errItems);
-    alert("Error trayendo detalle de artículos");
-    return;
-  }
+    // ----------- DETALLE -----------------
+    const { data: items, error: errItems } = await supabase
+        .from("detalle_venta")
+        .select(`
+            cantidad,
+            precio_unitario,
+            articulos:id_articulo (
+                codigo,
+                descripcion,
+                marca,
+                precio_venta
+            )
+        `)
+        .eq("id_venta", idVenta);
 
-  let contenedor = document.getElementById("items");
-  let subtotal = 0;
+    if (errItems) {
+        console.error(errItems);
+        alert("Error trayendo detalle de artículos");
+        return;
+    }
 
-  items.forEach(item => {
+    let contenedor = document.getElementById("items");
+    let subtotal = 0;
 
-    const articulo = item.articulos;
+    items.forEach(item => {
+        const articulo = item.articulos;
 
-    const unit = item.precio_unitario || articulo?.precio_venta || 0;
-    const total = unit * item.cantidad;
-    subtotal += total;
+        const unit = item.precio_unitario || articulo?.precio_venta || 0;
+        const total = unit * item.cantidad;
+        subtotal += total;
 
-    const fila = document.createElement("div");
-    fila.classList.add("fila");
+        const fila = document.createElement("div");
+        fila.classList.add("factura-fila");
 
-    fila.innerHTML = `
-      <div class="c1">${item.cantidad}</div>
-      <div class="c2">${articulo?.codigo || "-"}</div>
-      <div class="c3">${articulo?.descripcion || "-"} (${articulo?.marca || "-"})</div>
-      <div class="c4">${unit.toFixed(2)}</div>
-      <div class="c5">${total.toFixed(2)}</div>
-    `;
+        fila.innerHTML = `
+            <div class="c1">${item.cantidad}</div>
+            <div class="c2">${articulo?.codigo || "-"}</div>
+            <div class="c3">${articulo?.descripcion || "-"} (${articulo?.marca || "-"})</div>
+            <div class="c4">${unit.toFixed(2)}</div>
+            <div class="c5">${total.toFixed(2)}</div>
+        `;
 
-    contenedor.appendChild(fila);
-  });
+        contenedor.appendChild(fila);
+    });
 
-  document.getElementById("subtotal").textContent = subtotal.toFixed(2);
-  document.getElementById("total").textContent = subtotal.toFixed(2);
+    document.getElementById("subtotal").textContent = subtotal.toFixed(2);
+    document.getElementById("total").textContent = subtotal.toFixed(2);
 }
 
-// --- GENERAR PDF ---
+// ==========================================
+// GENERAR PDF
+// ==========================================
+
 document.getElementById("imprimirPDF").addEventListener("click", async () => {
-  const elemento = document.getElementById("areaBoleta");
+    const elemento = document.getElementById("areaBoleta");
 
-  const canvas = await html2canvas(elemento, { scale: 2 });
-  const imgData = canvas.toDataURL("image/png");
+    const canvas = await html2canvas(elemento, { scale: 2 });
+    const imgData = canvas.toDataURL("image/png");
 
-  const pdf = new jspdf.jsPDF("p", "pt", "a4");
+    const pdf = new jspdf.jsPDF("p", "pt", "a4");
 
-  let ancho = pdf.internal.pageSize.getWidth();
-  let alto = canvas.height * (ancho / canvas.width);
+    const ancho = pdf.internal.pageSize.getWidth();
+    const alto = canvas.height * (ancho / canvas.width);
 
-  pdf.addImage(imgData, "PNG", 0, 0, ancho, alto);
-  pdf.save("boleta.pdf");
+    pdf.addImage(imgData, "PNG", 0, 0, ancho, alto);
+    pdf.save("boleta.pdf");
 });
 
 cargarBoleta();

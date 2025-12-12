@@ -4,35 +4,37 @@
 <head>
     <meta charset="UTF-8">
     <title>Factura / Boleta de Venta</title>
+
+    <!-- CSS exclusivo y aislado -->
     <link rel="stylesheet" href="css/ver_factura_venta.css">
 </head>
 
-<body>
+<body class="factura-page">
 
-    <div class="hoja" id="areaBoleta">
+    <div class="factura-hoja" id="areaBoleta">
 
-        <div class="encabezado">
+        <div class="factura-encabezado">
             <div class="left">
-                <p class="title">PRESUPUESTO</p>
-                <p class="subtitle">NO VALIDO COMO FACTURA</p>
+                <p class="factura-title">PRESUPUESTO</p>
+                <p class="factura-subtitle">NO VALIDO COMO FACTURA</p>
             </div>
-            <div class="right">
+            <div class="factura-right">
                 <p id="fecha"></p>
                 <p id="numero"></p>
             </div>
         </div>
 
-        <div class="datos-local">
+        <div class="factura-datos-local">
             <p>REPUESTOS LF MOTOR (177)</p>
             <p>RUTA 7 VIEJA 917</p>
             <p>GRAL RODRIGUEZ (1748)</p>
             <p>BUENOS AIRES</p>
         </div>
 
-        <p class="cta">CTA. CTE.</p>
+        <p class="factura-cta">CTA. CTE.</p>
 
-        <div class="tabla">
-            <div class="fila header">
+        <div class="factura-tabla">
+            <div class="factura-fila factura-header">
                 <div class="c1">Cant.</div>
                 <div class="c2">Cod.</div>
                 <div class="c3">Detalle</div>
@@ -43,25 +45,35 @@
             <div id="items"></div>
         </div>
 
-        <div class="pie">
+        <div class="factura-pie">
             <p>Precios NETOS - No incluye I.V.A</p>
 
-            <div class="totales">
-                <div class="linea"><span>Subtotal:</span> <span id="subtotal"></span></div>
-                <div class="linea"><span>Total:</span> <span id="total"></span></div>
+            <div class="factura-totales">
+                <div class="factura-totales-linea">
+                    <span>Subtotal:</span>
+                    <span id="subtotal"></span>
+                </div>
+
+                <div class="factura-totales-linea">
+                    <span>Total:</span>
+                    <span id="total"></span>
+                </div>
             </div>
         </div>
 
     </div>
 
-    <div class="acciones">
+    <div class="factura-acciones">
         <button id="imprimirPDF">Exportar a PDF</button>
     </div>
 
+
+    <!-- Librerías PDF -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+    <!-- JS -->
     <script type="module" src="js/ver_factura_venta.js"></script>
 
 </body>
-
 </html>
