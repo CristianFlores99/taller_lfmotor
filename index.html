@@ -1,64 +1,79 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Dashboard Gestión de Repuestos</title>
   <link rel="stylesheet" href="css/index.css">
 </head>
+
 <body>
   <div class="container">
-    <header>
-      <h1>⚙️ Panel de Gestión de Repuestos</h1>
-      <p>Bienvenidos al sistema de administracion de LFMotor.</p>
-      <p>Selecciona una sección para administrar tu emprendimiento</p>
+    <header class="main-header">
+      <div class="header-row">
+
+        <!-- LOGO IZQUIERDA -->
+        <img src="logo.png" alt="Logo LFMotor" class="header-logo">
+
+        <!-- TEXTO CENTRADO -->
+        <div class="header-text">
+          <h1>LF Motor</h1>
+          <h2>⚙️ Panel de Gestión de Repuestos</h2>
+          <p>Bienvenidos al sistema de administración de LFMotor.</p>
+          <p>Selecciona una sección para administrar tu emprendimiento</p>
+        </div>
+
+      </div>
     </header>
 
-<main class="grid">
-  <div class="card">
-    <h2>📦 Repuestos</h2>
-    <p>Ver y gestionar stock de repuestos</p>
-    <button onclick="location.href='ver_repuesto.html'">Ir a Repuestos</button>
-  </div>
 
-  <div class="card">
-    <h2>💰 Ventas</h2>
-    <p>Registrar y consultar ventas realizadas</p>
-    <button onclick="location.href='ventas.html'">Ir a Ventas</button>
-  </div>
+    <main class="grid">
+      <div class="card">
+        <h2>📦 Repuestos</h2>
+        <p>Ver y gestionar stock de repuestos</p>
+        <button onclick="location.href='ver_repuesto.html'">Ir a Repuestos</button>
+      </div>
 
-  <div class="card">
-    <h2>🏷️ Subrubros</h2>
-    <p>Gestionar los subrubros de los repuestos</p>
-    <button onclick="location.href='subrubro.html'">Ir a Subrubros</button>
-  </div>
+      <div class="card">
+        <h2>💰 Ventas</h2>
+        <p>Registrar y consultar ventas realizadas</p>
+        <button onclick="location.href='ventas.html'">Ir a Ventas</button>
+      </div>
 
-  <div class="card">
-    <h2>🏢 Proveedores</h2>
-    <p>Ver y registrar proveedores</p>
-    <button onclick="location.href='proveedores.html'">Ir a Proveedores</button>
-  </div>
+      <div class="card">
+        <h2>🏷️ Subrubros</h2>
+        <p>Gestionar los subrubros de los repuestos</p>
+        <button onclick="location.href='subrubro.html'">Ir a Subrubros</button>
+      </div>
 
-  <div class="card">
-    <h2>📄 Facturas Entrada</h2>
-    <p>Ver todas las facturas de compra y sus detalles</p>
-    <button onclick="location.href='ver_facturas_entrada.html'">Ir a Facturas</button>
-  </div>
+      <div class="card">
+        <h2>🏢 Proveedores</h2>
+        <p>Ver y registrar proveedores</p>
+        <button onclick="location.href='proveedores.html'">Ir a Proveedores</button>
+      </div>
 
-  <div class="card">
-    <h2>📈 Movimientos</h2>
-    <p>Controlar entradas y salidas de stock</p>
-    <button onclick="location.href='movimientos.html'">Ir a Movimientos</button>
-  </div>
+      <div class="card">
+        <h2>📄 Facturas Entrada</h2>
+        <p>Ver todas las facturas de compra y sus detalles</p>
+        <button onclick="location.href='ver_facturas_entrada.html'">Ir a Facturas</button>
+      </div>
 
-  <div class="card">
-    <h2>📊 Reportes</h2>
-    <p>Ver reportes de ventas, compras y stock crítico</p>
-    <button onclick="location.href='reportes.html'">Ir a Reportes</button>
-  </div>
+      <div class="card">
+        <h2>📈 Movimientos</h2>
+        <p>Controlar entradas y salidas de stock</p>
+        <button onclick="location.href='movimientos.html'">Ir a Movimientos</button>
+      </div>
 
-</main>
+      <div class="card">
+        <h2>📊 Reportes</h2>
+        <p>Ver reportes de ventas, compras y stock crítico</p>
+        <button onclick="location.href='reportes.html'">Ir a Reportes</button>
+      </div>
+
+    </main>
 
   </div>
 </body>
+
 </html>
