@@ -1,65 +1,67 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Factura de Venta</title>
+    <title>Factura / Boleta de Venta</title>
     <link rel="stylesheet" href="css/ver_factura_venta.css">
 </head>
+
 <body>
 
-<div class="factura-container">
+    <div class="hoja" id="areaBoleta">
 
-    <!-- Encabezado -->
-    <header class="factura-header">
-
-        <div class="logo-box">
-            <img src="logo.png" alt="LF Hnos Logo">
+        <div class="encabezado">
+            <div class="left">
+                <p class="title">PRESUPUESTO</p>
+                <p class="subtitle">NO VALIDO COMO FACTURA</p>
+            </div>
+            <div class="right">
+                <p id="fecha"></p>
+                <p id="numero"></p>
+            </div>
         </div>
 
-        <div class="empresa-info">
-            <h2>LF Hnos – MOTOR</h2>
-            <p>Servicios de Mecánica Integral</p>
-            <p><strong>CUIT:</strong> 20-42279018-8</p>
-            <p><strong>Dirección:</strong> Ex Ruta 7 (Intendente Colobraro) 917, Partido de General Rodríguez</p>
-            <p><strong>WhatsApp:</strong> 11 4046-7070</p>
+        <div class="datos-local">
+            <p>REPUESTOS LF MOTOR (177)</p>
+            <p>RUTA 7 VIEJA 917</p>
+            <p>GRAL RODRIGUEZ (1748)</p>
+            <p>BUENOS AIRES</p>
         </div>
-    </header>
 
-    <h1 class="titulo-factura">FACTURA DE VENTA</h1>
+        <p class="cta">CTA. CTE.</p>
 
-    <!-- Info de la venta -->
-    <section class="venta-info">
-        <p><strong>Fecha:</strong> <span id="fecha"></span></p>
-        <p><strong>Cliente:</strong> <span id="cliente"></span></p>
-        <p><strong>Medio de pago:</strong> <span id="medio_pago"></span></p>
-        <p><strong>Responsable:</strong> <span id="responsable"></span></p>
-        <p><strong>Observaciones:</strong> <span id="observaciones"></span></p>
-    </section>
+        <div class="tabla">
+            <div class="fila header">
+                <div class="c1">Cant.</div>
+                <div class="c2">Cod.</div>
+                <div class="c3">Detalle</div>
+                <div class="c4">Unit.</div>
+                <div class="c5">Total</div>
+            </div>
 
-    <!-- Detalle -->
-    <table class="detalle-tabla">
-        <thead>
-            <tr>
-                <th>Código</th>
-                <th>Descripción</th>
-                <th>Cantidad</th>
-                <th>Precio Unit.</th>
-                <th>Subtotal</th>
-            </tr>
-        </thead>
-        <tbody id="detalle-body"></tbody>
-    </table>
+            <div id="items"></div>
+        </div>
 
-    <!-- Total -->
-    <div class="total-box">
-        Total: <span id="total"></span>
+        <div class="pie">
+            <p>Precios NETOS - No incluye I.V.A</p>
+
+            <div class="totales">
+                <div class="linea"><span>Subtotal:</span> <span id="subtotal"></span></div>
+                <div class="linea"><span>Total:</span> <span id="total"></span></div>
+            </div>
+        </div>
+
     </div>
 
-    <button class="btn-imprimir" onclick="window.print()">Imprimir Factura</button>
+    <div class="acciones">
+        <button id="imprimirPDF">Exportar a PDF</button>
+    </div>
 
-</div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script type="module" src="js/ver_factura_venta.js"></script>
 
-<script src="js/ver_factura_venta.js"></script>
 </body>
+
 </html>

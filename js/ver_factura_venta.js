@@ -6,70 +6,96 @@ const supabaseKey =
 
 const supabase = createClient(supabaseUrl, supabaseKey);
 
-document.addEventListener("DOMContentLoaded", async () => {
-  const idVenta = new URLSearchParams(window.location.search).get("id");
+async function cargarBoleta() {
+  const params = new URLSearchParams(window.location.search);
+  const idVenta = params.get("id_venta");
 
   if (!idVenta) {
-    alert("No llegó el ID de la venta.");
+    alert("No se recibió id_venta");
     return;
   }
 
-  // ------------------------------
-  //   1) Obtener la venta
-  // ------------------------------
-  const { data: venta, error: err1 } = await supabase
+  // --- CABECERA ---
+  const { data: venta, error: errVenta } = await supabase
     .from("ventas")
     .select("*")
     .eq("id_venta", idVenta)
     .single();
 
-  if (err1) {
-    console.error("Error obteniendo venta:", err1);
-    alert("Error al cargar la venta.");
+  if (errVenta || !venta) {
+    alert("Error cargando la venta");
     return;
   }
 
-  // Mostrar datos principales
-  document.getElementById("fecha").textContent = venta.fecha;
-  document.getElementById("cliente").textContent = venta.cliente;
-  document.getElementById("medio_pago").textContent = venta.medio_pago;
-  document.getElementById("responsable").textContent = venta.responsable;
-  document.getElementById("observaciones").textContent =
-    venta.observaciones ?? "";
+  document.getElementById("fecha").textContent =
+    new Date(venta.fecha).toLocaleDateString("es-AR");
 
-  // ------------------------------
-  //   2) Obtener detalle de venta
-  // ------------------------------
-  const { data: detalle, error: err2 } = await supabase
+  document.getElementById("numero").textContent = "N° " + venta.id_venta;
+
+  // --- DETALLE ---
+  const { data: items, error: errItems } = await supabase
     .from("detalle_venta")
-    .select("*, articulos(*)")
+    .select(`
+        cantidad,
+        precio_unitario,
+        articulos:id_articulo (
+            codigo,
+            descripcion,
+            marca,
+            precio_venta
+        )
+    `)
     .eq("id_venta", idVenta);
 
-  if (err2) {
-    console.error("Error obteniendo detalle:", err2);
-    alert("Error al cargar el detalle.");
+  if (errItems) {
+    console.error(errItems);
+    alert("Error trayendo detalle de artículos");
     return;
   }
 
-  const tbody = document.getElementById("detalle-body");
+  let contenedor = document.getElementById("items");
+  let subtotal = 0;
 
-  let total = 0;
+  items.forEach(item => {
 
-  detalle.forEach((item) => {
-    const fila = document.createElement("tr");
+    const articulo = item.articulos;
+
+    const unit = item.precio_unitario || articulo?.precio_venta || 0;
+    const total = unit * item.cantidad;
+    subtotal += total;
+
+    const fila = document.createElement("div");
+    fila.classList.add("fila");
 
     fila.innerHTML = `
-      <td>${item.articulos?.codigo ?? ""}</td>
-      <td>${item.articulos?.descripcion ?? ""}</td>
-      <td>${item.cantidad}</td>
-      <td>$${Number(item.precio_unitario).toFixed(2)}</td>
-      <td>$${Number(item.subtotal).toFixed(2)}</td>
+      <div class="c1">${item.cantidad}</div>
+      <div class="c2">${articulo?.codigo || "-"}</div>
+      <div class="c3">${articulo?.descripcion || "-"} (${articulo?.marca || "-"})</div>
+      <div class="c4">${unit.toFixed(2)}</div>
+      <div class="c5">${total.toFixed(2)}</div>
     `;
 
-    tbody.appendChild(fila);
-
-    total += Number(item.subtotal);
+    contenedor.appendChild(fila);
   });
 
-  document.getElementById("total").textContent = "$" + total.toFixed(2);
+  document.getElementById("subtotal").textContent = subtotal.toFixed(2);
+  document.getElementById("total").textContent = subtotal.toFixed(2);
+}
+
+// --- GENERAR PDF ---
+document.getElementById("imprimirPDF").addEventListener("click", async () => {
+  const elemento = document.getElementById("areaBoleta");
+
+  const canvas = await html2canvas(elemento, { scale: 2 });
+  const imgData = canvas.toDataURL("image/png");
+
+  const pdf = new jspdf.jsPDF("p", "pt", "a4");
+
+  let ancho = pdf.internal.pageSize.getWidth();
+  let alto = canvas.height * (ancho / canvas.width);
+
+  pdf.addImage(imgData, "PNG", 0, 0, ancho, alto);
+  pdf.save("boleta.pdf");
 });
+
+cargarBoleta();

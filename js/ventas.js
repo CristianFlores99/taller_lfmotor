@@ -47,7 +47,7 @@ async function cargarVentas() {
 
 // --- Redirigir a detalle ---
 window.verDetalle = (id_venta) => {
-  window.location.href = `detalle_ventas.html?id_venta=${id_venta}`;
+  window.location.href = `ver_factura_venta.html?id_venta=${id_venta}`;
 };
 
 // --- Eliminar venta ---
