@@ -37,8 +37,9 @@ async function cargarVentas() {
       <td>$${v.total?.toFixed(2) || "0.00"}</td>
       <td>${v.responsable || "-"}</td>
       <td>
-        <button class="btn-ver" onclick="verDetalle(${v.id_venta})">👁 Ver</button>
-        <button class="btn-eliminar" onclick="eliminarVenta(${v.id_venta})">🗑 Eliminar</button>
+        <button class="btn-ver" onclick="verDetalle(${v.id_venta})">Ver Detalle</button>
+        <button class="btn-ver" onclick="verFactura(${v.id_venta})"">Ver Factura</button>
+        <button class="btn-eliminar" onclick="eliminarVenta(${v.id_venta})">Eliminar</button>
       </td>
     `;
     tablaVentas.appendChild(tr);
@@ -47,8 +48,19 @@ async function cargarVentas() {
 
 // --- Redirigir a detalle ---
 window.verDetalle = (id_venta) => {
+  window.location.href = `detalle_ventas.html?id_venta=${id_venta}`;
+};
+
+window.verFactura = (id_venta) => {
+  window.location.href = `factura.html?id_venta=${id_venta}`;
+};
+
+// --- Redirigir a detalle ---
+/*
+window.verDetalle = (id_venta) => {
   window.location.href = `ver_factura_venta.html?id_venta=${id_venta}`;
 };
+*/
 
 // --- Eliminar venta ---
 window.eliminarVenta = async (id_venta) => {

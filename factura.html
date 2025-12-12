@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Presupuesto / Factura de Venta</title>
+    <link rel="stylesheet" href="css/factura.css">
+</head>
+
+<body>
+
+    <div class="hoja" id="areaBoleta">
+
+        <!-- ENCABEZADO CON LOGO Y DATOS -->
+        <div class="encabezado-top">
+            <div class="logo">
+                <img src="logo.png" alt="LF Motor">
+            </div>
+            <div class="datos-negocio">
+                <h2>REPUESTOS LF MOTOR</h2>
+                <p>Ruta 7 Vieja 917</p>
+                <p>Gral. Rodríguez (1748), Buenos Aires</p>
+                <p>CUIT: 20-35606226-5</p>
+                <p>Tel: 11-4046-7070</p>
+            </div>
+            <div class="datos-documento">
+                <h1>PRESUPUESTO</h1>
+                <p class="no-valido">NO VÁLIDO COMO FACTURA</p>
+                <p id="numero"></p>
+                <p id="fecha"></p>
+            </div>
+        </div>
+
+        <!-- DATOS DEL CLIENTE -->
+        <div class="cliente-box">
+            <p><strong>Cliente:</strong> <span id="cliente"></span></p>
+            <p><strong>DNI / CUIT:</strong> <span id="dni"></span></p>
+            <p><strong>Medio de Pago:</strong> <span id="medio_pago"></span></p>
+        </div>
+
+        <!-- TABLA DE ARTICULOS -->
+        <div class="tabla">
+            <div class="fila header">
+                <div class="c1">Cant.</div>
+                <div class="c2">Cod.</div>
+                <div class="c3">Detalle</div>
+                <div class="c4">Unit.</div>
+                <div class="c5">Importe</div>
+            </div>
+
+            <div id="items"></div>
+        </div>
+
+        <!-- PIE DE TOTALES -->
+        <div class="pie">
+            <div class="totales">
+           <!--      <div class="linea"><span>Subtotal:</span> <span id="subtotal"></span></div> -->
+                <div class="linea total-final"><span>Total:</span> <span id="total"></span></div>
+            </div>
+
+            <p class="nota-legal">
+                Precios netos. No incluyen IVA. Este documento es un presupuesto para el cliente.
+            </p>
+        </div>
+
+    </div>
+
+    <div class="acciones">
+        <button class="btn-volver" onclick="location.href='ventas.html'">⬅ Volver</button>
+        <button id="imprimirPDF">Exportar a PDF</button>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+    <script type="module" src="js/factura.js"></script>
+
+</body>
+
+</html>
