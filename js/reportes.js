@@ -31,7 +31,7 @@ async function cargarVentas() {
 
   if (error) return console.error(error);
 
-  const etiquetas = data.map(v => new Date(v.fecha).toLocaleDateString());
+  const etiquetas = data.map(v => parseFechaLocal(v.fecha).toLocaleDateString());
   const totales = data.map(v => v.total);
 
   chartVentas = new Chart(chartVentasEl, {
@@ -102,7 +102,7 @@ function agruparPorMes(ventas) {
   const meses = {};
 
   ventas.forEach(v => {
-    const fecha = new Date(v.fecha);
+    const fecha = parseFechaLocal(v.fecha);
     const año = fecha.getFullYear();
     const mes = String(fecha.getMonth() + 1).padStart(2, "0"); // 01-12
 
@@ -113,6 +113,10 @@ function agruparPorMes(ventas) {
   });
 
   return meses;
+}
+function parseFechaLocal(fechaStr) {
+  const [año, mes, dia] = fechaStr.split("-").map(Number);
+  return new Date(año, mes - 1, dia); // <-- LOCAL, SIN DESFASE UTC
 }
 
 // ---------------- Ventas por mes ----------------
@@ -157,7 +161,7 @@ async function cargarCompras() {
   const { data, error } = await supabase.from('compra_detalle').select('*').order('fecha', { ascending: true });
   if (error) return console.error(error);
 
-  const etiquetas = data.map(c => new Date(c.fecha).toLocaleDateString());
+  const etiquetas = data.map(c => parseFechaLocal(v.fecha).toLocaleDateString());
   const totales = data.map(c => c.total);
 
   chartCompras = new Chart(chartComprasEl, {
@@ -259,7 +263,7 @@ document.getElementById('exportExcel').addEventListener('click', () => {
 
 //
 async function metricasVentasDia() {
-  const hoy = new Date().toISOString().split("T")[0];
+  const hoy = fechaLocalActual();
 
   const { data, error } = await supabase
     .from("ventas")
@@ -272,6 +276,14 @@ async function metricasVentasDia() {
 
   document.getElementById("m_ventasDia").textContent = `$${total}`;
 }
+function fechaLocalActual() {
+  const f = new Date();
+  const año = f.getFullYear();
+  const mes = String(f.getMonth() + 1).padStart(2, "0");
+  const dia = String(f.getDate()).padStart(2, "0");
+  return `${año}-${mes}-${dia}`;
+}
+
 //
 async function metricasVentasMes() {
   const hoy = new Date();
