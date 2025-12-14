@@ -12,7 +12,6 @@ const modalForm = document.getElementById("modalForm");
 const cerrarForm = document.getElementById("cerrarForm");
 const formRepuesto = document.getElementById("formRepuesto");
 const tituloForm = document.getElementById("tituloForm");
-const subrubroSelect = document.getElementById("subrubro");
 const btnEliminar = document.getElementById("eliminarRepuesto");
 
 const modalMov = document.getElementById("modalMovimientos");
@@ -20,20 +19,10 @@ const cerrarModal = document.getElementById("cerrarModal");
 const cuerpoMovimientos = document.getElementById("cuerpoMovimientos");
 const tituloRepuesto = document.getElementById("tituloRepuesto");
 
-const filtroSubrubro = document.getElementById("filtroSubrubro");
 const indicadorStock = document.getElementById("indicadorStock");
-
 let editId = null;
 
-// ---------- Eventos ----------
-document.addEventListener("DOMContentLoaded", () => {
-    cargarSubrubro();
-    cargarMarcas(); // 🆕 nuevo
-    cargarRepuestos();
-});
-
 inputBusqueda.addEventListener("input", cargarRepuestos);
-filtroSubrubro.addEventListener("change", cargarRepuestos);
 btnAgregar.addEventListener("click", abrirFormulario);
 cerrarForm.addEventListener("click", () => modalForm.style.display = "none");
 cerrarModal.addEventListener("click", () => modalMov.style.display = "none");
@@ -45,64 +34,19 @@ window.addEventListener("click", e => {
 
 // ---------- Funciones ----------
 
-// --- Cargar Subrubros con el filtro principal
-async function cargarSubrubro() {
-    const { data, error } = await supabase.from("subrubro").select("*").order("nombre", { ascending: true });
-    if (error) return console.error(error);
-
-    filtroSubrubro.innerHTML = `<option value="">Todos los subrubros</option>` +
-        data.map(c => `<option value="${c.id_subrubro}">${c.nombre}</option>`).join("");
-
-    subrubroSelect.innerHTML = data.map(c => `<option value="${c.id_subrubro}">${c.nombre}</option>`).join("");
-}
-
 // --- Cargar Repuestos con filtro de subrubro + texto
 async function cargarRepuestos() {
     const filtro = inputBusqueda.value.trim();
-    const _subrubro = filtroSubrubro.value;
+    const _subrubro = document.getElementById("filtroSubrubro")?.value;
     const marcaSel = document.getElementById("filtroMarca").value; // 🆕 nuevo
 
     let query = supabase
         .from("articulos")
-        .select("*, subrubro(nombre)")
+        .select("*")
         .order("codigo", { ascending: true });
 
-//    if (filtro) query = query.or(`codigo.ilike.%${filtro}%, descripcion.ilike.%${filtro}%, marca.ilike.%${filtro}%, ubicacion.ilike.%${filtro}%`);
-    // --------------------------------------------------------
-    // 🔎 1) Si hay texto en el buscador → buscar subrubros
-    // --------------------------------------------------------
-    let idsSub = [];
-    if (filtro) {
-        const { data: subs } = await supabase
-            .from("subrubro")
-            .select("id_subrubro")
-            .ilike("nombre", `%${filtro}%`);
-
-        idsSub = subs?.map(s => s.id_subrubro) ?? [];
-    }
-
-    // --------------------------------------------------------
-    // 🔎 2) OR principal (ya funciona bien tuyo)
-    // --------------------------------------------------------
-    if (filtro) {
-        let orFilters = [
-            `codigo.ilike.%${filtro}%`,
-            `descripcion.ilike.%${filtro}%`,
-            `marca.ilike.%${filtro}%`,
-            `ubicacion.ilike.%${filtro}%`
-        ];
-
-        // --------------------------------------------------------
-        // 🔎 3) Si se encontraron subrubros → agregarlos al OR
-        // --------------------------------------------------------
-        if (idsSub.length > 0) {
-            orFilters.push(`id_subrubro.in.(${idsSub.join(",")})`);
-        }
-
-        query = query.or(orFilters.join(","));
-    }
-
-    if (_subrubro) query = query.eq("id_subrubro", _subrubro);
+    if (filtro) query = query.or(`codigo.ilike.%${filtro}%,descripcion.ilike.%${filtro}%,marca.ilike.%${filtro}%,rubro.ilike.%${filtro}%,subrubro.ilike.%${filtro}%,ubicacion.ilike.%${filtro}%`);
+    if (_subrubro) query = query.eq("subrubro", _subrubro);
     if (marcaSel) query = query.eq("marca", marcaSel); // 🆕 nuevo
 
     const { data, error } = await query;
@@ -130,7 +74,8 @@ async function cargarRepuestos() {
       <td>${rep.codigo}</td>
       <td>${rep.descripcion}</td>
       <td>${rep.marca || "-"}</td>
-      <td>${rep.subrubro?.nombre || "-"}</td>
+      <td>${rep.subrubro || "-"}</td>
+      <td>${rep.rubro || "-"}</td>
       <td class="${claseStock}">${rep.stock_actual}</td>
       <td>${rep.ubicacion || "-"}</td>
       <td>$${rep.precio_venta?.toFixed(2) || "0.00"}</td>
@@ -168,16 +113,16 @@ async function editarRepuesto(id) {
     tituloForm.textContent = "Editar Repuesto";
     btnEliminar.style.display = "inline-block";
 
-    document.getElementById("idRepuesto").value = data.id_repuesto;
+    document.getElementById("idRepuesto").value = data.id_articulo;
     document.getElementById("codigo").value = data.codigo;
     document.getElementById("descripcion").value = data.descripcion;
     document.getElementById("marca").value = data.marca || "";
+    document.getElementById("subrubro").value = data.subrubro || "";
+    document.getElementById("rubro").value = data.rubro || "";
     document.getElementById("ubicacion").value = data.ubicacion || "";
     document.getElementById("stock_actual").value = data.stock_actual;
     document.getElementById("stock_minimo").value = data.stock_minimo;
     document.getElementById("precio_venta").value = data.precio_venta;
-    subrubroSelect.value = data.id_subrubro || "";
-
     modalForm.style.display = "flex";
 }
 
@@ -195,12 +140,14 @@ formRepuesto.addEventListener("submit", async (e) => {
         codigo: codigo.value.trim(),
         descripcion: descripcion.value.trim(),
         marca: marca.value.trim(),
+        subrubro: subrubro.value.trim(),
+        rubro: rubro.value.trim(),
         ubicacion: ubicacion.value.trim(),
         stock_actual: parseInt(stock_actual.value) || 0,
         stock_minimo: parseInt(stock_minimo.value) || 0,
-        precio_venta: parseFloat(precio_venta.value) || 0,
-        id_subrubro: parseInt(subrubro.value)
+        precio_venta: parseFloat(precio_venta.value) || 0
     };
+
 
     let result;
     if (editId) {
@@ -274,12 +221,45 @@ async function verMovimientos(idRepuesto, descripcion) {
 }
 
 // Actualizar stock automáticamente desde ventas
-export async function actualizarStock(id_repuesto, cantidad) {
-    if (!id_repuesto || !cantidad) return;
+export async function actualizarStock(id_articulo, cantidad) {
+    if (!id_articulo || !cantidad) return;
     await supabase.from('articulos')
         .update({ stock_actual: supabase.raw('stock_actual - ?', [cantidad]) })
-        .eq('id_articulo', id_repuesto);
+        .eq('id_articulo', id_articulo);
     cargarRepuestos(); // refresca tabla
+}
+
+// --- Cargar Subrubros (únicos desde articulos)
+async function cargarSubrubrosFiltro() {
+    const { data, error } = await supabase
+        .from("articulos")
+        .select("subrubro")
+        .not("subrubro", "is", null)
+        .order("subrubro", { ascending: true });
+
+    if (error) {
+        console.error(error);
+        return;
+    }
+
+    const subrubrosUnicos = [
+        ...new Set(
+            data
+                .map(r => r.subrubro?.trim())
+                .filter(Boolean)
+        )
+    ];
+
+    const select = document.getElementById("filtroSubrubro");
+
+    select.innerHTML = `
+        <option value="">Todos los subrubros</option>
+        ${subrubrosUnicos
+            .map(s => `<option value="${s}">${s}</option>`)
+            .join("")}
+    `;
+
+    select.addEventListener("change", cargarRepuestos);
 }
 
 // --- Cargar Marcas (únicas desde repuestos)
@@ -287,7 +267,8 @@ async function cargarMarcas() {
     const { data, error } = await supabase
         .from("articulos")
         .select("marca")
-        .not("marca", "is", null);
+        .not("marca", "is", null)
+        .order("marca", { ascending: true });
 
     if (error) return console.error(error);
 
@@ -332,7 +313,6 @@ function mostrarAlerta(mensaje, tipo = "ok") {
     }, 3000);
 }
 
-
 // ==============================
 // 📌 Exportación PDF y Excel
 // ==============================
@@ -350,17 +330,16 @@ document.getElementById("exportarPDF").addEventListener("click", async () => {
     try {
         const subrubroSeleccionado = document.getElementById("filtroSubrubro").value;
 
-        // Construyo query base
         let query = supabase
             .from("articulos")
-            .select("codigo, marca, descripcion, stock_actual, precio_venta, id_subrubro");
+            .select("*");
 
-        // Si se selecciona un subrubro → filtro
         if (subrubroSeleccionado !== "") {
-            query = query.eq("id_subrubro", subrubroSeleccionado);
+            query = query.eq("subrubro", subrubroSeleccionado);
         }
 
         const { data, error } = await query;
+
 
         if (error) {
             mostrarAlerta("❌ Error obteniendo datos: " + error.message, "error");
@@ -371,14 +350,6 @@ document.getElementById("exportarPDF").addEventListener("click", async () => {
             mostrarAlerta("ℹ️ No hay repuestos para exportar", "info");
             return;
         }
-
-        // Traigo tabla de subrubros para traducir ID -> nombre
-        const { data: subrubros } = await supabase
-            .from("subrubro")
-            .select("id_subrubro, nombre");
-
-        const mapSubrubro = {};
-        subrubros?.forEach(s => mapSubrubro[s.id_subrubro] = s.nombre);
 
         // jsPDF init
         const jsPDFclass =
@@ -407,7 +378,8 @@ document.getElementById("exportarPDF").addEventListener("click", async () => {
             const descripcion = r.descripcion ?? "-";
             const stock = r.stock_actual ?? 0;
             const precio = r.precio_venta ?? 0;
-            const subrubro = mapSubrubro[r.id_subrubro] ?? "Sin categoría";
+            const subrubro = r.subrubro || "Sin categoría";
+
 
             if (y > pageHeight - 100) {
                 pdf.addPage();
@@ -452,8 +424,8 @@ document.getElementById("exportarExcel").addEventListener("click", async () => {
     try {
         // Repuestos
         const { data, error } = await supabase
-            .from("repuestos")
-            .select("codigo, marca, descripcion, stock_actual, precio_venta, id_subrubro");
+            .from("articulos")
+            .select("*")
 
         if (error) {
             mostrarAlerta("❌ Error obteniendo datos: " + error.message, "error");
@@ -465,26 +437,25 @@ document.getElementById("exportarExcel").addEventListener("click", async () => {
             return;
         }
 
-        // Subrubros
-        const { data: subrubros } = await supabase
-            .from("subrubro")
-            .select("id_subrubro, nombre")
-            .order("nombre", { ascending: true });
+        const subrubrosUnicos = [...new Set(
+            data.map(r => r.subrubro || "Sin categoría")
+        )];
 
         // Crear libro Excel
         const workbook = XLSX.utils.book_new();
 
         // Recorrer cada subrubro → una hoja por subrubro
-        subrubros.forEach(sub => {
-            const nombreSub = sub.nombre || "Sin nombre";
+        subrubrosUnicos.forEach(nombreSub => {
+
 
             // Filtrar repuestos del subrubro actual
             const datosFiltrados = data
-                .filter(r => r.id_subrubro === sub.id_subrubro)
+                .filter(r => (r.subrubro || "Sin categoría") === nombreSub)
                 .map(r => ({
                     "Código": r.codigo ?? "-",
                     "Marca": r.marca ?? "-",
                     "Subrubro": nombreSub,
+                    "Rubro": r.rubro ?? "-",
                     "Descripción": r.descripcion ?? "-",
                     "Stock Actual": r.stock_actual ?? 0,
                     "Precio Venta": r.precio_venta ?? 0
@@ -517,3 +488,145 @@ document.getElementById("exportarExcel").addEventListener("click", async () => {
         mostrarAlerta("❌ Error al generar Excel: " + err.message, "error");
     }
 });
+
+
+function crearDropdown(input, dropdown, toggle, lista) {
+    let selectedIndex = -1;
+    let abierto = false;
+
+    function render(filtro = "") {
+        dropdown.innerHTML = "";
+        const matches = lista.filter(v =>
+            v.toLowerCase().includes(filtro.toLowerCase())
+        );
+
+        matches.forEach((v, idx) => {
+            const div = document.createElement("div");
+            div.textContent = v;
+            div.addEventListener("click", () => {
+                input.value = v;
+                cerrar();
+            });
+            dropdown.appendChild(div);
+        });
+
+        if (matches.length) abrir();
+        else cerrar();
+    }
+
+    function abrir() {
+        dropdown.style.display = "block";
+        toggle.classList.add("open");
+        abierto = true;
+    }
+
+    function cerrar() {
+        dropdown.style.display = "none";
+        toggle.classList.remove("open");
+        selectedIndex = -1;
+        abierto = false;
+    }
+
+    function highlight(items) {
+        items.forEach((el, i) =>
+            el.classList.toggle("active", i === selectedIndex)
+        );
+        if (items[selectedIndex]) {
+            items[selectedIndex].scrollIntoView({ block: "nearest" });
+        }
+    }
+
+    // Escribir
+    input.addEventListener("input", () => {
+        render(input.value);
+    });
+
+    // Teclado
+    input.addEventListener("keydown", e => {
+        const items = dropdown.querySelectorAll("div");
+        if (!items.length) return;
+
+        if (e.key === "ArrowDown") {
+            e.preventDefault();
+            selectedIndex = (selectedIndex + 1) % items.length;
+            highlight(items);
+        } else if (e.key === "ArrowUp") {
+            e.preventDefault();
+            selectedIndex = (selectedIndex - 1 + items.length) % items.length;
+            highlight(items);
+        } else if (e.key === "Enter") {
+            e.preventDefault();
+            if (selectedIndex >= 0) {
+                input.value = items[selectedIndex].textContent;
+                cerrar();
+            }
+        } else if (e.key === "Escape") {
+            cerrar();
+        }
+    });
+
+    // Click en icono ▾
+    toggle.addEventListener("click", e => {
+        e.stopPropagation();
+        abierto ? cerrar() : render("");
+    });
+
+    // Click fuera
+    document.addEventListener("click", e => {
+        if (!input.contains(e.target) && !dropdown.contains(e.target)) {
+            cerrar();
+        }
+    });
+}
+
+async function cargarValoresUnicos(campo) {
+    const { data, error } = await supabase
+        .from("articulos")
+        .select(campo)
+        .not(campo, "is", null);
+
+    if (error) {
+        console.error(error);
+        return [];
+    }
+
+    return [...new Set(
+        data
+            .map(r => r[campo]?.trim())
+            .filter(Boolean)
+    )].sort();
+}
+
+document.addEventListener("DOMContentLoaded", async () => {
+    cargarSubrubrosFiltro();
+    cargarMarcas(); // 🆕 nuevo
+    cargarRepuestos();
+    // MARCA
+    const marcas = await cargarValoresUnicos("marca");
+    crearDropdown(
+        document.getElementById("marca"),
+        document.getElementById("marca-dropdown"),
+        document.getElementById("marca-toggle"),
+        marcas
+    );
+
+    // RUBRO
+    const rubros = await cargarValoresUnicos("rubro");
+    crearDropdown(
+        document.getElementById("rubro"),
+        document.getElementById("rubro-dropdown"),
+        document.getElementById("rubro-toggle"),
+        rubros
+    );
+
+    // SUBRUBRO
+    const subrubros = await cargarValoresUnicos("subrubro");
+    crearDropdown(
+        document.getElementById("subrubro"),
+        document.getElementById("subrubro-dropdown"),
+        document.getElementById("subrubro-toggle"),
+        subrubros
+    );
+
+});
+

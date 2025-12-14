@@ -24,9 +24,9 @@
         <button id="btnVolver" class="btn-volver">⬅ Volver</button>
       </div>
       <div class="export-buttons">
-    <button id="exportarPDF">📄 Exportar PDF</button>
-    <button id="exportarExcel">📊 Exportar Excel</button>
-</div>
+        <button id="exportarPDF">📄 Exportar PDF</button>
+        <button id="exportarExcel">📊 Exportar Excel</button>
+      </div>
 
     </header>
 
@@ -40,6 +40,7 @@
           <th>Descripción</th>
           <th>Marca</th>
           <th>Subrubro</th>
+          <th>Rubro</th>
           <th>Stock</th>
           <th>Ubicación</th>
           <th>Precio Venta</th>
@@ -86,11 +87,29 @@
         <label>Descripción:</label>
         <input type="text" id="descripcion" required />
 
+        <!-- Marca con dropdown moderno -->
         <label>Marca:</label>
-        <input type="text" id="marca" />
+        <div class="input-wrapper">
+          <input id="marca" placeholder="Seleccione o escriba una marca" autocomplete="off" />
+          <span class="dropdown-icon" id="marca-toggle">▾</span>
+          <div id="marca-dropdown" class="dropdown"></div>
+        </div>
 
+        <!-- SUBRUBRO -->
         <label>Subrubro:</label>
-        <select id="subrubro"></select>
+        <div class="input-wrapper">
+          <input id="subrubro" placeholder="Seleccione o escriba un subrubro" autocomplete="off" />
+          <span class="dropdown-icon" id="subrubro-toggle">▾</span>
+          <div id="subrubro-dropdown" class="dropdown"></div>
+        </div>
+
+        <!-- RUBRO -->
+        <label>Rubro:</label>
+        <div class="input-wrapper">
+          <input id="rubro" placeholder="Seleccione o escriba un rubro" autocomplete="off" />
+          <span class="dropdown-icon" id="rubro-toggle">▾</span>
+          <div id="rubro-dropdown" class="dropdown"></div>
+        </div>
 
         <label>Ubicación:</label>
         <input type="text" id="ubicacion" />

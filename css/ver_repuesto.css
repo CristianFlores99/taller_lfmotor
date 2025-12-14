@@ -279,3 +279,94 @@ form select:focus {
   from { opacity: 0; transform: scale(0.96); }
   to { opacity: 1; transform: scale(1); }
 }
+
+/* Input con datalist (marca) */
+.input-wrapper {
+  position: relative;
+  width: 100%;
+  margin-bottom: 10px;
+}
+
+/* Input */
+.input-wrapper input {
+  width: 100%;
+  padding: 10px 38px 10px 14px; /* espacio para el icono */
+  border: 2px solid #334155;
+  border-radius: 8px;
+  background: #0f172a;
+  color: #e2e8f0;
+  font-size: 14px;
+  outline: none;
+  transition: all 0.25s;
+}
+
+.input-wrapper input:focus {
+  border-color: #3b82f6;
+  box-shadow: 0 0 10px rgba(59,130,246,0.35);
+  background: #1e293b;
+}
+
+/* Icono desplegable */
+.dropdown-icon {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #94a3b8;
+  cursor: pointer;
+  font-size: 14px;
+  user-select: none;
+  transition: color 0.2s, transform 0.2s;
+}
+
+.dropdown-icon:hover {
+  color: #3b82f6;
+}
+
+.dropdown-icon.open {
+  transform: translateY(-50%) rotate(180deg);
+}
+
+/* Dropdown */
+.dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  max-height: 200px;
+  background: #1e293b;
+  border: 1px solid #334155;
+  border-top: none;
+  border-radius: 0 0 8px 8px;
+  overflow-y: auto;
+  z-index: 1000;
+  display: none;
+  box-shadow: 0 6px 16px rgba(0,0,0,0.6);
+}
+
+.dropdown div {
+  padding: 10px 14px;
+  cursor: pointer;
+  color: #e2e8f0;
+  transition: background 0.2s, color 0.2s;
+}
+
+.dropdown div:hover,
+.dropdown div.active {
+  background: #3b82f6;
+  color: #fff;
+  font-weight: 600;
+}
+
+/* Scroll */
+.dropdown::-webkit-scrollbar {
+  width: 8px;
+}
+
+.dropdown::-webkit-scrollbar-thumb {
+  background: #3b82f6;
+  border-radius: 4px;
+}
+
+
+
