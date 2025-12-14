@@ -5,15 +5,14 @@ const supabase = createClient(supabaseUrl, supabaseKey);
 
 const chartVentasEl = document.getElementById('chartVentas').getContext('2d');
 const chartComprasEl = document.getElementById('chartCompras').getContext('2d');
+const chartComprasMesFacturaEl = document.getElementById("chartComprasMesFactura").getContext("2d");
 
-
-
-let chartVentas, chartCompras;
+let chartVentas, chartCompras, chartComprasMesFactura;
 
 document.addEventListener('DOMContentLoaded', async () => {
   await cargarVentas();
   await cargarCompras();
-  await cargarStock();
+  await cargarComprasMesPorFactura();
   await cargarVentasMensual();
   await metricasVentasDia();
   await metricasVentasMes();
@@ -114,6 +113,7 @@ function agruparPorMes(ventas) {
 
   return meses;
 }
+
 function parseFechaLocal(fechaStr) {
   const [año, mes, dia] = fechaStr.split("-").map(Number);
   return new Date(año, mes - 1, dia); // <-- LOCAL, SIN DESFASE UTC
@@ -158,11 +158,11 @@ async function cargarVentasMensual() {
 
 // ---------------- Compras ----------------
 async function cargarCompras() {
-  const { data, error } = await supabase.from('compra_detalle').select('*').order('fecha', { ascending: true });
+  const { data, error } = await supabase.from('facturas_proveedor').select('*').order('fecha', { ascending: true });
   if (error) return console.error(error);
 
-  const etiquetas = data.map(c => parseFechaLocal(v.fecha).toLocaleDateString());
-  const totales = data.map(c => c.total);
+  const etiquetas = data.map(c => parseFechaLocal(c.fecha).toLocaleDateString());
+  const totales = data.map(c => c.monto_total);
 
   chartCompras = new Chart(chartComprasEl, {
     type: 'bar',
@@ -183,49 +183,6 @@ async function cargarCompras() {
     }
   });
 }
-
-// ---------------- Stock Crítico ----------------
-async function cargarStock() {
-  const { data, error } = await supabase
-    .from('articulos')
-    .select('*')
-    .order('stock_minimo', { ascending: true });
-
-  if (error) return console.error(error);
-
-  // FILTRAR CRÍTICOS: stock_actual <= stock_minimo
-  const criticos = data.filter(r => Number(r.stock_actual) <= Number(r.stock_minimo));
-
-  // Etiquetas = descripción
-  const etiquetas = criticos.map(r => r.descripcion);
-
-  // Valores = stock_actual
-  const valores = criticos.map(r => Number(r.stock_actual));
-
-  // Render chart
-  const chartStockEl = document.getElementById('chartStock').getContext('2d');
-
-  new Chart(chartStockEl, {
-    type: 'bar',
-    data: {
-      labels: etiquetas,
-      datasets: [{
-        label: 'Stock actual',
-        data: valores,
-        borderWidth: 1
-      }]
-    },
-    options: {
-      responsive: true,
-      scales: {
-        x: { title: { display: true, text: 'Repuestos con stock crítico' } },
-        y: { title: { display: true, text: 'Cantidad actual' } }
-      }
-    }
-  });
-}
-
-
 
 // ---------------- Exportar PDF ----------------
 document.getElementById('exportPDF').addEventListener('click', () => {
@@ -317,3 +274,100 @@ async function metricasStockCritico() {
   document.getElementById("m_stockCritico").textContent = `${criticos} Items`;
 }
 
+//
+async function metricasComprasMes() {
+  const hoy = new Date();
+  const año = hoy.getFullYear();
+  const mes = String(hoy.getMonth() + 1).padStart(2, "0");
+
+  const inicioMes = `${año}-${mes}-01`;
+
+  const { data, error } = await supabase
+    .from("facturas_proveedor")
+    .select("monto_total, fecha")
+    .gte("fecha", inicioMes);
+
+  if (error) {
+    console.error("Error métricas compras mes:", error);
+    return;
+  }
+
+  const total = data.reduce(
+    (sum, c) => sum + Number(c.monto_total),
+    0
+  );
+
+  document.getElementById("m_comprasMes").textContent =
+    `$${total.toLocaleString("es-AR")}`;
+}
+
+//
+async function cargarComprasMesPorFactura() {
+  const hoy = new Date();
+  const año = hoy.getFullYear();
+  const mes = String(hoy.getMonth() + 1).padStart(2, "0");
+  const inicioMes = `${año}-${mes}-01`;
+
+  const { data, error } = await supabase
+    .from("facturas_proveedor")
+    .select("fecha, monto_total, codigo_alfanumerico")
+    .gte("fecha", inicioMes)
+    .order("fecha", { ascending: true });
+
+  if (error) {
+    console.error("Error compras mes por factura:", error);
+    return;
+  }
+
+  const etiquetas = data.map(f =>
+    f.numero_factura
+      ? `Factura ${f.numero_factura}`
+      : new Date(f.fecha).toLocaleDateString("es-AR")
+  );
+
+  const totales = data.map(f => Number(f.monto_total));
+
+  if (chartComprasMesFactura) {
+    chartComprasMesFactura.destroy();
+  }
+
+  chartComprasMesFactura = new Chart(chartComprasMesFacturaEl, {
+    type: "bar",
+    data: {
+      labels: etiquetas,
+      datasets: [{
+        label: "Compras del mes",
+        data: totales,
+        borderWidth: 1
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        tooltip: {
+          callbacks: {
+            label: ctx =>
+              `$ ${ctx.parsed.y.toLocaleString("es-AR")}`
+          }
+        }
+      },
+      scales: {
+        x: {
+          title: {
+            display: true,
+            text: "Facturas del mes"
+          }
+        },
+        y: {
+          title: {
+            display: true,
+            text: "Monto"
+          },
+          ticks: {
+            callback: v => `$ ${v.toLocaleString("es-AR")}`
+          }
+        }
+      }
+    }
+  });
+}
