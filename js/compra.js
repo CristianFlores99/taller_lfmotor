@@ -104,7 +104,6 @@ function parsePrecio(valor) {
   return parseFloat(valor);
 }
 
-
 function formatMoney(num) {
   return Number(num).toFixed(2);
 }

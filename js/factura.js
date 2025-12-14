@@ -57,7 +57,7 @@ async function cargarBoleta() {
                 codigo,
                 descripcion,
                 marca,
-                subrubro ( nombre )
+                subrubro
             )
         `)
         .eq("id_venta", idVenta);
@@ -67,7 +67,7 @@ async function cargarBoleta() {
 
     items.forEach(item => {
         const art = item.articulos;
-        const sub = art?.subrubro?.nombre ? ` (${art.subrubro.nombre})` : "..";
+        const sub = art?.subrubro ? ` (${art.subrubro})` : "..";
         const desc = `${art.descripcion}${sub}`;
 
         const unit = item.precio_unitario || 0;
