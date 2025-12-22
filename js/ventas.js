@@ -19,7 +19,7 @@ async function cargarVentas() {
   const { data, error } = await supabase
     .from("ventas")
     .select("*")
-    .order("id_venta", { ascending: false });
+    .order("fecha", { ascending: false });
 
   if (error) {
     alert("Error al cargar ventas: " + error.message);
