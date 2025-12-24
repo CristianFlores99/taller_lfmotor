@@ -14,46 +14,51 @@ body {
 
 /* ---------------- Layout general ---------------- */
 .container {
-  max-width: 1300px;
-  margin: auto;
+  max-width: 1400px;
+  margin: 0 auto;
+  background: #1e293b;
+  padding: 25px;
+  border-radius: 14px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.35);
+}
+
+.container table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+  background: #1e293b;
+  border-radius: 12px;
 }
 
 /* ---------------- Header ---------------- */
 header {
-  background: #1e293b;
-  padding: 15px 20px;
-  border-radius: 12px;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.35);
-  margin-bottom: 22px;
+  padding: 12px 15px;
+  border-radius: 12px;
+  margin-bottom: 18px;
 }
 
 header h1 {
-  font-size: 22px;
-  color: #fff;
+  font-size: 26px;
+  color: #93c5fd;
+  font-weight: 700;
 }
 
-header input {
-  padding: 10px 14px;
-  width: 280px;
-  border: 1px solid #334155;
-  background: #0f172a;
-  border-radius: 8px;
-  color: #fff;
-  outline: none;
-  transition: 0.2s;
-}
-
-header input:focus {
-  border-color: #3b82f6;
-  box-shadow: 0 0 6px rgba(59,130,246,0.5);
-}
-
-header .acciones {
+.acciones {
   display: flex;
   gap: 10px;
+  align-items: center;
+}
+
+.acciones input,
+.acciones select {
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: 1px solid #334155;
+  background: #0f172a;
+  color: #e2e8f0;
 }
 
 /* ---------------- Botones ---------------- */
@@ -77,6 +82,7 @@ button:hover {
 .btn-volver {
   background: #2563eb;
 }
+
 .btn-volver:hover {
   background: #1d4ed8;
 }
@@ -99,27 +105,82 @@ button:hover {
 }
 
 /* ---------------- Tabla ---------------- */
-table {
-  width: 100%;
-  border-collapse: collapse;
-  margin-top: 10px;
-  background: #1e293b;
-  border-radius: 12px;
-  overflow: hidden;
-  box-shadow: 0px 4px 12px rgba(0,0,0,0.35);
-}
 
-th, td {
-  padding: 12px 14px;
-  text-align: left;
-}
 
 th {
   background: #334155;
-  font-weight: 600;
-  color: #e2e8f0;
+  color: #cbd5e1;
   text-transform: uppercase;
   font-size: 13px;
+}
+
+.tabla-wrapper {
+  margin-top: 10px;
+  padding-bottom: 5px;
+  width: 100%;
+  overflow-x: auto;
+}
+
+.tabla-repuestos {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+  /* ← FUNDAMENTAL */
+  font-size: 13.5px;
+}
+
+.tabla-repuestos td,
+.tabla-repuestos th {
+    vertical-align: middle;
+      text-align: left;
+  line-height: 1.4;
+  padding: 6px 8px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  word-break: break-word;
+}
+
+/* Columnas numéricas centradas */
+.tabla-repuestos td.col-stock,
+.tabla-repuestos td.col-precio,
+.tabla-repuestos th.col-stock,
+.tabla-repuestos th.col-precio {
+  text-align: center;
+}
+
+.tabla-repuestos th.col-codigo,
+.tabla-repuestos td.col-codigo {
+  width: 120px;
+}
+
+.tabla-repuestos td.col-descripcion {
+  white-space: normal;
+}
+
+
+
+.tabla-repuestos th.col-marca,
+.tabla-repuestos td.col-marca {
+  width: 140px;
+}
+
+.tabla-repuestos th.col-precio,
+.tabla-repuestos td.col-precio {
+  width: 110px;
+}
+
+
+.tabla-repuestos th.col-acciones,
+.tabla-repuestos td.col-acciones {
+  width: 120px;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.tabla-repuestos th.col-stock,
+.tabla-repuestos td.col-stock {
+  width: 90px;
+  text-align: center;
 }
 
 tr {
@@ -145,17 +206,17 @@ tr:hover {
 
 /* Indicadores superiores */
 .indicador-stock {
-  padding: 10px;
-  background: #1e293b;
-  border-radius: 10px;
   margin-bottom: 15px;
+  padding: 10px;
+  background: #0f172a;
+  border-radius: 10px;
   text-align: center;
   font-weight: 600;
 }
 
 .stock-ok {
   color: #86efac;
-  background: rgba(134,239,172,0.15);
+  background: rgba(134, 239, 172, 0.15);
 }
 
 /* ---------------- Modal ---------------- */
@@ -175,7 +236,7 @@ tr:hover {
   border-radius: 12px;
   width: 480px;
   max-width: 92%;
-  box-shadow: 0 0 20px rgba(0,0,0,0.6);
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.6);
   animation: fadeIn 0.25s ease-out;
 }
 
@@ -192,6 +253,7 @@ tr:hover {
   padding: 6px 10px;
   border-radius: 6px;
 }
+
 .btn-cerrar:hover {
   background: #dc2626;
 }
@@ -244,7 +306,7 @@ form select:focus {
 
   z-index: 99999;
 
-  box-shadow: 0 6px 14px rgba(0,0,0,0.25);
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.25);
 
   opacity: 0;
   transform: translateX(20px);
@@ -254,20 +316,39 @@ form select:focus {
 .alerta-ok {
   background: linear-gradient(135deg, #22c55e, #16a34a);
 }
+
 .alerta-error {
   background: linear-gradient(135deg, #ef4444, #dc2626);
 }
+
 .alerta-info {
   background: linear-gradient(135deg, #facc15, #eab308);
 }
 
 @keyframes vibrar {
-  0% { transform: translateX(0); }
-  20% { transform: translateX(-4px); }
-  40% { transform: translateX(4px); }
-  60% { transform: translateX(-4px); }
-  80% { transform: translateX(4px); }
-  100% { transform: translateX(0); }
+  0% {
+    transform: translateX(0);
+  }
+
+  20% {
+    transform: translateX(-4px);
+  }
+
+  40% {
+    transform: translateX(4px);
+  }
+
+  60% {
+    transform: translateX(-4px);
+  }
+
+  80% {
+    transform: translateX(4px);
+  }
+
+  100% {
+    transform: translateX(0);
+  }
 }
 
 .alerta-error.anim-vibrar {
@@ -276,8 +357,15 @@ form select:focus {
 
 /* Animación modal */
 @keyframes fadeIn {
-  from { opacity: 0; transform: scale(0.96); }
-  to { opacity: 1; transform: scale(1); }
+  from {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
 
 /* Input con datalist (marca) */
@@ -290,7 +378,8 @@ form select:focus {
 /* Input */
 .input-wrapper input {
   width: 100%;
-  padding: 10px 38px 10px 14px; /* espacio para el icono */
+  padding: 10px 38px 10px 14px;
+  /* espacio para el icono */
   border: 2px solid #334155;
   border-radius: 8px;
   background: #0f172a;
@@ -302,7 +391,7 @@ form select:focus {
 
 .input-wrapper input:focus {
   border-color: #3b82f6;
-  box-shadow: 0 0 10px rgba(59,130,246,0.35);
+  box-shadow: 0 0 10px rgba(59, 130, 246, 0.35);
   background: #1e293b;
 }
 
@@ -341,7 +430,7 @@ form select:focus {
   overflow-y: auto;
   z-index: 1000;
   display: none;
-  box-shadow: 0 6px 16px rgba(0,0,0,0.6);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.6);
 }
 
 .dropdown div {
@@ -367,6 +456,3 @@ form select:focus {
   background: #3b82f6;
   border-radius: 4px;
 }
-
-
-

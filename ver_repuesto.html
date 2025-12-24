@@ -10,45 +10,51 @@
 
 <body>
   <div class="container">
+
+    <!-- HEADER (título + acciones) -->
     <header>
       <h1>📦 Repuestos en Stock</h1>
+
       <div class="acciones">
         <select id="filtroSubrubro">
           <option value="">Todos los subrubros</option>
         </select>
+
         <select id="filtroMarca">
           <option value="">Todas las marcas</option>
         </select>
-        <input type="text" id="busqueda" placeholder="Buscar repuesto..." />
-        <button id="btnAgregar">➕ Nuevo Repuesto</button>
-        <button id="btnVolver" class="btn-volver">⬅ Volver</button>
-      </div>
-      <div class="export-buttons">
-        <button id="exportarPDF">📄 Exportar PDF</button>
-        <button id="exportarExcel">📊 Exportar Excel</button>
-      </div>
 
+        <input type="text" id="busqueda" placeholder="Buscar repuesto..." />
+
+        <button id="btnAgregar">➕ Nuevo Repuesto</button>
+        <button id="btnVolver">⬅ Volver</button>
+      </div>
     </header>
 
-    <!-- 🔹 Contador de stock -->
-    <div id="indicadorStock" class="indicador-stock">Cargando datos...</div>
+    <!-- INDICADOR DE STOCK (DENTRO DEL CONTAINER) -->
+    <div id="indicadorStock" class="indicador-stock">
+      Cargando datos...
+    </div>
 
-    <table>
-      <thead>
-        <tr>
-          <th>Código</th>
-          <th>Descripción</th>
-          <th>Marca</th>
-          <th>Subrubro</th>
-          <th>Rubro</th>
-          <th>Stock</th>
-          <th>Ubicación</th>
-          <th>Precio Venta</th>
-          <th>Acciones</th>
-        </tr>
-      </thead>
-      <tbody id="cuerpoTabla"></tbody>
-    </table>
+    <!-- TABLA (DENTRO DEL CONTAINER) -->
+    <div class="tabla-wrapper">
+      <table class="tabla-repuestos">
+        <thead>
+          <tr>
+            <th>Código</th>
+            <th>Descripción</th>
+            <th>Marca</th>
+            <th>Subrubro</th>
+            <th>Rubro</th>
+            <th class="col-stock">Stock</th>
+            <th>Ubicación</th>
+            <th>Precio Venta</th>
+            <th class="col-acciones">Acciones</th>
+          </tr>
+        </thead>
+        <tbody id="cuerpoTabla"></tbody>
+      </table>
+    </div>
   </div>
 
   <!-- Modal Movimientos -->
