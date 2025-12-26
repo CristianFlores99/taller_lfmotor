@@ -448,7 +448,8 @@ async function exportarExcel() {
                         "Rubro": r.rubro ?? "-",
                         "Descripción": r.descripcion ?? "-",
                         "Stock Actual": r.stock_actual ?? 0,
-                        "Precio Venta": r.precio_venta ?? 0
+                        "Precio Venta": r.precio_venta ?? 0,
+                        "Fecha de actualizacion ": r.fecha_actualizacion
                     }));
 
                 // Crear hoja
