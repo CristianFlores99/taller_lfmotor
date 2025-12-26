@@ -22,6 +22,7 @@ let indicadorStock;
 let btnExportarPDF;
 let btnExportarExcel;
 
+let precioAnterior = null;
 let editId = null;
 
 // ---------- Funciones ----------
@@ -71,6 +72,7 @@ async function cargarRepuestos() {
       <td class="${claseStock}">${rep.stock_actual}</td>
       <td>${rep.ubicacion || "-"}</td>
       <td>$${rep.precio_venta?.toFixed(2) || "0.00"}</td>
+      <td>${rep.fecha_actualizacion}</td>
       <td>
         <button class="btn-editar" data-id="${rep.id_articulo}">Editar</button>
         <button class="btn-mov" data-id="${rep.id_articulo}" data-desc="${rep.descripcion}">Ver Historial</button>
@@ -115,6 +117,8 @@ async function editarRepuesto(id) {
     document.getElementById("stock_actual").value = data.stock_actual;
     document.getElementById("stock_minimo").value = data.stock_minimo;
     document.getElementById("precio_venta").value = data.precio_venta;
+    precioAnterior = Number(data.precio_venta) || 0;
+
     modalForm.style.display = "flex";
 }
 
@@ -127,6 +131,7 @@ formRepuesto.addEventListener("submit", async (e) => {
         mostrarAlerta("Código y Descripción son obligatorios");
         return;
     }
+    const precioNuevo = parseFloat(precio_venta.value) || 0;
 
     const repuesto = {
         codigo: codigo.value.trim(),
@@ -140,6 +145,10 @@ formRepuesto.addEventListener("submit", async (e) => {
         precio_venta: parseFloat(precio_venta.value) || 0
     };
 
+    // 📅 Si es nuevo o cambió el precio → actualizar fecha
+    if (!editId || precioNuevo !== precioAnterior) {
+        repuesto.fecha_actualizacion = new Date().toISOString().split("T")[0];
+    }
 
     let result;
     if (editId) {
