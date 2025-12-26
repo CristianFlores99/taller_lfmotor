@@ -1,0 +1,94 @@
+* {
+  box-sizing: border-box;
+  font-family: "Segoe UI", Tahoma, sans-serif;
+}
+
+body {
+  background: #0f172a;
+  color: #e5e7eb;
+  padding: 30px;
+}
+
+h1 {
+  margin-bottom: 6px;
+}
+
+.info {
+  color: #94a3b8;
+  margin-bottom: 20px;
+}
+
+/* LAYOUT */
+.layout {
+  display: flex;
+  gap: 25px;
+  align-items: flex-start;
+}
+
+/* LOCAL */
+#local {
+  position: relative;
+  width: 600px;
+  height: 380px;
+  background: #1e293b;
+  border: 3px solid #334155;
+  border-radius: 16px;
+}
+
+/* ZONAS */
+.zona {
+  position: absolute;
+  background: #334155;
+  border-radius: 12px;
+  padding: 10px;
+  text-align: center;
+  cursor: pointer;
+  transition: 0.25s;
+}
+
+.zona:hover {
+  transform: scale(1.04);
+  background: #475569;
+}
+
+.pared { width: 120px; }
+.gondola { width: 200px; height: 90px; background: #1d4ed8; }
+.mostrador { width: 260px; height: 70px; background: #16a34a; }
+
+.zona strong {
+  display: block;
+  font-size: 14px;
+}
+
+.zona span {
+  font-size: 13px;
+  color: #cbd5f5;
+}
+
+/* PANEL PRODUCTOS */
+.panel {
+  width: 300px;
+  background: #1e293b;
+  border-radius: 14px;
+  padding: 18px;
+  border: 1px solid #334155;
+}
+
+.panel h2 {
+  font-size: 18px;
+  margin-bottom: 12px;
+  border-bottom: 2px solid #334155;
+  padding-bottom: 6px;
+}
+
+.panel ul {
+  list-style: none;
+}
+
+.panel li {
+  padding: 8px;
+  background: #334155;
+  border-radius: 8px;
+  margin-bottom: 6px;
+  font-size: 14px;
+}

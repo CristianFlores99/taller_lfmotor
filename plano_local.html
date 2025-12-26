@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Plano del Local</title>
+  <link rel="stylesheet" href="css/plano_local.css">
+</head>
+<body>
+
+  <h1>🗺️ Plano del Local</h1>
+  <p class="info">Click en una zona para ver productos</p>
+
+  <div class="layout">
+
+    <!-- PLANO -->
+    <div id="local">
+
+      <div class="zona pared" data-zona="pared_a" style="top:20px; left:20px; height:260px;">
+        <strong>Pared A</strong>
+        <span>Filtros</span>
+      </div>
+
+      <div class="zona pared" data-zona="pared_b" style="top:20px; right:20px; height:260px;">
+        <strong>Pared B</strong>
+        <span>Frenos</span>
+      </div>
+
+      <div class="zona gondola" data-zona="gondola" style="top:110px; left:200px;">
+        <strong>Góndola</strong>
+        <span>Aceites</span>
+      </div>
+
+      <div class="zona mostrador" data-zona="mostrador" style="bottom:20px; left:120px;">
+        <strong>Mostrador</strong>
+      </div>
+
+    </div>
+
+    <!-- PANEL -->
+    <div class="panel">
+      <h2 id="tituloZona">Seleccioná una zona</h2>
+      <ul id="listaProductos"></ul>
+    </div>
+
+  </div>
+
+  <script src="js/plano_local.js"></script>
+</body>
+</html>
