@@ -127,8 +127,8 @@ formRepuesto.addEventListener("submit", async (e) => {
     e.preventDefault();
 
     // Validación básica
-    if (!codigo.value || !descripcion.value) {
-        mostrarAlerta("Código y Descripción son obligatorios");
+    if (!codigo.value) {
+        mostrarAlerta("Código es obligatorio");
         return;
     }
     const precioNuevo = parseFloat(precio_venta.value) || 0;
