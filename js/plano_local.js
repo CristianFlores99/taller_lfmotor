@@ -1,3 +1,4 @@
+/*
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const supabaseUrl = "https://ovfsffckhzelgbgohakv.supabase.co";
@@ -5,60 +6,110 @@ const supabaseKey =
   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im92ZnNmZmNraHplbGdiZ29oYWt2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjA2NTA0MjYsImV4cCI6MjA3NjIyNjQyNn0.hDiIhAHAr04Uo9todWdk0QUaqD3RYj5kMkITavzPiHc";
 
 const supabase = createClient(supabaseUrl, supabaseKey);
+*/
+const svg = document.getElementById("plano");
 
-const tituloZona = document.getElementById("tituloZona");
-const listaProductos = document.getElementById("listaProductos");
+// Función helper para crear SVG
+function crearElemento(tipo, atributos = {}) {
+  const el = document.createElementNS("http://www.w3.org/2000/svg", tipo);
+  for (const attr in atributos) {
+    el.setAttribute(attr, atributos[attr]);
+  }
+  return el;
+}
 
-document.querySelectorAll(".zona").forEach(zona => {
-  zona.addEventListener("click", async () => {
-    const ubicacion = zona.dataset.ubicacion;
+// ----------------------------
+// DIBUJO DEL PLANO
+// ----------------------------
 
-    tituloZona.textContent = "Cargando productos...";
-    listaProductos.innerHTML = "";
+// Contorno del local
+svg.appendChild(
+  crearElemento("rect", {
+    x: 20,
+    y: 20,
+    width: 960,
+    height: 560,
+    class: "local"
+  })
+);
 
-    const { data, error } = await supabase
-      .from("articulos")
-      .select(`
-        codigo,
-        descripcion,
-        precio_venta,
-        stock_actual,
-        stock_minimo,
-        marca
-      `)
-      .eq("ubicacion", ubicacion)
-      .order("descripcion");
+// Entrada diagonal
+svg.appendChild(
+  crearElemento("line", {
+    x1: 760,
+    y1: 580,
+    x2: 980,
+    y2: 420,
+    class: "entrada"
+  })
+);
 
-    if (error) {
-      tituloZona.textContent = "Error";
-      alert("Error cargando artículos: " + error.message);
-      return;
-    }
+// Texto entrada
+svg.appendChild(
+  crearElemento("text", {
+    x: 800,
+    y: 520,
+    fill: "#ef4444",
+    "font-size": 14
+  })
+).textContent = "ENTRADA";
 
-    if (data.length === 0) {
-      tituloZona.textContent = "Ubicación sin productos";
-      listaProductos.innerHTML = "<li>No hay artículos asignados</li>";
-      return;
-    }
+// ----------------------------
+// ESTANTES
+// ----------------------------
+const estantes = [
+  { id: "E1", x: 60, y: 80 },
+  { id: "E2", x: 60, y: 150 },
+  { id: "E3", x: 60, y: 220 },
+  { id: "E4", x: 60, y: 290 },
+  { id: "E5", x: 60, y: 360 },
 
-    tituloZona.textContent =
-      `Productos en ${ubicacion.replace("_", " ").toUpperCase()}`;
+  { id: "E6", x: 420, y: 80 },
+  { id: "E7", x: 420, y: 150 },
+  { id: "E8", x: 420, y: 220 },
+  { id: "E9", x: 420, y: 290 },
+  { id: "E10", x: 420, y: 360 }
+];
 
-    data.forEach(a => {
-      const stockBajo = a.stock_actual <= a.stock_minimo;
+estantes.forEach(e => {
+  svg.appendChild(
+    crearElemento("rect", {
+      x: e.x,
+      y: e.y,
+      width: 300,
+      height: 50,
+      class: "estante"
+    })
+  );
 
-      const li = document.createElement("li");
-      li.classList.toggle("stock-bajo", stockBajo);
-
-      li.innerHTML = `
-        <strong>${a.codigo}</strong> ${a.marca ? `(${a.marca})` : ""}<br>
-        ${a.descripcion}<br>
-        💲 ${Number(a.precio_venta).toFixed(2)} |
-        📦 Stock: ${a.stock_actual}
-        ${stockBajo ? " ⚠️" : ""}
-      `;
-
-      listaProductos.appendChild(li);
-    });
-  });
+  svg.appendChild(
+    crearElemento("text", {
+      x: e.x + 10,
+      y: e.y + 30,
+      class: "texto-estante"
+    })
+  ).textContent = e.id;
 });
+
+// ----------------------------
+// PARED DE GANCHOS
+// ----------------------------
+svg.appendChild(
+  crearElemento("rect", {
+    x: 780,
+    y: 80,
+    width: 160,
+    height: 300,
+    class: "pared"
+  })
+);
+
+svg.appendChild(
+  crearElemento("text", {
+    x: 795,
+    y: 100,
+    fill: "#020617",
+    "font-size": 12,
+    "font-weight": "bold"
+  })
+).textContent = "PARED DE GANCHOS";
