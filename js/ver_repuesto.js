@@ -53,18 +53,21 @@ async function cargarRepuestos() {
     }
 
     // 🔹 Calcular resumen de stock
-    const bajo = data.filter(r => r.stock_actual <= r.stock_minimo).length;
-    const normal = data.length - bajo;
+    const rojo = data.filter(r => r.stock_actual === 0).length;
+    const amarillo = data.filter(r => r.stock_actual > 0 && r.stock_actual <= 1).length;
+    const verde = data.filter(r => r.stock_actual >= 2).length;
+
     indicadorStock.innerHTML = `
-    <span style="color:#f87171">⚠️ ${bajo} con stock bajo</span> |
-    <span style="color:#86efac">🔋 ${normal} en stock normal</span>
-  `;
+  <span style="color:#dc2626">🔴 ${rojo} sin stock</span> |
+  <span style="color:#facc15">🟡 ${amarillo} bajo</span> |
+  <span style="color:#16a34a">🟢 ${verde} correcto</span>
+`;
 
     data.forEach(rep => {
         let claseStock = "stock-verde";
         if (rep.stock_actual === 0) {
             claseStock = "stock-rojo";
-        } else if (rep.stock_actual <= 2) {
+        } else if (rep.stock_actual <= 1) {
             claseStock = "stock-amarillo";
         }
         const tr = document.createElement("tr");
@@ -161,36 +164,32 @@ formRepuesto.addEventListener("submit", async (e) => {
         repuesto.fecha_actualizacion = new Date().toISOString().split("T")[0];
     }
 
-    let result;
     if (editId) {
-        const { data: duplicado } = await supabase
+        const { error } = await supabase
             .from("articulos")
-            .select("id_articulo")
-            .eq("codigo", codigoNorm)
-            .eq("marca", marcaNorm)
-            .neq("id_articulo", editId);
+            .update(repuesto)
+            .eq("id_articulo", editId);
 
-        if (duplicado.length > 0) {
-            mostrarAlerta("Ya existe otro repuesto con ese código y marca", "error");
+        if (error) {
+            mostrarAlerta("Error al actualizar: " + error.message, "error");
             return;
         }
+
     } else {
-        // Verificar duplicados por código
-        const { data: duplicado } = await supabase.from("articulos").select("*").eq("codigo", codigoNorm).eq("marca", marcaNorm);
-        if (duplicado.length > 0) {
-            mostrarAlerta("Ya existe un repuesto con ese código");
+        const { error } = await supabase
+            .from("articulos")
+            .insert([repuesto]);
+
+        if (error) {
+            mostrarAlerta("YA EXISTE EL CODIGO Y MARCA", "error");
             return;
         }
-        result = await supabase.from("articulos").insert([repuesto]);
     }
 
-    if (result.error) alert("Error: " + result.error.message);
-    else {
-        // Feedback visual
-        mostrarAlerta("Repuesto guardado correctamente");
-        modalForm.style.display = "none";
-        cargarRepuestos();
-    }
+    mostrarAlerta("Repuesto guardado correctamente");
+    modalForm.style.display = "none";
+    cargarRepuestos();
+
 });
 
 // Ver Movimientos
