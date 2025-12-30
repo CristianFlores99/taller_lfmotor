@@ -61,7 +61,12 @@ async function cargarRepuestos() {
   `;
 
     data.forEach(rep => {
-        const claseStock = rep.stock_actual <= rep.stock_minimo ? "stock-bajo" : "stock-ok";
+        let claseStock = "stock-verde";
+        if (rep.stock_actual === 0) {
+            claseStock = "stock-rojo";
+        } else if (rep.stock_actual <= 2) {
+            claseStock = "stock-amarillo";
+        }
         const tr = document.createElement("tr");
         tr.innerHTML = `
       <td>${rep.codigo}</td>

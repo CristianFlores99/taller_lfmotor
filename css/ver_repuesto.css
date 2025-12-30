@@ -195,14 +195,34 @@ tr:hover {
   background: #2c3a50;
 }
 
-/* Stock bajo resaltado */
-.stock-bajo {
+/* Stock por niveles */
+.stock-rojo {
+  background-color: #dc2626; /* rojo */
   color: #fff;
-  background-color: #dc2626;
+  font-weight: 700;
+  text-align: center;
   border-radius: 6px;
   padding: 3px 7px;
-  font-weight: 600;
 }
+
+.stock-amarillo {
+  background-color: #facc15; /* amarillo */
+  color: #1f2937;
+  font-weight: 700;
+  text-align: center;
+  border-radius: 6px;
+  padding: 3px 7px;
+}
+
+.stock-verde {
+  background-color: #16a34a; /* verde */
+  color: #fff;
+  font-weight: 700;
+  text-align: center;
+  border-radius: 6px;
+  padding: 3px 7px;
+}
+
 
 /* Indicadores superiores */
 .indicador-stock {
@@ -212,11 +232,6 @@ tr:hover {
   border-radius: 10px;
   text-align: center;
   font-weight: 600;
-}
-
-.stock-ok {
-  color: #86efac;
-  background: rgba(134, 239, 172, 0.15);
 }
 
 /* ---------------- Modal ---------------- */
