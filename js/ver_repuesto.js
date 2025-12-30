@@ -125,18 +125,24 @@ async function editarRepuesto(id) {
 // Guardar Repuesto
 formRepuesto.addEventListener("submit", async (e) => {
     e.preventDefault();
+    const codigoNorm = codigo.value.trim().toUpperCase();
+    const marcaNorm = marca.value.trim().toUpperCase();
 
     // Validación básica
     if (!codigo.value) {
         mostrarAlerta("Código es obligatorio");
         return;
     }
+    if (!marcaNorm) {
+        mostrarAlerta("La marca es obligatoria", "error");
+        return;
+    }
     const precioNuevo = parseFloat(precio_venta.value) || 0;
 
     const repuesto = {
-        codigo: codigo.value.trim(),
+        codigo: codigoNorm,
         descripcion: descripcion.value.trim(),
-        marca: marca.value.trim(),
+        marca: marcaNorm,
         subrubro: subrubro.value.trim(),
         rubro: rubro.value.trim(),
         ubicacion: ubicacion.value.trim(),
@@ -152,10 +158,20 @@ formRepuesto.addEventListener("submit", async (e) => {
 
     let result;
     if (editId) {
-        result = await supabase.from("articulos").update(repuesto).eq("id_articulo", editId);
+        const { data: duplicado } = await supabase
+            .from("articulos")
+            .select("id_articulo")
+            .eq("codigo", codigoNorm)
+            .eq("marca", marcaNorm)
+            .neq("id_articulo", editId);
+
+        if (duplicado.length > 0) {
+            mostrarAlerta("Ya existe otro repuesto con ese código y marca", "error");
+            return;
+        }
     } else {
         // Verificar duplicados por código
-        const { data: duplicado } = await supabase.from("articulos").select("*").eq("codigo", repuesto.codigo);
+        const { data: duplicado } = await supabase.from("articulos").select("*").eq("codigo", codigoNorm).eq("marca", marcaNorm);
         if (duplicado.length > 0) {
             mostrarAlerta("Ya existe un repuesto con ese código");
             return;
