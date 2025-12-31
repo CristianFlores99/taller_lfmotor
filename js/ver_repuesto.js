@@ -12,8 +12,6 @@ const btnEliminar = document.getElementById("eliminarRepuesto");
 
 const modalMov = document.getElementById("modalMovimientos");
 const cerrarModal = document.getElementById("cerrarModal");
-const cuerpoMovimientos = document.getElementById("cuerpoMovimientos");
-const tituloRepuesto = document.getElementById("tituloRepuesto");
 
 let cuerpoTabla;
 let inputBusqueda;
