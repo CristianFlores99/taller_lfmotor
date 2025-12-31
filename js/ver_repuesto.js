@@ -83,7 +83,6 @@ async function cargarRepuestos() {
       <td>${rep.fecha_actualizacion}</td>
       <td>
         <button class="btn-editar" data-id="${rep.id_articulo}">Editar</button>
-        <button class="btn-mov" data-id="${rep.id_articulo}" data-desc="${rep.descripcion}">Ver Historial</button>
       </td>
     `;
         cuerpoTabla.appendChild(tr);
@@ -92,9 +91,7 @@ async function cargarRepuestos() {
     document.querySelectorAll(".btn-editar").forEach(btn =>
         btn.addEventListener("click", e => editarRepuesto(e.target.dataset.id))
     );
-    document.querySelectorAll(".btn-mov").forEach(btn =>
-        btn.addEventListener("click", e => verMovimientos(e.target.dataset.id, e.target.dataset.desc))
-    );
+
 }
 
 // Abrir Formulario
@@ -123,7 +120,6 @@ async function editarRepuesto(id) {
     document.getElementById("rubro").value = data.rubro || "";
     document.getElementById("ubicacion").value = data.ubicacion || "";
     document.getElementById("stock_actual").value = data.stock_actual;
-    document.getElementById("stock_minimo").value = data.stock_minimo;
     document.getElementById("precio_venta").value = data.precio_venta;
     precioAnterior = Number(data.precio_venta) || 0;
 
@@ -155,7 +151,6 @@ formRepuesto.addEventListener("submit", async (e) => {
         rubro: rubro.value.trim(),
         ubicacion: ubicacion.value.trim(),
         stock_actual: parseInt(stock_actual.value) || 0,
-        stock_minimo: parseInt(stock_minimo.value) || 0,
         precio_venta: parseFloat(precio_venta.value) || 0
     };
 
@@ -191,41 +186,6 @@ formRepuesto.addEventListener("submit", async (e) => {
     cargarRepuestos();
 
 });
-
-// Ver Movimientos
-async function verMovimientos(idRepuesto, descripcion) {
-    tituloRepuesto.textContent = `Repuesto: ${descripcion}`;
-    modalMov.style.display = "flex";
-    cuerpoMovimientos.innerHTML = "<tr><td colspan='4'>Cargando...</td></tr>";
-
-    const { data, error } = await supabase
-        .from("movimientos_stock")
-        .select("*")
-        .eq("id_articulo", idRepuesto)
-        .order("fecha", { ascending: false });
-
-    if (error) {
-        cuerpoMovimientos.innerHTML = "<tr><td colspan='4'>Error al cargar movimientos</td></tr>";
-        return;
-    }
-
-    if (!data.length) {
-        cuerpoMovimientos.innerHTML = "<tr><td colspan='4'>No hay movimientos registrados</td></tr>";
-        return;
-    }
-
-    cuerpoMovimientos.innerHTML = "";
-    data.forEach(m => {
-        const tr = document.createElement("tr");
-        tr.innerHTML = `
-            <td>${new Date(m.fecha).toLocaleDateString()}</td>
-            <td>${m.tipo_movimiento}</td>
-            <td>${m.cantidad}</td>
-            <td>${m.motivo || "-"}</td>
-        `;
-        cuerpoMovimientos.appendChild(tr);
-    });
-}
 
 // Actualizar stock automáticamente desde ventas
 export async function actualizarStock(id_articulo, cantidad) {
