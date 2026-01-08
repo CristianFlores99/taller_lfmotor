@@ -311,3 +311,85 @@ button:hover {
   from { transform: translateY(20px); opacity: 0; }
   to { transform: translateY(0); opacity: 1; }
 }
+
+/* ---------------- Alertas ---------------- */
+.alerta-custom {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  min-width: 260px;
+  max-width: 340px;
+  padding: 14px 20px;
+
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  border-radius: 12px;
+  font-size: 15px;
+  font-weight: 600;
+  color: white;
+
+  z-index: 99999;
+
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.25);
+
+  opacity: 0;
+  transform: translateX(20px);
+  transition: 0.4s ease;
+}
+
+.alerta-ok {
+  background: linear-gradient(135deg, #22c55e, #16a34a);
+}
+
+.alerta-error {
+  background: linear-gradient(135deg, #ef4444, #dc2626);
+}
+
+.alerta-info {
+  background: linear-gradient(135deg, #facc15, #eab308);
+}
+
+@keyframes vibrar {
+  0% {
+    transform: translateX(0);
+  }
+
+  20% {
+    transform: translateX(-4px);
+  }
+
+  40% {
+    transform: translateX(4px);
+  }
+
+  60% {
+    transform: translateX(-4px);
+  }
+
+  80% {
+    transform: translateX(4px);
+  }
+
+  100% {
+    transform: translateX(0);
+  }
+}
+
+.alerta-error.anim-vibrar {
+  animation: vibrar 0.4s ease;
+}
+
+/* Animación modal */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}

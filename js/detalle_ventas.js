@@ -45,7 +45,7 @@ async function agregarProducto() {
     .select("id_articulo, codigo, descripcion, precio_venta, stock_actual");
 
   if (error) {
-    alert("Error obteniendo artículos: " + error.message);
+    mostrarAlerta("Error obteniendo artículos: " + error.message);
     return;
   }
 
@@ -112,18 +112,18 @@ function cerrarModal() {
 
 function confirmarAgregar() {
   if (!articuloSeleccionado) {
-    alert("Debe seleccionar un artículo.");
+    mostrarAlerta("Debe seleccionar un artículo.");
     return;
   }
 
   const cant = parseInt(document.getElementById("cantidadProducto").value);
   if (cant <= 0) {
-    alert("Cantidad inválida.");
+    mostrarAlerta("Cantidad inválida.");
     return;
   }
 
   if (cant > articuloSeleccionado.stock_actual) {
-    alert("No hay suficiente stock.");
+    mostrarAlerta("No hay suficiente stock.");
     return;
   }
 
@@ -170,7 +170,7 @@ async function guardarVenta() {
   const obsVal = observaciones.value.trim();
 
   if (!clienteVal || productos.length === 0) {
-    alert("⚠️ Debes ingresar un cliente y al menos un producto.");
+    mostrarAlerta("⚠️ Debes ingresar un cliente y al menos un producto.");
     return;
   }
 
@@ -245,7 +245,7 @@ async function guardarVenta() {
     ]);
   }
 
-  alert("✅ Venta registrada y stock actualizado correctamente.");
+  mostrarAlerta("✅ Venta registrada y stock actualizado correctamente.");
   window.location.href = "ventas.html";
 }
 
@@ -258,7 +258,7 @@ async function cargarVenta(idVenta) {
     .single();
 
   if (errVenta) {
-    alert("Error cargando venta: " + errVenta.message);
+    mostrarAlerta("Error cargando venta: " + errVenta.message);
     return;
   }
 
@@ -278,7 +278,7 @@ async function cargarVenta(idVenta) {
     .eq("id_venta", idVenta);
 
   if (errDetalle) {
-    alert("Error cargando detalle: " + errDetalle.message);
+    mostrarAlerta("Error cargando detalle: " + errDetalle.message);
     return;
   }
 
@@ -292,4 +292,35 @@ async function cargarVenta(idVenta) {
   }));
 
   renderTabla();
+}
+
+///ALERTA! 
+function mostrarAlerta(mensaje, tipo = "ok") {
+    const alerta = document.getElementById("alertaCustom");
+
+    alerta.textContent = mensaje;
+
+    alerta.className = "alerta-custom"; // reset
+    alerta.classList.add(`alerta-${tipo}`);
+
+    alerta.style.display = "flex";
+
+    // Fade + slide in
+    setTimeout(() => {
+        alerta.style.opacity = 1;
+        alerta.style.transform = "translateX(0)";
+    }, 10);
+
+    // Si es error → vibración
+    if (tipo === "error") {
+        alerta.classList.add("anim-vibrar");
+        setTimeout(() => alerta.classList.remove("anim-vibrar"), 500);
+    }
+
+    // Ocultar automático
+    setTimeout(() => {
+        alerta.style.opacity = 0;
+        alerta.style.transform = "translateX(20px)";
+        setTimeout(() => alerta.style.display = "none", 400);
+    }, 3000);
 }

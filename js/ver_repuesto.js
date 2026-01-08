@@ -387,13 +387,11 @@ async function exportarPDF() {
 // 📊 EXPORTAR A EXCEL
 // ------------------------------
 async function exportarExcel() {
-    // (pegás acá el contenido actual del listener)
     document.getElementById("exportarExcel").addEventListener("click", async () => {
         try {
-            // Repuestos
             const { data, error } = await supabase
                 .from("articulos")
-                .select("*")
+                .select("*");
 
             if (error) {
                 mostrarAlerta("❌ Error obteniendo datos: " + error.message, "error");
@@ -405,52 +403,49 @@ async function exportarExcel() {
                 return;
             }
 
-            const subrubrosUnicos = [...new Set(
-                data.map(r => r.subrubro || "Sin categoría")
-            )];
-
-            // Crear libro Excel
-            const workbook = XLSX.utils.book_new();
-
-            // Recorrer cada subrubro → una hoja por subrubro
-            subrubrosUnicos.forEach(nombreSub => {
-
-
-                // Filtrar repuestos del subrubro actual
-                const datosFiltrados = data
-                    .filter(r => (r.subrubro || "Sin categoría") === nombreSub)
-                    .map(r => ({
-                        "Código": r.codigo ?? "-",
-                        "Marca": r.marca ?? "-",
-                        "Subrubro": nombreSub,
-                        "Rubro": r.rubro ?? "-",
-                        "Descripción": r.descripcion ?? "-",
-                        "Stock Actual": r.stock_actual ?? 0,
-                        "Precio Venta": r.precio_venta ?? 0,
-                        "Fecha de actualizacion ": r.fecha_actualizacion
-                    }));
-
-                // Crear hoja
-                const worksheet = XLSX.utils.json_to_sheet(datosFiltrados);
-
-                // Ajustar ancho de columnas
-                const colWidths = [];
-                datosFiltrados.forEach(row => {
-                    Object.values(row).forEach((val, i) => {
-                        const width = (val ? val.toString().length : 10) + 5;
-                        colWidths[i] = Math.max(colWidths[i] || 10, width);
-                    });
-                });
-                worksheet['!cols'] = colWidths.map(w => ({ wch: w }));
-
-                // Agregar hoja al libro
-                XLSX.utils.book_append_sheet(workbook, worksheet, nombreSub.substring(0, 30));
+            // Ordenar por subrubro A → Z
+            const datosOrdenados = data.sort((a, b) => {
+                const subA = (a.subrubro || "Sin categoría").toLowerCase();
+                const subB = (b.subrubro || "Sin categoría").toLowerCase();
+                return subA.localeCompare(subB);
             });
 
-            // Guardar archivo
-            XLSX.writeFile(workbook, `repuestos_por_subrubro_${nombreArchivo()}.xlsx`);
+            // Mapear datos para Excel
+            const datosExcel = datosOrdenados.map(r => ({
+                "Código": r.codigo ?? "-",
+                "Rubro": r.rubro ?? "-",
+                "Subrubro": r.subrubro || "Sin categoría",
+                "Marca": r.marca ?? "-",
+                "Detalle": r.descripcion ?? "-",
+                "Stock Actual": r.stock_actual ?? 0,
+                "Precio Venta": r.precio_venta ?? 0,
+                "Fecha de Actualización": r.fecha_actualizacion ?? "-"
+            }));
 
-            mostrarAlerta("✅ Excel generado correctamente (una hoja por subrubro)", "ok");
+            // Crear libro y hoja
+            const workbook = XLSX.utils.book_new();
+            const worksheet = XLSX.utils.json_to_sheet(datosExcel);
+
+            // Ajustar ancho de columnas automáticamente
+            const colWidths = [];
+            datosExcel.forEach(row => {
+                Object.values(row).forEach((val, i) => {
+                    const width = (val ? val.toString().length : 10) + 5;
+                    colWidths[i] = Math.max(colWidths[i] || 10, width);
+                });
+            });
+            worksheet["!cols"] = colWidths.map(w => ({ wch: w }));
+
+            // Agregar hoja única
+            XLSX.utils.book_append_sheet(workbook, worksheet, "Repuestos");
+
+            // Guardar archivo
+            XLSX.writeFile(
+                workbook,
+                `repuestos_ordenados_por_subrubro_${nombreArchivo()}.xlsx`
+            );
+
+            mostrarAlerta("✅ Excel generado correctamente (una sola hoja ordenada por subrubro)", "ok");
 
         } catch (err) {
             console.error(err);
