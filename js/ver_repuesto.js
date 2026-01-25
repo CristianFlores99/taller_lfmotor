@@ -500,7 +500,8 @@ async function exportarExcel() {
                         "Descripción": r.descripcion ?? "-",
                         "Stock Actual": r.stock_actual ?? 0,
                         "Precio Venta": r.precio_venta ?? 0,
-                        "Fecha de actualización": r.fecha_actualizacion ?? "-"
+                        "Fecha de actualización": r.fecha_actualizacion ?? "-",
+                        "Estante/Fila": r.ubicacion ?? "-"
                     }));
 
 
