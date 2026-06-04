@@ -80,6 +80,7 @@ async function cargarRepuestos() {
       <td>$${rep.precio_venta?.toFixed(2) || "0.00"}</td>
       <td>${rep.fecha_actualizacion}</td>
       <td>
+        ${rep.imagen_url ? `<button class="btn-ver-imagen" data-url="${rep.imagen_url}">Ver imagen</button>` : "-"}
         <button class="btn-editar" data-id="${rep.id_articulo}">Editar</button>
       </td>
     `;
@@ -88,6 +89,10 @@ async function cargarRepuestos() {
 
     document.querySelectorAll(".btn-editar").forEach(btn =>
         btn.addEventListener("click", e => editarRepuesto(e.target.dataset.id))
+    );
+
+    document.querySelectorAll(".btn-ver-imagen").forEach(btn =>
+        btn.addEventListener("click", e => mostrarImagen(e.target.dataset.url))
     );
 
 }
@@ -117,6 +122,7 @@ async function editarRepuesto(id) {
     document.getElementById("subrubro").value = data.subrubro || "";
     document.getElementById("rubro").value = data.rubro || "";
     document.getElementById("ubicacion").value = data.ubicacion || "";
+    document.getElementById("imagen_url").value = data.imagen_url || "";
     document.getElementById("stock_actual").value = data.stock_actual;
     document.getElementById("precio_venta").value = data.precio_venta;
     precioAnterior = Number(data.precio_venta) || 0;
@@ -148,6 +154,7 @@ formRepuesto.addEventListener("submit", async (e) => {
         subrubro: subrubro.value.trim(),
         rubro: rubro.value.trim(),
         ubicacion: ubicacion.value.trim(),
+        imagen_url: imagen_url.value.trim(),
         stock_actual: parseInt(stock_actual.value) || 0,
         precio_venta: parseFloat(precio_venta.value) || 0
     };
@@ -184,6 +191,19 @@ formRepuesto.addEventListener("submit", async (e) => {
     cargarRepuestos();
 
 });
+
+function mostrarImagen(url) {
+    const modalImagen = document.getElementById("modalImagen");
+    const imagenPreview = document.getElementById("imagenPreview");
+
+    if (!url) {
+        mostrarAlerta("No hay imagen disponible", "info");
+        return;
+    }
+
+    imagenPreview.src = url;
+    modalImagen.style.display = "flex";
+}
 
 // Actualizar stock automáticamente desde ventas
 export async function actualizarStock(id_articulo, cantidad) {
@@ -574,6 +594,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     inputBusqueda = document.getElementById("busqueda");
     btnAgregar = document.getElementById("btnAgregar");
     indicadorStock = document.getElementById("indicadorStock");
+    const modalImagen = document.getElementById("modalImagen");
+    const cerrarImagenModal = document.getElementById("cerrarImagenModal");
 
     // 🔹 Eventos
     inputBusqueda.addEventListener("input", cargarRepuestos);
@@ -581,10 +603,12 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     cerrarForm.addEventListener("click", () => modalForm.style.display = "none");
     cerrarModal.addEventListener("click", () => modalMov.style.display = "none");
+    cerrarImagenModal.addEventListener("click", () => modalImagen.style.display = "none");
 
     window.addEventListener("click", e => {
         if (e.target === modalForm) modalForm.style.display = "none";
         if (e.target === modalMov) modalMov.style.display = "none";
+        if (e.target === modalImagen) modalImagen.style.display = "none";
     });
 
     // 🔹 Cargas iniciales

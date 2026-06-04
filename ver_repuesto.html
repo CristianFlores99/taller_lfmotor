@@ -123,6 +123,9 @@
         <label>Ubicación:</label>
         <input type="text" id="ubicacion" />
 
+        <label>Imagen URL:</label>
+        <input type="text" id="imagen_url" placeholder="https://.../imagen.jpg" />
+
         <label>Stock actual:</label>
         <input type="number" id="stock_actual" value="0" min="0" />
 
@@ -134,6 +137,18 @@
           <button type="button" id="eliminarRepuesto" class="btn-eliminar">Eliminar</button>
         </div>
       </form>
+    </div>
+  </div>
+
+  <div id="modalImagen" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Vista de Imagen</h2>
+        <button class="btn-cerrar" id="cerrarImagenModal">X</button>
+      </div>
+      <div class="imagen-wrapper" style="padding: 1rem; text-align: center;">
+        <img id="imagenPreview" src="" alt="Repuesto" style="max-width: 100%; max-height: 80vh;" />
+      </div>
     </div>
   </div>
   <div id="alertaCustom" class="alerta-custom" style="display:none;"></div>
