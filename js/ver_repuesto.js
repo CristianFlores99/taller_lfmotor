@@ -292,144 +292,141 @@ function nombreArchivo() {
 // 📄 EXPORTAR A PDF
 // ------------------------------
 async function exportarPDF() {
-    // (pegás acá el contenido actual del listener)
-    document.getElementById("exportarPDF").addEventListener("click", async () => {
-        try {
-            const subrubroSeleccionado = document.getElementById("filtroSubrubro").value;
+    try {
+        const subrubroSeleccionado = document.getElementById("filtroSubrubro").value;
 
-            let query = supabase
-                .from("articulos")
-                .select("*");
+        let query = supabase
+            .from("articulos")
+            .select("*");
 
-            if (subrubroSeleccionado !== "") {
-                query = query.eq("subrubro", subrubroSeleccionado);
-            }
-
-            const { data, error } = await query;
-
-
-            if (error) {
-                mostrarAlerta("❌ Error obteniendo datos: " + error.message, "error");
-                return;
-            }
-
-            if (!data || data.length === 0) {
-                mostrarAlerta("ℹ️ No hay repuestos para exportar", "info");
-                return;
-            }
-
-            // jsPDF init
-            const jsPDFclass =
-                (window.jspdf && window.jspdf.jsPDF)
-                    ? window.jspdf.jsPDF
-                    : (typeof jsPDF !== "undefined" ? jsPDF : null);
-
-            if (!jsPDFclass) {
-                mostrarAlerta("❌ jsPDF no está disponible", "error");
-                return;
-            }
-
-            const pdf = new jsPDFclass({ unit: "pt", format: "a4" });
-            const pageHeight = pdf.internal.pageSize.height;
-
-            // Título
-            pdf.setFontSize(18);
-            pdf.setFont("helvetica", "bold");
-            pdf.text("Listado de Repuestos", 40, 50);
-
-            let y = 90;
-
-            data.forEach((r, index) => {
-                const codigo = r.codigo ?? "-";
-                const marca = r.marca ?? "-";
-                const descripcion = r.descripcion ?? "-";
-                const stock = r.stock_actual ?? 0;
-                const precio = r.precio_venta ?? 0;
-                const subrubro = r.subrubro || "Sin categoría";
-
-
-                if (y > pageHeight - 100) {
-                    pdf.addPage();
-                    y = 50;
-                }
-
-                // Título del repuesto
-                pdf.setFontSize(12);
-                pdf.setFont("helvetica", "bold");
-                pdf.text(`${index + 1}. ${descripcion}`, 40, y);
-                y += 18;
-
-                pdf.setFontSize(10);
-                pdf.setFont("helvetica", "normal");
-                pdf.text(`Código: ${codigo}`, 60, y); y += 14;
-                pdf.text(`Marca: ${marca}`, 60, y); y += 14;
-                pdf.text(`Subrubro: ${subrubro}`, 60, y); y += 14;
-                pdf.text(`Stock: ${stock}`, 60, y); y += 14;
-                pdf.text(`Precio Venta: $${precio}`, 60, y); y += 20;
-
-                // Separador
-                pdf.setDrawColor(180);
-                pdf.line(40, y, 550, y);
-                y += 20;
-            });
-
-            pdf.save(`repuestos_${nombreArchivo()}.pdf`);
-            mostrarAlerta("📄 PDF exportado correctamente", "ok");
-
-        } catch (err) {
-            console.error(err);
-            mostrarAlerta("❌ Error al generar PDF: " + err.message, "error");
+        if (subrubroSeleccionado !== "") {
+            query = query.eq("subrubro", subrubroSeleccionado);
         }
-    });
+
+        const { data, error } = await query;
+
+        if (error) {
+            mostrarAlerta("❌ Error obteniendo datos: " + error.message, "error");
+            return;
+        }
+
+        if (!data || data.length === 0) {
+            mostrarAlerta("ℹ️ No hay repuestos para exportar", "info");
+            return;
+        }
+
+        const jsPDFclass =
+            (window.jspdf && window.jspdf.jsPDF)
+                ? window.jspdf.jsPDF
+                : (typeof jsPDF !== "undefined" ? jsPDF : null);
+
+        if (!jsPDFclass) {
+            mostrarAlerta("❌ jsPDF no está disponible", "error");
+            return;
+        }
+
+        const pdf = new jsPDFclass({ unit: "pt", format: "a4" });
+        const pageHeight = pdf.internal.pageSize.height;
+
+        pdf.setFontSize(18);
+        pdf.setFont("helvetica", "bold");
+        pdf.text("Listado de Repuestos", 40, 50);
+
+        let y = 90;
+
+        data.forEach((r, index) => {
+            const codigo = r.codigo ?? "-";
+            const marca = r.marca ?? "-";
+            const descripcion = r.descripcion ?? "-";
+            const stock = r.stock_actual ?? 0;
+            const precio = r.precio_venta ?? 0;
+            const subrubro = r.subrubro || "Sin categoría";
+
+            if (y > pageHeight - 100) {
+                pdf.addPage();
+                y = 50;
+            }
+
+            pdf.setFontSize(12);
+            pdf.setFont("helvetica", "bold");
+            pdf.text(`${index + 1}. ${descripcion}`, 40, y);
+            y += 18;
+
+            pdf.setFontSize(10);
+            pdf.setFont("helvetica", "normal");
+            pdf.text(`Código: ${codigo}`, 60, y);
+            y += 14;
+            pdf.text(`Marca: ${marca}`, 60, y);
+            y += 14;
+            pdf.text(`Subrubro: ${subrubro}`, 60, y);
+            y += 14;
+            pdf.text(`Stock: ${stock}`, 60, y);
+            y += 14;
+            pdf.text(`Precio Venta: $${precio}`, 60, y);
+            y += 20;
+
+            pdf.setDrawColor(180);
+            pdf.line(40, y, 550, y);
+            y += 20;
+        });
+
+        pdf.save(`repuestos_${nombreArchivo()}.pdf`);
+        mostrarAlerta("📄 PDF exportado correctamente", "ok");
+    } catch (err) {
+        console.error(err);
+        mostrarAlerta("❌ Error al generar PDF: " + err.message, "error");
+    }
 }
 
 // ------------------------------
 // 📊 EXPORTAR A EXCEL
 // ------------------------------
-/*
 async function exportarExcel() {
-    document.getElementById("exportarExcel").addEventListener("click", async () => {
-        try {
-            const { data, error } = await supabase
-                .from("articulos")
-                .select("*");
+    try {
+        const { data, error } = await supabase
+            .from("articulos")
+            .select("*");
 
-            if (error) {
-                mostrarAlerta("❌ Error obteniendo datos: " + error.message, "error");
-                return;
-            }
+        if (error) {
+            mostrarAlerta("❌ Error obteniendo datos: " + error.message, "error");
+            return;
+        }
 
-            if (!data || data.length === 0) {
-                mostrarAlerta("ℹ️ No hay repuestos para exportar", "info");
-                return;
-            }
+        if (!data || data.length === 0) {
+            mostrarAlerta("ℹ️ No hay repuestos para exportar", "info");
+            return;
+        }
 
-            // Ordenar por subrubro A → Z
-            const datosOrdenados = data.sort((a, b) => {
-                const subA = (a.subrubro || "Sin categoría").toLowerCase();
-                const subB = (b.subrubro || "Sin categoría").toLowerCase();
-                return subA.localeCompare(subB);
-            });
+        const subrubrosUnicos = [
+            ...new Set(data.map(r => r.subrubro || "Sin categoría"))
+        ].sort((a, b) => a.localeCompare(b));
 
-            // Mapear datos para Excel
-            const datosExcel = datosOrdenados.map(r => ({
-                "Código": r.codigo ?? "-",
-                "Rubro": r.rubro ?? "-",
-                "Subrubro": r.subrubro || "Sin categoría",
-                "Marca": r.marca ?? "-",
-                "Detalle": r.descripcion ?? "-",
-                "Stock Actual": r.stock_actual ?? 0,
-                "Precio Venta": r.precio_venta ?? 0,
-                "Fecha de Actualización": r.fecha_actualizacion ?? "-"
-            }));
+        const workbook = XLSX.utils.book_new();
 
-            // Crear libro y hoja
-            const workbook = XLSX.utils.book_new();
-            const worksheet = XLSX.utils.json_to_sheet(datosExcel);
+        subrubrosUnicos.forEach(nombreSub => {
+            const datosFiltrados = data
+                .filter(r => (r.subrubro || "Sin categoría") === nombreSub)
+                .sort((a, b) => {
+                    const marcaA = (a.marca || "").toLowerCase();
+                    const marcaB = (b.marca || "").toLowerCase();
+                    return marcaA.localeCompare(marcaB);
+                })
+                .map(r => ({
+                    "Código": r.codigo ?? "-",
+                    "Marca": r.marca ?? "-",
+                    "Subrubro": nombreSub,
+                    "Rubro": r.rubro ?? "-",
+                    "Descripción": r.descripcion ?? "-",
+                    "Stock Actual": r.stock_actual ?? 0,
+                    "Precio Venta": r.precio_venta ?? 0,
+                    "Fecha de actualización": r.fecha_actualizacion ?? "-",
+                    "Estante/Fila": r.ubicacion ?? "-"
+                }));
 
-            // Ajustar ancho de columnas automáticamente
+            const worksheet = XLSX.utils.json_to_sheet(datosFiltrados);
+
             const colWidths = [];
-            datosExcel.forEach(row => {
+            datosFiltrados.forEach(row => {
                 Object.values(row).forEach((val, i) => {
                     const width = (val ? val.toString().length : 10) + 5;
                     colWidths[i] = Math.max(colWidths[i] || 10, width);
@@ -437,109 +434,23 @@ async function exportarExcel() {
             });
             worksheet["!cols"] = colWidths.map(w => ({ wch: w }));
 
-            // Agregar hoja única
-            XLSX.utils.book_append_sheet(workbook, worksheet, "Repuestos");
+            const nombreHoja = limpiarNombreHoja(nombreSub);
+            XLSX.utils.book_append_sheet(workbook, worksheet, nombreHoja);
+        });
 
-            // Guardar archivo
-            XLSX.writeFile(
-                workbook,
-                `repuestos_ordenados_por_subrubro_${nombreArchivo()}.xlsx`
-            );
+        XLSX.writeFile(
+            workbook,
+            `repuestos_por_subrubro_${nombreArchivo()}.xlsx`
+        );
 
-            mostrarAlerta("✅ Excel generado correctamente (una sola hoja ordenada por subrubro)", "ok");
-
-        } catch (err) {
-            console.error(err);
-            mostrarAlerta("❌ Error al generar Excel: " + err.message, "error");
-        }
-    });
-}
-*/
-async function exportarExcel() {
-    document.getElementById("exportarExcel").addEventListener("click", async () => {
-        try {
-            // Repuestos
-            const { data, error } = await supabase
-                .from("articulos")
-                .select("*");
-
-            if (error) {
-                mostrarAlerta("❌ Error obteniendo datos: " + error.message, "error");
-                return;
-            }
-
-            if (!data || data.length === 0) {
-                mostrarAlerta("ℹ️ No hay repuestos para exportar", "info");
-                return;
-            }
-
-            // 👉 Subrubros únicos ORDENADOS A → Z
-            const subrubrosUnicos = [
-                ...new Set(data.map(r => r.subrubro || "Sin categoría"))
-            ].sort((a, b) => a.localeCompare(b));
-
-            // Crear libro Excel
-            const workbook = XLSX.utils.book_new();
-
-            // Recorrer cada subrubro → una hoja por subrubro
-            subrubrosUnicos.forEach(nombreSub => {
-
-                // Filtrar repuestos del subrubro actual
-                const datosFiltrados = data
-                    .filter(r => (r.subrubro || "Sin categoría") === nombreSub)
-                    .sort((a, b) => {
-                        const marcaA = (a.marca || "").toLowerCase();
-                        const marcaB = (b.marca || "").toLowerCase();
-                        return marcaA.localeCompare(marcaB);
-                    })
-                    .map(r => ({
-                        "Código": r.codigo ?? "-",
-                        "Marca": r.marca ?? "-",
-                        "Subrubro": nombreSub,
-                        "Rubro": r.rubro ?? "-",
-                        "Descripción": r.descripcion ?? "-",
-                        "Stock Actual": r.stock_actual ?? 0,
-                        "Precio Venta": r.precio_venta ?? 0,
-                        "Fecha de actualización": r.fecha_actualizacion ?? "-",
-                        "Estante/Fila": r.ubicacion ?? "-"
-                    }));
-
-
-                // Crear hoja
-                const worksheet = XLSX.utils.json_to_sheet(datosFiltrados);
-
-                // Ajustar ancho de columnas
-                const colWidths = [];
-                datosFiltrados.forEach(row => {
-                    Object.values(row).forEach((val, i) => {
-                        const width = (val ? val.toString().length : 10) + 5;
-                        colWidths[i] = Math.max(colWidths[i] || 10, width);
-                    });
-                });
-                worksheet["!cols"] = colWidths.map(w => ({ wch: w }));
-
-                // Agregar hoja al libro
-                const nombreHoja = limpiarNombreHoja(nombreSub);
-                XLSX.utils.book_append_sheet(workbook, worksheet, nombreHoja);
-
-            });
-
-            // Guardar archivo
-            XLSX.writeFile(
-                workbook,
-                `repuestos_por_subrubro_${nombreArchivo()}.xlsx`
-            );
-
-            mostrarAlerta(
-                "✅ Excel generado correctamente (una hoja por subrubro ordenado A–Z)",
-                "ok"
-            );
-
-        } catch (err) {
-            console.error(err);
-            mostrarAlerta("❌ Error al generar Excel: " + err.message, "error");
-        }
-    });
+        mostrarAlerta(
+            "✅ Excel generado correctamente (una hoja por subrubro ordenado A–Z)",
+            "ok"
+        );
+    } catch (err) {
+        console.error(err);
+        mostrarAlerta("❌ Error al generar Excel: " + err.message, "error");
+    }
 }
 function limpiarNombreHoja(nombre) {
     return nombre
