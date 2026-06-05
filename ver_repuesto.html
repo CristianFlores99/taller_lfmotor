@@ -140,14 +140,36 @@
     </div>
   </div>
 
-  <div id="modalImagen" class="modal">
+    <div id="modalImagen" class="modal">
     <div class="modal-content">
       <div class="modal-header">
         <h2>Vista de Imagen</h2>
-        <button class="btn-cerrar" id="cerrarImagenModal">X</button>
+        <div style="display: flex; gap: 10px; align-items:center;">
+          <button id="btnZoomOut" class="btn-zoom" title="Alejar">−</button>
+          <span id="zoomLevel" style="min-width: 60px; text-align: center; line-height: 40px;">100%</span>
+          <button id="btnZoomIn" class="btn-zoom" title="Acercar">+</button>
+          <button class="btn-cerrar" id="cerrarImagenModal">X</button>
+        </div>
       </div>
-      <div class="imagen-wrapper" style="padding: 1rem; text-align: center;">
-        <img id="imagenPreview" src="" alt="Repuesto" style="max-width: 100%; max-height: 80vh;" />
+
+      <!-- Cuerpo del modal: imagen a la izquierda, datos a la derecha -->
+      <div class="modal-body" style="display:flex; gap:1rem; align-items:flex-start;">
+        <div class="imagen-wrapper" id="imagenWrapper" style="flex:1; padding: 1rem; text-align: center; overflow: hidden; max-height: 70vh;">
+          <img id="imagenPreview" src="" alt="Repuesto" style="max-width: 100%; max-height: 100%; transition: transform 0.2s;" />
+        </div>
+
+        <div id="imagenDetalles" style="width:320px; padding:1rem; background: rgba(255,255,255,0.03); border-radius:8px;">
+          <h3 style="margin-bottom:0.5rem;">Datos del Repuesto</h3>
+          <p><strong>Código:</strong> <span id="det_codigo">-</span></p>
+          <p><strong>Descripción:</strong> <span id="det_descripcion">-</span></p>
+          <p><strong>Marca:</strong> <span id="det_marca">-</span></p>
+          <p><strong>Subrubro:</strong> <span id="det_subrubro">-</span></p>
+          <p><strong>Rubro:</strong> <span id="det_rubro">-</span></p>
+          <p><strong>Stock:</strong> <span id="det_stock">-</span></p>
+          <p><strong>Ubicación:</strong> <span id="det_ubicacion">-</span></p>
+          <p><strong>Precio Venta:</strong> <span id="det_precio">-</span></p>
+          <p><strong>Últ. actualización:</strong> <span id="det_fecha">-</span></p>
+        </div>
       </div>
     </div>
   </div>

@@ -79,10 +79,10 @@ async function cargarRepuestos() {
       <td>${rep.ubicacion || "-"}</td>
       <td>$${rep.precio_venta?.toFixed(2) || "0.00"}</td>
       <td>${rep.fecha_actualizacion}</td>
-      <td>
-        ${rep.imagen_url ? `<button class="btn-ver-imagen" data-url="${rep.imagen_url}">Ver imagen</button>` : "-"}
-        <button class="btn-editar" data-id="${rep.id_articulo}">Editar</button>
-      </td>
+            <td>
+                ${rep.imagen_url ? `<img src="${rep.imagen_url}" alt="miniatura" class="miniatura-repuesto" data-id="${rep.id_articulo}" data-url="${rep.imagen_url}" style="cursor: pointer;" />` : "-"}
+                <button class="btn-editar" data-id="${rep.id_articulo}">Editar</button>
+            </td>
     `;
         cuerpoTabla.appendChild(tr);
     });
@@ -91,8 +91,12 @@ async function cargarRepuestos() {
         btn.addEventListener("click", e => editarRepuesto(e.target.dataset.id))
     );
 
-    document.querySelectorAll(".btn-ver-imagen").forEach(btn =>
-        btn.addEventListener("click", e => mostrarImagen(e.target.dataset.url))
+    document.querySelectorAll(".miniatura-repuesto").forEach(img =>
+        img.addEventListener("click", async e => {
+            const id = e.currentTarget.dataset.id || e.target.dataset.id;
+            if (!id) return mostrarImagen(e.currentTarget.dataset.url || e.target.dataset.url);
+            await mostrarImagenById(id);
+        })
     );
 
 }
@@ -192,25 +196,84 @@ formRepuesto.addEventListener("submit", async (e) => {
 
 });
 
-function mostrarImagen(url) {
+// Muestra la imagen y completa los detalles en el modal a partir de un objeto 'item'
+function mostrarImagenWithData(item) {
     const modalImagen = document.getElementById("modalImagen");
     const imagenPreview = document.getElementById("imagenPreview");
 
-    if (!url) {
+    if (!item || !item.imagen_url) {
         mostrarAlerta("No hay imagen disponible", "info");
         return;
     }
 
-    imagenPreview.src = url;
+    imagenPreview.src = item.imagen_url;
+    imagenPreview.style.transform = "scale(1) translate(0, 0)";
+    document.getElementById("zoomLevel").textContent = "100%";
+    zoomActual = 1;
+    offsetX = 0;
+    offsetY = 0;
+
+    // Rellenar detalles
+    document.getElementById('det_codigo').textContent = item.codigo || '-';
+    document.getElementById('det_descripcion').textContent = item.descripcion || '-';
+    document.getElementById('det_marca').textContent = item.marca || '-';
+    document.getElementById('det_subrubro').textContent = item.subrubro || '-';
+    document.getElementById('det_rubro').textContent = item.rubro || '-';
+    document.getElementById('det_stock').textContent = (item.stock_actual != null) ? item.stock_actual : '-';
+    document.getElementById('det_ubicacion').textContent = item.ubicacion || '-';
+    document.getElementById('det_precio').textContent = item.precio_venta != null ? `$${Number(item.precio_venta).toFixed(2)}` : '-';
+    document.getElementById('det_fecha').textContent = item.fecha_actualizacion || '-';
+
     modalImagen.style.display = "flex";
 }
+
+// Buscar por id y mostrar
+async function mostrarImagenById(id) {
+    if (!id) return mostrarAlerta('ID inválido', 'error');
+
+    const { data, error } = await supabase.from('articulos').select('*').eq('id_articulo', id).single();
+    if (error) {
+        console.error('Error obteniendo repuesto:', error);
+        mostrarAlerta('Error obteniendo datos del repuesto', 'error');
+        return;
+    }
+
+    mostrarImagenWithData(data);
+}
+
+let zoomActual = 1;
+let offsetX = 0;
+let offsetY = 0;
+let isDragging = false;
+let dragStartX = 0;
+let dragStartY = 0;
 
 // Actualizar stock automáticamente desde ventas
 export async function actualizarStock(id_articulo, cantidad) {
     if (!id_articulo || !cantidad) return;
-    await supabase.from('articulos')
-        .update({ stock_actual: supabase.raw('stock_actual - ?', [cantidad]) })
+    
+    // Obtener stock actual
+    const { data, error: fetchError } = await supabase.from('articulos')
+        .select('stock_actual')
+        .eq('id_articulo', id_articulo)
+        .single();
+    
+    if (fetchError) {
+        console.error('Error obteniendo stock:', fetchError);
+        return;
+    }
+    
+    // Actualizar con el nuevo valor
+    const nuevoStock = Math.max(0, (data?.stock_actual || 0) - cantidad);
+    const { error } = await supabase.from('articulos')
+        .update({ stock_actual: nuevoStock })
         .eq('id_articulo', id_articulo);
+    
+    if (error) {
+        console.error('Error actualizando stock:', error);
+        return;
+    }
+    
     cargarRepuestos(); // refresca tabla
 }
 
@@ -632,6 +695,54 @@ document.addEventListener("DOMContentLoaded", async () => {
         document.getElementById("rubro-toggle"),
         rubros
     );
+
+    // Zoom controls
+    const btnZoomIn = document.getElementById("btnZoomIn");
+    const btnZoomOut = document.getElementById("btnZoomOut");
+    const imagenPreview = document.getElementById("imagenPreview");
+    const zoomLevel = document.getElementById("zoomLevel");
+    const imagenWrapper = document.getElementById("imagenWrapper");
+
+    function actualizarTransform() {
+        imagenPreview.style.transform = `scale(${zoomActual}) translate(${offsetX}px, ${offsetY}px)`;
+    }
+
+    function actualizarZoom(factor) {
+        zoomActual = Math.max(0.5, Math.min(3, zoomActual + factor));
+        zoomLevel.textContent = Math.round(zoomActual * 100) + "%";
+        actualizarTransform();
+    }
+
+    // click = pequeño paso
+    btnZoomIn?.addEventListener("click", () => actualizarZoom(0.1));
+    btnZoomOut?.addEventListener("click", () => actualizarZoom(-0.1));
+
+    imagenWrapper?.addEventListener("wheel", (e) => {
+        e.preventDefault();
+        const factor = e.deltaY < 0 ? 0.1 : -0.1;
+        actualizarZoom(factor);
+    });
+
+    // Drag/Pan
+    imagenPreview?.addEventListener("mousedown", (e) => {
+        if (zoomActual <= 1) return;
+        isDragging = true;
+        dragStartX = e.clientX - offsetX;
+        dragStartY = e.clientY - offsetY;
+        imagenPreview.style.cursor = "grabbing";
+    });
+
+    document.addEventListener("mousemove", (e) => {
+        if (!isDragging) return;
+        offsetX = e.clientX - dragStartX;
+        offsetY = e.clientY - dragStartY;
+        actualizarTransform();
+    });
+
+    document.addEventListener("mouseup", () => {
+        isDragging = false;
+        if (imagenPreview) imagenPreview.style.cursor = zoomActual > 1 ? "grab" : "default";
+    });
 
     const subrubros = await cargarValoresUnicos("subrubro");
     crearDropdown(
