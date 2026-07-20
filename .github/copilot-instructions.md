@@ -1,6 +1,4 @@
-﻿# Instrucciones para agentes de IA (Copilot) — taller_lfmotor
-
-Este repositorio es una aplicación web estática con vistas HTML y lógica JS que se ejecuta directamente en el navegador. No hay build ni backend local: todo el flujo de datos se hace desde el frontend hacia Supabase.
+﻿Este repositorio es una aplicación web estática con vistas HTML y lógica JS que se ejecuta directamente en el navegador. No hay build ni backend local: todo el flujo de datos se hace desde el frontend hacia Supabase.
 
 - Arquitectura general:
   - Cada vista tiene un HTML en la raíz y su JS asociado en `js/`.

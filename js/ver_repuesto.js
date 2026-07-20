@@ -22,6 +22,8 @@ let btnExportarExcel;
 
 let precioAnterior = null;
 let editId = null;
+let imagenesRepuesto = [];
+let imagenActualIndex = 0;
 
 // ---------- Funciones ----------
 
@@ -68,6 +70,13 @@ async function cargarRepuestos() {
         } else if (rep.stock_actual <= 1) {
             claseStock = "stock-amarillo";
         }
+        const imagenes = parseImagenes(rep.imagen_url2);
+        const imagenPrincipal = imagenes[0] || "";
+        const imagenContador = imagenes.length > 1 ? `<span class="imagen-cantidad">+${imagenes.length - 1}</span>` : "";
+        const miniaturaHTML = imagenPrincipal
+            ? `<div class="miniatura-contenedor"><img src="${imagenPrincipal}" alt="miniatura" class="miniatura-repuesto" data-id="${rep.id_articulo}" style="cursor: pointer;" />${imagenContador}</div>`
+            : `<div class="miniatura-contenedor placeholder-miniatura">SIN IMAGEN</div>`;
+
         const tr = document.createElement("tr");
         tr.innerHTML = `
       <td>${rep.codigo}</td>
@@ -80,8 +89,11 @@ async function cargarRepuestos() {
       <td>$${rep.precio_venta?.toFixed(2) || "0.00"}</td>
       <td>${rep.fecha_actualizacion}</td>
             <td>
-                ${rep.imagen_url ? `<img src="${rep.imagen_url}" alt="miniatura" class="miniatura-repuesto" data-id="${rep.id_articulo}" data-url="${rep.imagen_url}" style="cursor: pointer;" />` : "-"}
-                <button class="btn-editar" data-id="${rep.id_articulo}">Editar</button>
+                <div class="acciones-fila">
+                    ${miniaturaHTML}
+                    <button class="btn-ver-imagen" data-id="${rep.id_articulo}">Ver repuesto</button>
+                    <button class="btn-editar" data-id="${rep.id_articulo}">Editar</button>
+                </div>
             </td>
     `;
         cuerpoTabla.appendChild(tr);
@@ -91,14 +103,78 @@ async function cargarRepuestos() {
         btn.addEventListener("click", e => editarRepuesto(e.target.dataset.id))
     );
 
-    document.querySelectorAll(".miniatura-repuesto").forEach(img =>
-        img.addEventListener("click", async e => {
-            const id = e.currentTarget.dataset.id || e.target.dataset.id;
-            if (!id) return mostrarImagen(e.currentTarget.dataset.url || e.target.dataset.url);
-            await mostrarImagenById(id);
+    document.querySelectorAll(".btn-ver-imagen").forEach(btn =>
+        btn.addEventListener("click", async e => {
+            const id = e.target.dataset.id;
+            if (id) {
+                await mostrarImagenById(id);
+            }
         })
     );
 
+    document.querySelectorAll(".miniatura-repuesto").forEach(img =>
+        img.addEventListener("click", async e => {
+            const id = e.currentTarget.dataset.id || e.target.dataset.id;
+            if (id) {
+                await mostrarImagenById(id);
+            }
+        })
+    );
+
+}
+
+function parseImagenes(urls) {
+    if (!urls) return [];
+
+    if (Array.isArray(urls)) {
+        return urls
+            .map(url => String(url).trim())
+            .filter(Boolean);
+    }
+
+    const value = String(urls).trim();
+    if (!value) return [];
+
+    try {
+        const parsed = JSON.parse(value);
+        if (Array.isArray(parsed)) {
+            return parsed.map(url => String(url).trim()).filter(Boolean);
+        }
+    } catch (err) {
+        // ignore, no es JSON válido
+    }
+
+    return value
+        .split(/[;,\n]+/)
+        .map(url => url.trim())
+        .filter(Boolean);
+}
+
+function renderMiniaturas() {
+    const contenedor = document.getElementById('miniaturasGaleria');
+    if (!contenedor) return;
+
+    contenedor.innerHTML = imagenesRepuesto
+        .map((url, index) => `
+            <img src="${url}" data-index="${index}" class="${index === imagenActualIndex ? 'activa' : ''}" alt="miniatura ${index + 1}" />
+        `)
+        .join('');
+
+    contenedor.querySelectorAll('img').forEach(thumb => {
+        thumb.addEventListener('click', () => {
+            imagenActualIndex = Number(thumb.dataset.index);
+            actualizarImagenGaleria();
+        });
+    });
+}
+
+function actualizarImagenGaleria() {
+    const imagenPreview = document.getElementById('imagenPreview');
+    if (!imagenesRepuesto.length || !imagenPreview) return;
+
+    imagenActualIndex = (imagenActualIndex + imagenesRepuesto.length) % imagenesRepuesto.length;
+    imagenPreview.src = imagenesRepuesto[imagenActualIndex];
+    renderMiniaturas();
 }
 
 // Abrir Formulario
@@ -126,7 +202,9 @@ async function editarRepuesto(id) {
     document.getElementById("subrubro").value = data.subrubro || "";
     document.getElementById("rubro").value = data.rubro || "";
     document.getElementById("ubicacion").value = data.ubicacion || "";
-    document.getElementById("imagen_url").value = data.imagen_url || "";
+    document.getElementById("imagen_url2").value = Array.isArray(data.imagen_url2)
+        ? data.imagen_url2.join(", ")
+        : (data.imagen_url2 || "");
     document.getElementById("stock_actual").value = data.stock_actual;
     document.getElementById("precio_venta").value = data.precio_venta;
     precioAnterior = Number(data.precio_venta) || 0;
@@ -151,6 +229,9 @@ formRepuesto.addEventListener("submit", async (e) => {
     }
     const precioNuevo = parseFloat(precio_venta.value) || 0;
 
+    const imagenUrl2Raw = document.getElementById("imagen_url2").value.trim();
+    const imagenesUrl2 = parseImagenes(imagenUrl2Raw);
+
     const repuesto = {
         codigo: codigoNorm,
         descripcion: descripcion.value.trim(),
@@ -158,7 +239,7 @@ formRepuesto.addEventListener("submit", async (e) => {
         subrubro: subrubro.value.trim(),
         rubro: rubro.value.trim(),
         ubicacion: ubicacion.value.trim(),
-        imagen_url: imagen_url.value.trim(),
+        imagen_url2: imagenesUrl2.length ? imagenesUrl2 : null,
         stock_actual: parseInt(stock_actual.value) || 0,
         precio_venta: parseFloat(precio_venta.value) || 0
     };
@@ -200,18 +281,36 @@ formRepuesto.addEventListener("submit", async (e) => {
 function mostrarImagenWithData(item) {
     const modalImagen = document.getElementById("modalImagen");
     const imagenPreview = document.getElementById("imagenPreview");
+    const imagenWrapper = document.getElementById("imagenWrapper");
+    const miniaturasGaleria = document.getElementById("miniaturasGaleria");
+    const btnPrev = document.getElementById("btnPrevImagen");
+    const btnNext = document.getElementById("btnNextImagen");
 
-    if (!item || !item.imagen_url) {
-        mostrarAlerta("No hay imagen disponible", "info");
-        return;
+    const imagenes = parseImagenes(item.imagen_url2);
+    imagenesRepuesto = imagenes;
+    imagenActualIndex = 0;
+
+    const placeholder = document.getElementById("imagenPlaceholder");
+    if (!imagenes.length) {
+        imagenPreview.src = "";
+        imagenPreview.style.display = "block";
+        if (placeholder) placeholder.style.display = "flex";
+        miniaturasGaleria.innerHTML = "";
+        if (btnPrev) btnPrev.style.display = "inline-flex";
+        if (btnNext) btnNext.style.display = "inline-flex";
+    } else {
+        imagenPreview.style.display = "block";
+        if (placeholder) placeholder.style.display = "none";
+        imagenPreview.src = imagenesRepuesto[imagenActualIndex];
+        imagenPreview.style.transform = "scale(1) translate(0, 0)";
+        document.getElementById("zoomLevel").textContent = "100%";
+        zoomActual = 1;
+        offsetX = 0;
+        offsetY = 0;
+        renderMiniaturas();
+        if (btnPrev) btnPrev.style.display = "inline-flex";
+        if (btnNext) btnNext.style.display = "inline-flex";
     }
-
-    imagenPreview.src = item.imagen_url;
-    imagenPreview.style.transform = "scale(1) translate(0, 0)";
-    document.getElementById("zoomLevel").textContent = "100%";
-    zoomActual = 1;
-    offsetX = 0;
-    offsetY = 0;
 
     // Rellenar detalles
     document.getElementById('det_codigo').textContent = item.codigo || '-';
@@ -331,6 +430,51 @@ async function cargarMarcas() {
 }
 
 ///ALERTA! 
+async function cargarSugerenciasImagenes() {
+    const inputImagen = document.getElementById("imagen_url2");
+    if (!inputImagen) return;
+
+    const urls = new Set();
+
+    try {
+        const { data, error } = await supabase.from("articulos").select("imagen_url2");
+        if (!error && data) {
+            data.forEach(item => {
+                const imagenes = parseImagenes(item?.imagen_url2);
+                imagenes.forEach(url => urls.add(url));
+            });
+        }
+    } catch (err) {
+        console.error("No se pudieron cargar URLs desde los repuestos:", err);
+    }
+
+    const buckets = ["imagenes", "repuestos", "images", "storage", "public"];
+
+    for (const bucket of buckets) {
+        try {
+            const { data: files, error } = await supabase.storage.from(bucket).list("", { limit: 100 });
+            if (error || !files?.length) continue;
+
+            for (const file of files) {
+                if (!file?.name) continue;
+                const { data: publicData } = supabase.storage.from(bucket).getPublicUrl(file.name);
+                const url = publicData?.publicUrl;
+                if (url) urls.add(url);
+            }
+        } catch (err) {
+            // Ignorar buckets que no existan o no sean accesibles
+        }
+    }
+
+    const opciones = [...urls]
+        .filter(Boolean)
+        .sort((a, b) => a.localeCompare(b));
+
+    if (opciones.length) {
+        inputImagen.setAttribute("placeholder", `Ej: ${opciones[0]}`);
+    }
+}
+
 function mostrarAlerta(mensaje, tipo = "ok") {
     const alerta = document.getElementById("alertaCustom");
 
@@ -678,6 +822,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     await cargarSubrubrosFiltro();
     await cargarMarcas();
     await cargarRepuestos();
+    await cargarSugerenciasImagenes();
 
     // 🔹 Dropdowns del formulario
     const marcas = await cargarValoresUnicos("marca");
@@ -716,6 +861,21 @@ document.addEventListener("DOMContentLoaded", async () => {
     // click = pequeño paso
     btnZoomIn?.addEventListener("click", () => actualizarZoom(0.1));
     btnZoomOut?.addEventListener("click", () => actualizarZoom(-0.1));
+
+    const btnPrevImagen = document.getElementById("btnPrevImagen");
+    const btnNextImagen = document.getElementById("btnNextImagen");
+
+    btnPrevImagen?.addEventListener("click", () => {
+        if (!imagenesRepuesto.length) return;
+        imagenActualIndex = (imagenActualIndex - 1 + imagenesRepuesto.length) % imagenesRepuesto.length;
+        actualizarImagenGaleria();
+    });
+
+    btnNextImagen?.addEventListener("click", () => {
+        if (!imagenesRepuesto.length) return;
+        imagenActualIndex = (imagenActualIndex + 1) % imagenesRepuesto.length;
+        actualizarImagenGaleria();
+    });
 
     imagenWrapper?.addEventListener("wheel", (e) => {
         e.preventDefault();

@@ -123,8 +123,9 @@
         <label>Ubicación:</label>
         <input type="text" id="ubicacion" />
 
-        <label>Imagen URL:</label>
-        <input type="text" id="imagen_url" placeholder="https://.../imagen.jpg" />
+        <label>Imágenes del repuesto:</label>
+        <input type="text" id="imagen_url2" placeholder="Pegá una URL o varias separadas por comas" autocomplete="off" />
+        <small class="nota-input">Podés pegar URLs separadas por comas / saltos de línea.</small>
 
         <label>Stock actual:</label>
         <input type="number" id="stock_actual" value="0" min="0" />
@@ -155,7 +156,15 @@
       <!-- Cuerpo del modal: imagen a la izquierda, datos a la derecha -->
       <div class="modal-body" style="display:flex; gap:1rem; align-items:flex-start;">
         <div class="imagen-wrapper" id="imagenWrapper" style="flex:1; padding: 1rem; text-align: center; overflow: hidden; max-height: 70vh;">
-          <img id="imagenPreview" src="" alt="Repuesto" style="max-width: 100%; max-height: 100%; transition: transform 0.2s;" />
+          <div class="imagen-galeria">
+            <button id="btnPrevImagen" class="btn-flecha" title="Anterior">←</button>
+            <div class="imagen-main">
+              <img id="imagenPreview" src="" alt="Repuesto" style="max-width: 100%; max-height: 100%; transition: transform 0.2s;" />
+              <div id="imagenPlaceholder" class="imagen-placeholder">Sin imagen disponible</div>
+            </div>
+            <button id="btnNextImagen" class="btn-flecha" title="Siguiente">→</button>
+          </div>
+          <div class="miniaturas-galeria" id="miniaturasGaleria"></div>
         </div>
 
         <div id="imagenDetalles" style="width:320px; padding:1rem; background: rgba(255,255,255,0.03); border-radius:8px;">
