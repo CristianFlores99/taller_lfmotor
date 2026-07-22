@@ -1,22 +1,65 @@
-const API_BASE = window.location.hostname === "cristianflores99.github.io"
-    ? "https://mi-backend.lfmotor.com/api"
-    : "http://localhost:4000/api";
+const SUPABASE_URL = "https://ovfsffckhzelgbgohakv.supabase.co";
+const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im92ZnNmZmNraHplbGdiZ29oYWt2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjA2NTA0MjYsImV4cCI6MjA3NjIyNjQyNn0.hDiIhAHAr04Uo9todWdk0QUaqD3RYj5kMkITavzPiHc";
 
 const modalForm = document.getElementById("modalForm");
 
+function buildSupabaseUrl(path, method = "GET") {
+    const url = new URL(`${SUPABASE_URL}/rest/v1/articulos`);
+
+    if (path === "/repuestos" || path.startsWith("/repuestos?")) {
+        const query = new URLSearchParams(path.split("?")[1] || "");
+        url.searchParams.set("select", "*");
+        url.searchParams.set("order", "codigo.asc");
+
+        const subrubro = query.get("subrubro");
+        const marca = query.get("marca");
+        const filtro = query.get("filtro");
+
+        if (subrubro) url.searchParams.set("subrubro", `eq.${subrubro}`);
+        if (marca) url.searchParams.set("marca", `eq.${marca}`);
+        if (filtro) {
+            const filtroTerm = `*${filtro}*`;
+            url.searchParams.set(
+                "or",
+                `(codigo.ilike.${filtroTerm},descripcion.ilike.${filtroTerm},marca.ilike.${filtroTerm},rubro.ilike.${filtroTerm},subrubro.ilike.${filtroTerm},ubicacion.ilike.${filtroTerm})`
+            );
+        }
+        return url.toString();
+    }
+
+    if (path.startsWith("/repuestos/")) {
+        const id = path.slice("/repuestos/".length);
+        url.searchParams.set("id_articulo", `eq.${id}`);
+        if (method === "GET") url.searchParams.set("select", "*");
+        return url.toString();
+    }
+
+    return `${SUPABASE_URL}/rest/v1${path}`;
+}
+
 async function apiRequest(path, options = {}) {
-    const response = await fetch(`${API_BASE}${path}`, {
-        headers: {
-            "Content-Type": "application/json",
-        },
-        ...options,
+    const method = (options.method || "GET").toUpperCase();
+    const headers = {
+        "Content-Type": "application/json",
+        apikey: SUPABASE_KEY,
+        Authorization: `Bearer ${SUPABASE_KEY}`,
+    };
+
+    if (method === "POST" || method === "PATCH") {
+        headers.Prefer = "return=representation";
+    }
+
+    const response = await fetch(buildSupabaseUrl(path, method), {
+        method,
+        headers,
+        body: options.body,
     });
 
     const text = await response.text();
     const data = text ? JSON.parse(text) : null;
 
     if (!response.ok) {
-        const errorMessage = data?.error || response.statusText || "Error de red";
+        const errorMessage = data?.message || data?.error_description || data?.error || response.statusText || "Error de red";
         throw new Error(errorMessage);
     }
 
