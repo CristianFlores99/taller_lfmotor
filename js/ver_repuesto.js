@@ -1,80 +1,10 @@
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+
 const SUPABASE_URL = "https://ovfsffckhzelgbgohakv.supabase.co";
 const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im92ZnNmZmNraHplbGdiZ29oYWt2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjA2NTA0MjYsImV4cCI6MjA3NjIyNjQyNn0.hDiIhAHAr04Uo9todWdk0QUaqD3RYj5kMkITavzPiHc";
+const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
 const modalForm = document.getElementById("modalForm");
-
-function buildSupabaseUrl(path, method = "GET") {
-    const url = new URL(`${SUPABASE_URL}/rest/v1/articulos`);
-
-    if (path === "/repuestos" || path.startsWith("/repuestos?")) {
-        const query = new URLSearchParams(path.split("?")[1] || "");
-        url.searchParams.set("select", "*");
-        url.searchParams.set("order", "codigo.asc");
-
-        const subrubro = query.get("subrubro");
-        const marca = query.get("marca");
-        const filtro = query.get("filtro");
-
-        if (subrubro) url.searchParams.set("subrubro", `eq.${subrubro}`);
-        if (marca) url.searchParams.set("marca", `eq.${marca}`);
-        if (filtro) {
-            const filtroTerm = `*${filtro}*`;
-            url.searchParams.set(
-                "or",
-                `(codigo.ilike.${filtroTerm},descripcion.ilike.${filtroTerm},marca.ilike.${filtroTerm},rubro.ilike.${filtroTerm},subrubro.ilike.${filtroTerm},ubicacion.ilike.${filtroTerm})`
-            );
-        }
-        return url.toString();
-    }
-
-    if (path.startsWith("/repuestos/")) {
-        const id = path.slice("/repuestos/".length);
-        url.searchParams.set("id_articulo", `eq.${id}`);
-        if (method === "GET") url.searchParams.set("select", "*");
-        return url.toString();
-    }
-
-    return `${SUPABASE_URL}/rest/v1${path}`;
-}
-
-async function apiRequest(path, options = {}) {
-    const method = (options.method || "GET").toUpperCase();
-    const headers = {
-        "Content-Type": "application/json",
-        apikey: SUPABASE_KEY,
-        Authorization: `Bearer ${SUPABASE_KEY}`,
-    };
-
-    if (method === "POST" || method === "PATCH") {
-        headers.Prefer = "return=representation";
-    }
-
-    const response = await fetch(buildSupabaseUrl(path, method), {
-        method,
-        headers,
-        body: options.body,
-    });
-
-    const text = await response.text();
-    const data = text ? JSON.parse(text) : null;
-
-    if (!response.ok) {
-        const errorMessage = data?.message || data?.error_description || data?.error || response.statusText || "Error de red";
-        throw new Error(errorMessage);
-    }
-
-    return data;
-}
-
-function buildQuery(params) {
-    const query = new URLSearchParams();
-    Object.entries(params).forEach(([key, value]) => {
-        if (value !== undefined && value !== null && String(value).trim() !== "") {
-            query.append(key, String(value).trim());
-        }
-    });
-    return query.toString() ? `?${query.toString()}` : "";
-}
 
 const cerrarForm = document.getElementById("cerrarForm");
 const formRepuesto = document.getElementById("formRepuesto");
@@ -104,12 +34,20 @@ async function cargarRepuestos() {
     const _subrubro = document.getElementById("filtroSubrubro")?.value;
     const marcaSel = document.getElementById("filtroMarca")?.value; // 🆕 nuevo
 
-    const queryString = buildQuery({ filtro, subrubro: _subrubro, marca: marcaSel });
-    let data;
-    try {
-        data = await apiRequest(`/repuestos${queryString}`);
-    } catch (err) {
-        console.error(err);
+    let query = supabase
+        .from("articulos")
+        .select("*")
+        .order("codigo", { ascending: true });
+
+    if (filtro) {
+        query = query.or(`codigo.ilike.%${filtro}%,descripcion.ilike.%${filtro}%,marca.ilike.%${filtro}%,rubro.ilike.%${filtro}%,subrubro.ilike.%${filtro}%,ubicacion.ilike.%${filtro}%`);
+    }
+    if (_subrubro) query = query.eq("subrubro", _subrubro);
+    if (marcaSel) query = query.eq("marca", marcaSel);
+
+    const { data, error } = await query;
+    if (error) {
+        console.error(error);
         cuerpoTabla.innerHTML = "<tr><td colspan='9'>Error cargando repuestos</td></tr>";
         indicadorStock.textContent = "Error de carga";
         return;
@@ -170,12 +108,16 @@ async function cargarRepuestos() {
     });
 
     document.querySelectorAll(".btn-editar").forEach(btn =>
-        btn.addEventListener("click", e => editarRepuesto(e.target.dataset.id))
+        btn.addEventListener("click", e => {
+            const id = e.currentTarget.dataset.id;
+            if (!id) return;
+            editarRepuesto(id);
+        })
     );
 
     document.querySelectorAll(".btn-ver-imagen").forEach(btn =>
         btn.addEventListener("click", async e => {
-            const id = e.target.dataset.id;
+            const id = e.currentTarget.dataset.id;
             if (id) {
                 await mostrarImagenById(id);
             }
@@ -184,7 +126,7 @@ async function cargarRepuestos() {
 
     document.querySelectorAll(".miniatura-repuesto").forEach(img =>
         img.addEventListener("click", async e => {
-            const id = e.currentTarget.dataset.id || e.target.dataset.id;
+            const id = e.currentTarget.dataset.id;
             if (id) {
                 await mostrarImagenById(id);
             }
@@ -258,11 +200,15 @@ function abrirFormulario() {
 
 // Editar Repuesto
 async function editarRepuesto(id) {
-    let data;
-    try {
-        data = await apiRequest(`/repuestos/${id}`);
-    } catch (err) {
-        console.error(err);
+    const { data, error } = await supabase
+        .from("articulos")
+        .select("*")
+        .eq("id_articulo", id)
+        .single();
+
+    if (error) {
+        console.error(error);
+        mostrarAlerta("Error cargando repuesto para editar", "error");
         return;
     }
 
@@ -326,15 +272,16 @@ formRepuesto.addEventListener("submit", async (e) => {
 
     try {
         if (editId) {
-            await apiRequest(`/repuestos/${editId}`, {
-                method: "PUT",
-                body: JSON.stringify(repuesto)
-            });
+            const { error } = await supabase
+                .from("articulos")
+                .update(repuesto)
+                .eq("id_articulo", editId);
+            if (error) throw error;
         } else {
-            await apiRequest(`/repuestos`, {
-                method: "POST",
-                body: JSON.stringify(repuesto)
-            });
+            const { error } = await supabase
+                .from("articulos")
+                .insert([repuesto]);
+            if (error) throw error;
         }
     } catch (err) {
         mostrarAlerta("Error al guardar: " + err.message, "error");
@@ -400,11 +347,14 @@ function mostrarImagenWithData(item) {
 async function mostrarImagenById(id) {
     if (!id) return mostrarAlerta('ID inválido', 'error');
 
-    let data;
-    try {
-        data = await apiRequest(`/repuestos/${id}`);
-    } catch (err) {
-        console.error('Error obteniendo repuesto:', err);
+    const { data, error } = await supabase
+        .from("articulos")
+        .select("*")
+        .eq("id_articulo", id)
+        .single();
+
+    if (error) {
+        console.error('Error obteniendo repuesto:', error);
         mostrarAlerta('Error obteniendo datos del repuesto', 'error');
         return;
     }
@@ -423,23 +373,25 @@ let dragStartY = 0;
 export async function actualizarStock(id_articulo, cantidad) {
     if (!id_articulo || !cantidad) return;
 
-    // Obtener stock actual
-    let data;
-    try {
-        data = await apiRequest(`/repuestos/${id_articulo}`);
-    } catch (err) {
-        console.error('Error obteniendo stock:', err);
+    const { data, error } = await supabase
+        .from("articulos")
+        .select("stock_actual")
+        .eq("id_articulo", id_articulo)
+        .single();
+
+    if (error) {
+        console.error('Error obteniendo stock:', error);
         return;
     }
 
     const nuevoStock = Math.max(0, (data?.stock_actual || 0) - cantidad);
-    try {
-        await apiRequest(`/repuestos/${id_articulo}`, {
-            method: "PUT",
-            body: JSON.stringify({ stock_actual: nuevoStock })
-        });
-    } catch (err) {
-        console.error('Error actualizando stock:', err);
+    const { error: updateError } = await supabase
+        .from("articulos")
+        .update({ stock_actual: nuevoStock })
+        .eq("id_articulo", id_articulo);
+
+    if (updateError) {
+        console.error('Error actualizando stock:', updateError);
         return;
     }
 
@@ -448,11 +400,14 @@ export async function actualizarStock(id_articulo, cantidad) {
 
 // --- Cargar Subrubros (únicos desde articulos)
 async function cargarSubrubrosFiltro() {
-    let data;
-    try {
-        data = await apiRequest(`/repuestos`);
-    } catch (err) {
-        console.error(err);
+    const { data, error } = await supabase
+        .from("articulos")
+        .select("subrubro")
+        .not("subrubro", "is", null)
+        .order("subrubro", { ascending: true });
+
+    if (error) {
+        console.error(error);
         return;
     }
 
@@ -478,11 +433,14 @@ async function cargarSubrubrosFiltro() {
 
 // --- Cargar Marcas (únicas desde repuestos)
 async function cargarMarcas() {
-    let data;
-    try {
-        data = await apiRequest(`/repuestos`);
-    } catch (err) {
-        console.error(err);
+    const { data, error } = await supabase
+        .from("articulos")
+        .select("marca")
+        .not("marca", "is", null)
+        .order("marca", { ascending: true });
+
+    if (error) {
+        console.error(error);
         return;
     }
 
@@ -500,11 +458,12 @@ async function cargarSugerenciasImagenes() {
     const inputImagen = document.getElementById("imagen_url2");
     if (!inputImagen) return;
 
-    let data;
-    try {
-        data = await apiRequest(`/repuestos`);
-    } catch (err) {
-        console.error("No se pudieron cargar URLs desde los repuestos:", err);
+    const { data, error } = await supabase
+        .from("articulos")
+        .select("imagen_url2");
+
+    if (error) {
+        console.error("No se pudieron cargar URLs desde los repuestos:", error);
         return;
     }
 
@@ -569,8 +528,14 @@ function nombreArchivo() {
 async function exportarPDF() {
     try {
         const subrubroSeleccionado = document.getElementById("filtroSubrubro").value;
-        const queryString = buildQuery({ subrubro: subrubroSeleccionado });
-        const data = await apiRequest(`/repuestos${queryString}`);
+        let query = supabase.from("articulos").select("*");
+        if (subrubroSeleccionado !== "") query = query.eq("subrubro", subrubroSeleccionado);
+        const { data, error } = await query;
+
+        if (error) {
+            mostrarAlerta("❌ Error obteniendo datos: " + error.message, "error");
+            return;
+        }
 
         if (!data || data.length === 0) {
             mostrarAlerta("ℹ️ No hay repuestos para exportar", "info");
@@ -645,7 +610,12 @@ async function exportarPDF() {
 // ------------------------------
 async function exportarExcel() {
     try {
-        const data = await apiRequest(`/repuestos`);
+        const { data, error } = await supabase.from("articulos").select("*");
+
+        if (error) {
+            mostrarAlerta("❌ Error obteniendo datos: " + error.message, "error");
+            return;
+        }
 
         if (!data || data.length === 0) {
             mostrarAlerta("ℹ️ No hay repuestos para exportar", "info");
@@ -805,11 +775,13 @@ function crearDropdown(input, dropdown, toggle, lista) {
 }
 
 async function cargarValoresUnicos(campo) {
-    let data;
-    try {
-        data = await apiRequest(`/repuestos`);
-    } catch (err) {
-        console.error(err);
+    const { data, error } = await supabase
+        .from("articulos")
+        .select(campo)
+        .not(campo, "is", null);
+
+    if (error) {
+        console.error(error);
         return [];
     }
 
@@ -948,15 +920,17 @@ document.addEventListener("DOMContentLoaded", async () => {
         if (!editId) return;
         if (!confirm("¿Desea eliminar este repuesto?")) return;
 
-        try {
-            await apiRequest(`/repuestos/${editId}`, {
-                method: "DELETE"
-            });
-            mostrarAlerta("Repuesto eliminado correctamente");
+        const { error } = await supabase
+            .from("articulos")
+            .delete()
+            .eq("id_articulo", editId);
+
+        if (error) {
+            mostrarAlerta("Error al eliminar: " + error.message, "error");
+        } else {
+            mostrarAlerta("Repuesto eliminado correctamente", "ok");
             modalForm.style.display = "none";
             cargarRepuestos();
-        } catch (err) {
-            mostrarAlerta("Error al eliminar: " + err.message, "error");
         }
     });
 });
