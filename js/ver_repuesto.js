@@ -1,10 +1,36 @@
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
-
-const supabaseUrl = 'https://ovfsffckhzelgbgohakv.supabase.co';
-const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im92ZnNmZmNraHplbGdiZ29oYWt2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjA2NTA0MjYsImV4cCI6MjA3NjIyNjQyNn0.hDiIhAHAr04Uo9todWdk0QUaqD3RYj5kMkITavzPiHc';
-const supabase = createClient(supabaseUrl, supabaseKey);
+const API_BASE = "http://localhost:4000/api";
 
 const modalForm = document.getElementById("modalForm");
+
+async function apiRequest(path, options = {}) {
+    const response = await fetch(`${API_BASE}${path}`, {
+        headers: {
+            "Content-Type": "application/json",
+        },
+        ...options,
+    });
+
+    const text = await response.text();
+    const data = text ? JSON.parse(text) : null;
+
+    if (!response.ok) {
+        const errorMessage = data?.error || response.statusText || "Error de red";
+        throw new Error(errorMessage);
+    }
+
+    return data;
+}
+
+function buildQuery(params) {
+    const query = new URLSearchParams();
+    Object.entries(params).forEach(([key, value]) => {
+        if (value !== undefined && value !== null && String(value).trim() !== "") {
+            query.append(key, String(value).trim());
+        }
+    });
+    return query.toString() ? `?${query.toString()}` : "";
+}
+
 const cerrarForm = document.getElementById("cerrarForm");
 const formRepuesto = document.getElementById("formRepuesto");
 const tituloForm = document.getElementById("tituloForm");
@@ -33,17 +59,16 @@ async function cargarRepuestos() {
     const _subrubro = document.getElementById("filtroSubrubro")?.value;
     const marcaSel = document.getElementById("filtroMarca")?.value; // 🆕 nuevo
 
-    let query = supabase
-        .from("articulos")
-        .select("*")
-        .order("codigo", { ascending: true });
-
-    if (filtro) query = query.or(`codigo.ilike.%${filtro}%,descripcion.ilike.%${filtro}%,marca.ilike.%${filtro}%,rubro.ilike.%${filtro}%,subrubro.ilike.%${filtro}%,ubicacion.ilike.%${filtro}%`);
-    if (_subrubro) query = query.eq("subrubro", _subrubro);
-    if (marcaSel) query = query.eq("marca", marcaSel); // 🆕 nuevo
-
-    const { data, error } = await query;
-    if (error) return console.error(error);
+    const queryString = buildQuery({ filtro, subrubro: _subrubro, marca: marcaSel });
+    let data;
+    try {
+        data = await apiRequest(`/repuestos${queryString}`);
+    } catch (err) {
+        console.error(err);
+        cuerpoTabla.innerHTML = "<tr><td colspan='9'>Error cargando repuestos</td></tr>";
+        indicadorStock.textContent = "Error de carga";
+        return;
+    }
 
     cuerpoTabla.innerHTML = "";
     if (!data.length) {
@@ -188,8 +213,13 @@ function abrirFormulario() {
 
 // Editar Repuesto
 async function editarRepuesto(id) {
-    const { data, error } = await supabase.from("articulos").select("*").eq("id_articulo", id).single();
-    if (error) return console.error(error);
+    let data;
+    try {
+        data = await apiRequest(`/repuestos/${id}`);
+    } catch (err) {
+        console.error(err);
+        return;
+    }
 
     editId = id;
     tituloForm.textContent = "Editar Repuesto";
@@ -249,26 +279,21 @@ formRepuesto.addEventListener("submit", async (e) => {
         repuesto.fecha_actualizacion = new Date().toISOString().split("T")[0];
     }
 
-    if (editId) {
-        const { error } = await supabase
-            .from("articulos")
-            .update(repuesto)
-            .eq("id_articulo", editId);
-
-        if (error) {
-            mostrarAlerta("Error al actualizar: " + error.message, "error");
-            return;
+    try {
+        if (editId) {
+            await apiRequest(`/repuestos/${editId}`, {
+                method: "PUT",
+                body: JSON.stringify(repuesto)
+            });
+        } else {
+            await apiRequest(`/repuestos`, {
+                method: "POST",
+                body: JSON.stringify(repuesto)
+            });
         }
-
-    } else {
-        const { error } = await supabase
-            .from("articulos")
-            .insert([repuesto]);
-
-        if (error) {
-            mostrarAlerta("YA EXISTE EL CODIGO Y MARCA", "error");
-            return;
-        }
+    } catch (err) {
+        mostrarAlerta("Error al guardar: " + err.message, "error");
+        return;
     }
 
     mostrarAlerta("Repuesto guardado correctamente");
@@ -330,9 +355,11 @@ function mostrarImagenWithData(item) {
 async function mostrarImagenById(id) {
     if (!id) return mostrarAlerta('ID inválido', 'error');
 
-    const { data, error } = await supabase.from('articulos').select('*').eq('id_articulo', id).single();
-    if (error) {
-        console.error('Error obteniendo repuesto:', error);
+    let data;
+    try {
+        data = await apiRequest(`/repuestos/${id}`);
+    } catch (err) {
+        console.error('Error obteniendo repuesto:', err);
         mostrarAlerta('Error obteniendo datos del repuesto', 'error');
         return;
     }
@@ -350,42 +377,37 @@ let dragStartY = 0;
 // Actualizar stock automáticamente desde ventas
 export async function actualizarStock(id_articulo, cantidad) {
     if (!id_articulo || !cantidad) return;
-    
+
     // Obtener stock actual
-    const { data, error: fetchError } = await supabase.from('articulos')
-        .select('stock_actual')
-        .eq('id_articulo', id_articulo)
-        .single();
-    
-    if (fetchError) {
-        console.error('Error obteniendo stock:', fetchError);
+    let data;
+    try {
+        data = await apiRequest(`/repuestos/${id_articulo}`);
+    } catch (err) {
+        console.error('Error obteniendo stock:', err);
         return;
     }
-    
-    // Actualizar con el nuevo valor
+
     const nuevoStock = Math.max(0, (data?.stock_actual || 0) - cantidad);
-    const { error } = await supabase.from('articulos')
-        .update({ stock_actual: nuevoStock })
-        .eq('id_articulo', id_articulo);
-    
-    if (error) {
-        console.error('Error actualizando stock:', error);
+    try {
+        await apiRequest(`/repuestos/${id_articulo}`, {
+            method: "PUT",
+            body: JSON.stringify({ stock_actual: nuevoStock })
+        });
+    } catch (err) {
+        console.error('Error actualizando stock:', err);
         return;
     }
-    
+
     cargarRepuestos(); // refresca tabla
 }
 
 // --- Cargar Subrubros (únicos desde articulos)
 async function cargarSubrubrosFiltro() {
-    const { data, error } = await supabase
-        .from("articulos")
-        .select("subrubro")
-        .not("subrubro", "is", null)
-        .order("subrubro", { ascending: true });
-
-    if (error) {
-        console.error(error);
+    let data;
+    try {
+        data = await apiRequest(`/repuestos`);
+    } catch (err) {
+        console.error(err);
         return;
     }
 
@@ -411,16 +433,15 @@ async function cargarSubrubrosFiltro() {
 
 // --- Cargar Marcas (únicas desde repuestos)
 async function cargarMarcas() {
-    const { data, error } = await supabase
-        .from("articulos")
-        .select("marca")
-        .not("marca", "is", null)
-        .order("marca", { ascending: true });
+    let data;
+    try {
+        data = await apiRequest(`/repuestos`);
+    } catch (err) {
+        console.error(err);
+        return;
+    }
 
-    if (error) return console.error(error);
-
-    // Obtener valores únicos
-    const marcasUnicas = [...new Set(data.map(r => r.marca.trim()).filter(m => m))].sort();
+    const marcasUnicas = [...new Set(data.map(r => r.marca?.trim()).filter(Boolean))].sort();
 
     const filtroMarca = document.getElementById("filtroMarca");
     filtroMarca.innerHTML = `<option value="">Todas las marcas</option>` +
@@ -434,37 +455,19 @@ async function cargarSugerenciasImagenes() {
     const inputImagen = document.getElementById("imagen_url2");
     if (!inputImagen) return;
 
-    const urls = new Set();
-
+    let data;
     try {
-        const { data, error } = await supabase.from("articulos").select("imagen_url2");
-        if (!error && data) {
-            data.forEach(item => {
-                const imagenes = parseImagenes(item?.imagen_url2);
-                imagenes.forEach(url => urls.add(url));
-            });
-        }
+        data = await apiRequest(`/repuestos`);
     } catch (err) {
         console.error("No se pudieron cargar URLs desde los repuestos:", err);
+        return;
     }
 
-    const buckets = ["imagenes", "repuestos", "images", "storage", "public"];
-
-    for (const bucket of buckets) {
-        try {
-            const { data: files, error } = await supabase.storage.from(bucket).list("", { limit: 100 });
-            if (error || !files?.length) continue;
-
-            for (const file of files) {
-                if (!file?.name) continue;
-                const { data: publicData } = supabase.storage.from(bucket).getPublicUrl(file.name);
-                const url = publicData?.publicUrl;
-                if (url) urls.add(url);
-            }
-        } catch (err) {
-            // Ignorar buckets que no existan o no sean accesibles
-        }
-    }
+    const urls = new Set();
+    data.forEach(item => {
+        const imagenes = parseImagenes(item?.imagen_url2);
+        imagenes.forEach(url => urls.add(url));
+    });
 
     const opciones = [...urls]
         .filter(Boolean)
@@ -521,21 +524,8 @@ function nombreArchivo() {
 async function exportarPDF() {
     try {
         const subrubroSeleccionado = document.getElementById("filtroSubrubro").value;
-
-        let query = supabase
-            .from("articulos")
-            .select("*");
-
-        if (subrubroSeleccionado !== "") {
-            query = query.eq("subrubro", subrubroSeleccionado);
-        }
-
-        const { data, error } = await query;
-
-        if (error) {
-            mostrarAlerta("❌ Error obteniendo datos: " + error.message, "error");
-            return;
-        }
+        const queryString = buildQuery({ subrubro: subrubroSeleccionado });
+        const data = await apiRequest(`/repuestos${queryString}`);
 
         if (!data || data.length === 0) {
             mostrarAlerta("ℹ️ No hay repuestos para exportar", "info");
@@ -610,14 +600,7 @@ async function exportarPDF() {
 // ------------------------------
 async function exportarExcel() {
     try {
-        const { data, error } = await supabase
-            .from("articulos")
-            .select("*");
-
-        if (error) {
-            mostrarAlerta("❌ Error obteniendo datos: " + error.message, "error");
-            return;
-        }
+        const data = await apiRequest(`/repuestos`);
 
         if (!data || data.length === 0) {
             mostrarAlerta("ℹ️ No hay repuestos para exportar", "info");
@@ -777,13 +760,11 @@ function crearDropdown(input, dropdown, toggle, lista) {
 }
 
 async function cargarValoresUnicos(campo) {
-    const { data, error } = await supabase
-        .from("articulos")
-        .select(campo)
-        .not(campo, "is", null);
-
-    if (error) {
-        console.error(error);
+    let data;
+    try {
+        data = await apiRequest(`/repuestos`);
+    } catch (err) {
+        console.error(err);
         return [];
     }
 
@@ -922,12 +903,15 @@ document.addEventListener("DOMContentLoaded", async () => {
         if (!editId) return;
         if (!confirm("¿Desea eliminar este repuesto?")) return;
 
-        const { error } = await supabase.from("articulos").delete().eq("id_articulo", editId);
-        if (error) mostrarAlerta("Error al eliminar: " + error.message);
-        else {
+        try {
+            await apiRequest(`/repuestos/${editId}`, {
+                method: "DELETE"
+            });
             mostrarAlerta("Repuesto eliminado correctamente");
             modalForm.style.display = "none";
             cargarRepuestos();
+        } catch (err) {
+            mostrarAlerta("Error al eliminar: " + err.message, "error");
         }
     });
 });
