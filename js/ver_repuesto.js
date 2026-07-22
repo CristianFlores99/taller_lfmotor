@@ -1,4 +1,6 @@
-const API_BASE = "https://mi-backend.lfmotor.com/api";
+const API_BASE = window.location.hostname === "cristianflores99.github.io"
+    ? "https://mi-backend.lfmotor.com/api"
+    : "http://localhost:4000/api";
 
 const modalForm = document.getElementById("modalForm");
 
